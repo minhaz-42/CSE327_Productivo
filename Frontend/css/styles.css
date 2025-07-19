@@ -1,0 +1,327 @@
+/* Base Styles */
+:root {
+  --primary: #5D4037; /* Coffee brown */
+  --primary-light: #8D6E63; /* Lighter coffee */
+  --secondary: #FF8A65; /* Deep orange accent */
+  --success: #81C784; /* Soft green */
+  --warning: #FFB74D; /* Soft orange */
+  --danger: #E57373; /* Soft red */
+  --info: #64B5F6; /* Soft blue */
+  --light: #F5F5F5; /* Light gray */
+  --dark: #263238; /* Charcoal dark */
+  --gray: #757575; /* Medium gray */
+  --white: #FFFFFF; /* Pure white */
+}
+
+/* Light Theme (Default) */
+body {
+  --body-bg: #fcfdff; /* Warm beige background */
+  --text-color: #3E2723; /* Dark coffee brown */
+  --card-bg: #fdfeff; /* White cards */
+  --input-bg: #f4f4f4; /* Light creamy input fields */
+  --border-color: #5c392c; /* Light coffee border */
+  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: var(--body-bg);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dark Theme */
+body.dark-theme {
+  --body-bg: #fffbfb; /* Deep charcoal */
+  --text-color: #ECE0DB; /* Warm soft beige */
+  --card-bg: #2E2E2E; /* Dark slate */
+  --input-bg: #3A3A3A; /* Slightly lighter slate */
+  --border-color: #4B4B4B; /* Medium dark border */
+}
+
+/* Layout */
+.app {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.header {
+  grid-area: header;
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background-color: #dbdee4; /* Slightly deeper coffee brown */
+  color: #1d1c1c; /* Soft beige text */
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow-y: auto;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--primary);
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+}
+
+
+.main-content {
+  grid-area: main;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: var(--body-bg);
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+/* Dashboard Specific Styles */
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--light);
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: block;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-light);
+}
+
+/* Task Items */
+.task-item {
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid var(--primary);
+}
+
+.task-item.completed {
+  opacity: 0.75;
+  border-left-color: var(--success);
+  background-color: #E8F5E9; /* Very light green bg */
+}
+
+.task-item.overdue {
+  border-left-color: var(--danger);
+  background-color: #FFEBEE; /* Soft red bg */
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.task-header h4 {
+  color: var(--text-color);
+  margin: 0;
+}
+
+.priority-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+}
+
+.priority-badge.high {
+  background-color: var(--danger);
+}
+
+.priority-badge.medium {
+  background-color: var(--warning);
+  color: var(--dark);
+}
+
+.priority-badge.low {
+  background-color: var(--info);
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  background-color: var(--light);
+  border: 1px solid var(--border-color);
+}
+
+.action-btn.completed {
+  background-color: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.action-btn.delete {
+  background-color: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app {
+    grid-template-areas:
+      "header"
+      "main";
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 250px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+  
+  .sidebar.open {
+    left: 0;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    width: 100%;
+  }
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.empty-message {
+  color: var(--gray);
+  text-align: center;
+  padding: 1rem;
+}

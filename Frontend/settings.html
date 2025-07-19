@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings | Intelligent Task Planner</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="light-theme">
+  <div class="app">
+    <header class="header">
+      <h1 class="app-title">Settings</h1>
+    </header>
+    <main class="main-content">
+      <div class="dashboard-card card">
+        <h2>User Preferences</h2>
+        <form>
+          <div class="form-group">
+            <label for="default-priority">Default Priority</label>
+            <select id="default-priority">
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="notification-toggle">Enable Notifications</label>
+            <input type="checkbox" id="notification-toggle" checked />
+          </div>
+          <div class="form-group">
+            <label for="ai-toggle">Use AI for Scheduling</label>
+            <input type="checkbox" id="ai-toggle" />
+          </div>
+          <button class="primary-btn btn">Save Settings</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
