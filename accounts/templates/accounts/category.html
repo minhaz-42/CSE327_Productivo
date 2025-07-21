@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Categories - Task Planner</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="light-theme">
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-btn" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="app-title">Intelligent Task Planner</h1>
+      </div>
+      <div class="header-right">
+        <div class="notification-wrapper">
+          <button class="notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationCount">0</span>
+          </button>
+          <div class="notification-panel hidden" id="notificationPanel">
+            <p>No new notifications.</p>
+          </div>
+        </div>
+        <div class="user-profile">
+          <div class="avatar">U</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h2>TaskPlanner</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+          <li><a href="tasks.html"><i class="fas fa-tasks"></i> Tasks</a></li>
+          <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+          <li><a href="analytics.html"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+          <li><a href="category.html" class="active"><i class="fas fa-tags"></i> Categories</a></li>
+          <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2>Categories</h2>
+      <p>Manage your task categories here.</p>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Add New Category</h3>
+          <form id="categoryForm">
+            <div class="form-group">
+              <label for="category-name">Category Name*</label>
+              <input type="text" id="category-name" required />
+            </div>
+            <div class="form-group">
+              <label for="category-color">Color</label>
+              <input type="color" id="category-color" value="#5D4037" />
+            </div>
+            <button type="submit" class="primary-btn btn">Add Category</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Existing Categories</h3>
+          <ul id="categoryList">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/category.js"></script>
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggleBtn = document.getElementById('sidebarToggle');
+
+      sidebarToggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // Display categories dynamically
+      const categoryList = document.getElementById('categoryList');
+
+      function renderCategories() {
+        const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+        categoryList.innerHTML = '';
+
+        if (categories.length === 0) {
+          categoryList.innerHTML = '<li>No categories yet.</li>';
+          return;
+        }
+
+        categories.forEach(cat => {
+          const li = document.createElement('li');
+          li.textContent = cat.name;
+          li.style.color = cat.color;
+          categoryList.appendChild(li);
+        });
+      }
+
+      // Load on page load
+      renderCategories();
+
+      // Update renderCategories after adding new category
+      document.getElementById('categoryForm').addEventListener('submit', e => {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('category-name');
+        const colorInput = document.getElementById('category-color');
+
+        const newCategory = {
+          name: nameInput.value.trim(),
+          color: colorInput.value,
+        };
+
+        if (!newCategory.name) {
+          alert('Please enter a category name.');
+          return;
+        }
+
+        const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+        categories.push(newCategory);
+        localStorage.setItem('categories', JSON.stringify(categories));
+
+        nameInput.value = '';
+        colorInput.value = '#5D4037';
+
+        renderCategories();
+      });
+    </script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Task Details - Task Planner</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="light-theme">
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-btn" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="app-title">Intelligent Task Planner</h1>
+      </div>
+      <div class="header-right">
+        <div class="notification-wrapper">
+          <button class="notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationCount">0</span>
+          </button>
+          <div class="notification-panel hidden" id="notificationPanel">
+            <p>No new notifications.</p>
+          </div>
+        </div>
+        <div class="user-profile">
+          <div class="avatar">U</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h2>TaskPlanner</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+          <li><a href="tasks.html" class="active"><i class="fas fa-tasks"></i> Tasks</a></li>
+          <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+          <li><a href="analytics.html"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+          <li><a href="category.html"><i class="fas fa-tags"></i> Categories</a></li>
+          <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2>Task Details</h2>
+      <p>View and edit the details of your task here.</p>
+
+      <form id="taskDetailForm">
+        <div class="form-group">
+          <label for="taskTitle">Title*</label>
+          <input type="text" id="taskTitle" required />
+        </div>
+        <div class="form-group">
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="taskPriority">Priority*</label>
+          <select id="taskPriority" required>
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="taskDeadline">Deadline*</label>
+          <input type="datetime-local" id="taskDeadline" required />
+        </div>
+
+        <button type="submit" class="primary-btn btn">Save Task</button>
+      </form>
+    </main>
+
+    <script>
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggleBtn = document.getElementById('sidebarToggle');
+
+      sidebarToggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // For demonstration: Handle form submission
+      document.getElementById('taskDetailForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        alert('Task details saved!');
+      });
+    </script>
+  </div>
+</body>
+</html>
