@@ -360,11 +360,38 @@
       }
     }
   </style>
+<<<<<<< HEAD
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Task Planner Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    .username-availability {
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .username-available {
+      color: var(--success);
+    }
+    .username-taken {
+      color: #ef4444;
+    }
+  </style>
+>>>>>>> 29b22e0 (Made changes in html)
 </head>
 <body class="auth-body">
   <nav class="auth-nav">
     <div class="auth-nav-container">
+<<<<<<< HEAD
       <a href="{% url 'home'%}" class="back-to-home">
+=======
+      <a href="home.html" class="back-to-home">
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-chevron-left"></i>
         <span>Back to Home</span>
       </a>
@@ -377,7 +404,11 @@
   
   <div class="auth-container">
     <h1>Create Your Account</h1>
+<<<<<<< HEAD
     <form action="index.html" method="post" class="auth-form" enctype="multipart/form-data">
+=======
+    <form action="dashboard.html" method="post" class="auth-form" enctype="multipart/form-data">
+>>>>>>> 29b22e0 (Made changes in html)
       <div class="profile-section">
         <label for="profile-pic" class="profile-pic-label">
           <div class="profile-pic-preview">
@@ -389,12 +420,18 @@
       </div>
       
       <div class="form-group">
+<<<<<<< HEAD
         <label for="name">Full Name</label>
         <input type="text" id="name" required placeholder="Enter your full name" />
+=======
+        <label for="first-name">First Name*</label>
+        <input type="text" id="first-name" required placeholder="Enter your first name" />
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-user"></i>
       </div>
       
       <div class="form-group">
+<<<<<<< HEAD
         <label for="email">Email Address</label>
         <input type="email" id="email" required placeholder="your.email@example.com" />
         <i class="fas fa-envelope"></i>
@@ -403,18 +440,53 @@
       <div class="form-group">
         <label for="university">University/Institution</label>
         <input type="text" id="university" required placeholder="Where do you study/work?" />
+=======
+        <label for="last-name">Last Name*</label>
+        <input type="text" id="last-name" required placeholder="Enter your last name" />
+        <i class="fas fa-user"></i>
+      </div>
+      
+      <div class="form-group">
+        <label for="username">Username*</label>
+        <input type="text" id="username" required placeholder="Choose a unique username" minlength="4" />
+        <i class="fas fa-at"></i>
+        <div id="username-feedback" class="username-availability">
+          <i class="fas fa-check-circle"></i> <span>Username available</span>
+        </div>
+        <small class="hint">This will be your login identifier</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email Address*</label>
+        <input type="email" id="email" required placeholder="your.email@example.com" />
+        <i class="fas fa-envelope"></i>
+      </div>
+      
+      <div class="form-group">
+        <label for="university">University/Institution</label>
+        <input type="text" id="university" placeholder="Where do you study/work?" />
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-university"></i>
       </div>
       
       <div class="form-group">
         <label for="dob">Date of Birth</label>
+<<<<<<< HEAD
         <input type="date" id="dob" required />
+=======
+        <input type="date" id="dob" />
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-calendar-day"></i>
       </div>
       
       <div class="form-group">
+<<<<<<< HEAD
         <label for="password">Create Password</label>
         <input type="password" id="password" required placeholder="Minimum 8 characters" />
+=======
+        <label for="password">Create Password*</label>
+        <input type="password" id="password" required placeholder="Minimum 8 characters" minlength="8" />
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-lock"></i>
         <small class="hint">Use uppercase, lowercase, numbers, and symbols</small>
         <div class="password-strength">
@@ -426,8 +498,13 @@
       </div>
       
       <div class="form-group">
+<<<<<<< HEAD
         <label for="confirm-password">Confirm Password</label>
         <input type="password" id="confirm-password" required placeholder="Re-enter your password" />
+=======
+        <label for="confirm-password">Confirm Password*</label>
+        <input type="password" id="confirm-password" required placeholder="Re-enter your password" minlength="8" />
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-lock"></i>
       </div>
       
@@ -439,12 +516,20 @@
         </label>
       </div>
       
+<<<<<<< HEAD
       <button type="submit" class="primary-btn">
+=======
+      <button type="submit" class="primary-btn" id="register-btn">
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-user-plus"></i> Create Account
       </button>
       
       <p class="auth-switch">
+<<<<<<< HEAD
         Already have an account? <a href="{% url 'login'%}">Sign in here</a>
+=======
+        Already have an account? <a href="login.html">Sign in here</a>
+>>>>>>> 29b22e0 (Made changes in html)
       </p>
     </form>
   </div>
@@ -488,6 +573,91 @@
         }
       });
     });
+<<<<<<< HEAD
+=======
+
+    // Username availability check
+    const usernameInput = document.getElementById('username');
+    const usernameFeedback = document.getElementById('username-feedback');
+    const registerBtn = document.getElementById('register-btn');
+    
+    // Mock function to simulate username check (replace with actual API call)
+    function checkUsernameAvailability(username) {
+      // In a real app, this would be an API call to your backend
+      const takenUsernames = ['admin', 'user', 'test', 'demo'];
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(!takenUsernames.includes(username.toLowerCase()));
+        }, 500);
+      });
+    }
+    
+    usernameInput.addEventListener('blur', async function() {
+      const username = this.value.trim();
+      if (username.length >= 4) {
+        const isAvailable = await checkUsernameAvailability(username);
+        usernameFeedback.style.display = 'block';
+        if (isAvailable) {
+          usernameFeedback.className = 'username-availability username-available';
+          usernameFeedback.innerHTML = '<i class="fas fa-check-circle"></i> <span>Username available</span>';
+        } else {
+          usernameFeedback.className = 'username-availability username-taken';
+          usernameFeedback.innerHTML = '<i class="fas fa-times-circle"></i> <span>Username already taken</span>';
+        }
+      } else {
+        usernameFeedback.style.display = 'none';
+      }
+    });
+
+    // Form validation
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get all form values
+      const formData = {
+        firstName: document.getElementById('first-name').value,
+        lastName: document.getElementById('last-name').value,
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        university: document.getElementById('university').value,
+        dob: document.getElementById('dob').value,
+        password: document.getElementById('password').value,
+        confirmPassword: document.getElementById('confirm-password').value,
+        profilePic: document.getElementById('profile-pic').files[0]
+      };
+      
+      // Basic validation
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      // In a real app, you would send this data to your backend
+      console.log('Registration data:', formData);
+      
+      // Redirect after successful registration
+      window.location.href = 'dashboard.html';
+    });
+    
+    // Ensure all links work properly
+    document.querySelector('.back-to-home').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'home.html';
+    });
+
+    document.querySelector('.auth-switch a').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'login.html';
+    });
+
+    document.querySelectorAll('.terms-group a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        // You can add modal or page navigation for terms/privacy here
+        console.log('Terms/Privacy link clicked');
+      });
+    });
+>>>>>>> 29b22e0 (Made changes in html)
   </script>
 </body>
 </html>

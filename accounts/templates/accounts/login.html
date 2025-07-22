@@ -174,6 +174,26 @@
       color: var(--primary-color);
       text-decoration: underline;
     }
+<<<<<<< HEAD
+=======
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .remember-me input {
+      width: auto;
+    }
+    
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+>>>>>>> 29b22e0 (Made changes in html)
     
     @media (max-width: 600px) {
       .auth-container {
@@ -194,7 +214,11 @@
 <body class="auth-body">
   <nav class="auth-nav">
     <div class="auth-nav-container">
+<<<<<<< HEAD
       <a href="{% url 'home'%}" class="back-to-home">
+=======
+      <a href="home.html" class="back-to-home">
+>>>>>>> 29b22e0 (Made changes in html)
         <i class="fas fa-chevron-left"></i>
         <span>Home</span>
       </a>
@@ -206,11 +230,17 @@
   
   <div class="auth-container">
     <h1>Login to Task Planner</h1>
-    <form action="index.html" method="post" class="auth-form">
+    <form action="dashboard.html" method="post" class="auth-form">
       <div class="form-group">
+<<<<<<< HEAD
         <label for="email">Email*</label>
         <input type="email" id="email" required placeholder="your.email@example.com" />
         <i class="fas fa-envelope"></i>
+=======
+        <label for="username">Username*</label>
+        <input type="text" id="username" required placeholder="Enter your username" />
+        <i class="fas fa-user"></i>
+>>>>>>> 29b22e0 (Made changes in html)
       </div>
       
       <div class="form-group">
@@ -219,16 +249,69 @@
         <i class="fas fa-lock"></i>
       </div>
       
+<<<<<<< HEAD
       <div class="forgot-password">
         <a href="forgot-password.html">Forgot password?</a>
+=======
+      <div class="form-footer">
+        <div class="remember-me">
+          <input type="checkbox" id="remember" />
+          <label for="remember">Remember me</label>
+        </div>
+        <div class="forgot-password">
+          <a href="forgot-password.html">Forgot password?</a>
+        </div>
+>>>>>>> 29b22e0 (Made changes in html)
       </div>
       
       <button type="submit" class="primary-btn">Login</button>
       
       <p class="auth-switch">
-        Don't have an account? <a href="{% url 'registration'%}">Register here</a>
+        Don't have an account? <a href="register.html">Register here</a>
       </p>
     </form>
   </div>
+
+  <script>
+    // Form submission handling
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('remember').checked;
+      
+      // In a real application, you would send this data to your server
+      console.log('Login attempt:', { username, password, rememberMe });
+      
+      // For demo purposes, redirect to dashboard
+      window.location.href = 'dashboard.html';
+    });
+    
+    // Ensure all links work properly
+    document.querySelector('.back-to-home').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'home.html';
+    });
+
+    document.querySelector('.auth-switch a').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'register.html';
+    });
+
+    document.querySelector('.forgot-password a').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'forgot-password.html';
+    });
+
+    // Check for remembered credentials
+    document.addEventListener('DOMContentLoaded', function() {
+      const rememberedUsername = localStorage.getItem('rememberedUsername');
+      if (rememberedUsername) {
+        document.getElementById('username').value = rememberedUsername;
+        document.getElementById('remember').checked = true;
+      }
+    });
+  </script>
 </body>
 </html>
