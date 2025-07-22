@@ -384,7 +384,7 @@
 <body class="auth-body">
   <nav class="auth-nav">
     <div class="auth-nav-container">
-      <a href="home.html" class="back-to-home">
+      <a href="{% url 'home' %}" class="back-to-home">
         <i class="fas fa-chevron-left"></i>
         <span>Back to Home</span>
       </a>
@@ -397,32 +397,33 @@
   
   <div class="auth-container">
     <h1>Create Your Account</h1>
-    <form action="dashboard.html" method="post" class="auth-form" enctype="multipart/form-data">
+    <form action="{% url 'registration' %}" method="post" class="auth-form" enctype="multipart/form-data">
+       {% csrf_token %}
       <div class="profile-section">
         <label for="profile-pic" class="profile-pic-label">
           <div class="profile-pic-preview">
             <i class="fas fa-user-circle default-avatar"></i>
             <span>Profile Photo</span>
           </div>
-          <input type="file" id="profile-pic" accept="image/*" style="display: none;" />
+          <input type="file" id="profile-pic" name="profile-pic" accept="image/*" style="display: none;" />
         </label>
       </div>
       
       <div class="form-group">
         <label for="first-name">First Name*</label>
-        <input type="text" id="first-name" required placeholder="Enter your first name" />
+        <input type="text" id="first-name" name="first-name" required placeholder="Enter your first name" />
         <i class="fas fa-user"></i>
       </div>
       
       <div class="form-group">
         <label for="last-name">Last Name*</label>
-        <input type="text" id="last-name" required placeholder="Enter your last name" />
+        <input type="text" id="last-name" name ="last-name" required placeholder="Enter your last name" />
         <i class="fas fa-user"></i>
       </div>
       
       <div class="form-group">
         <label for="username">Username*</label>
-        <input type="text" id="username" required placeholder="Choose a unique username" minlength="4" />
+        <input type="text" id="username" name="username" required placeholder="Choose a unique username" minlength="4" />
         <i class="fas fa-at"></i>
         <div id="username-feedback" class="username-availability">
           <i class="fas fa-check-circle"></i> <span>Username available</span>
@@ -432,25 +433,25 @@
       
       <div class="form-group">
         <label for="email">Email Address*</label>
-        <input type="email" id="email" required placeholder="your.email@example.com" />
+        <input type="email" id="email" name="email" required placeholder="your.email@example.com" />
         <i class="fas fa-envelope"></i>
       </div>
       
       <div class="form-group">
         <label for="university">University/Institution</label>
-        <input type="text" id="university" placeholder="Where do you study/work?" />
+        <input type="text" id="university" name="university" placeholder="Where do you study/work?" />
         <i class="fas fa-university"></i>
       </div>
       
       <div class="form-group">
         <label for="dob">Date of Birth</label>
-        <input type="date" id="dob" />
+        <input type="date" id="dob" name ="dob" />
         <i class="fas fa-calendar-day"></i>
       </div>
       
       <div class="form-group">
         <label for="password">Create Password*</label>
-        <input type="password" id="password" required placeholder="Minimum 8 characters" minlength="8" />
+        <input type="password" id="password" name="password" required placeholder="Minimum 8 characters" minlength="8" />
         <i class="fas fa-lock"></i>
         <small class="hint">Use uppercase, lowercase, numbers, and symbols</small>
         <div class="password-strength">
@@ -480,7 +481,7 @@
       </button>
       
       <p class="auth-switch">
-        Already have an account? <a href="login.html">Sign in here</a>
+        Already have an account? <a href="{% url 'login' %}">Sign in here</a>
       </p>
     </form>
   </div>
@@ -559,6 +560,7 @@
     });
 
     // Form validation
+    /*
     document.querySelector('.auth-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -605,7 +607,19 @@
         // You can add modal or page navigation for terms/privacy here
         console.log('Terms/Privacy link clicked');
       });
-    });
+    });*/
   </script>
+    {% if success %}
+  <script>
+    alert("{{ success }}");
+    window.location.href = "{% url 'login' %}";
+  </script>
+    {% endif %}
+
+    {% if error %}
+  <script>
+    alert("{{ error }}");
+  </script>
+    {% endif %}
 </body>
 </html>
