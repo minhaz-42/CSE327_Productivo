@@ -364,7 +364,7 @@
 <body class="auth-body">
   <nav class="auth-nav">
     <div class="auth-nav-container">
-      <a href="home.html" class="back-to-home">
+      <a href="{% url 'home'%}" class="back-to-home">
         <i class="fas fa-chevron-left"></i>
         <span>Back to Home</span>
       </a>
@@ -444,7 +444,7 @@
       </button>
       
       <p class="auth-switch">
-        Already have an account? <a href="login.html">Sign in here</a>
+        Already have an account? <a href="{% url 'login'%}">Sign in here</a>
       </p>
     </form>
   </div>
