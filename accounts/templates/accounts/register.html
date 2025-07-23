@@ -621,5 +621,30 @@
     alert("{{ error }}");
   </script>
     {% endif %}
+    <script>
+  const passwordInput = document.getElementById('password');
+  const bars = document.querySelectorAll('.strength-bar');
+
+  passwordInput.addEventListener('input', () => {
+    const value = passwordInput.value;
+    let strength = 0;
+
+    const hasLower = /[a-z]/.test(value);
+    const hasUpper = /[A-Z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSymbol = /[^A-Za-z0-9]/.test(value);
+    const lengthValid = value.length >= 8;
+
+    if (hasLower) strength++;
+    if (hasUpper) strength++;
+    if (hasNumber) strength++;
+    if (hasSymbol) strength++;
+
+    // Update bars
+    bars.forEach((bar, index) => {
+      bar.classList.toggle('active', index < strength);
+    });
+  });
+</script>
 </body>
 </html>
