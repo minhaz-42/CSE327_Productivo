@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
@@ -9,621 +10,734 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-  <!-- Fallback Font Awesome Support -->
+  <!-- Custom Styles -->
   <style>
-    .fas {
-      font-family: 'Font Awesome 6 Free' !important;
-    }
     /* Base Styles & Variables */
-:root {
-  --primary: #5D4037;
-  --primary-light: #8D6E63;
-  --primary-dark: #3E2723;
-  --secondary: #26A69A;
-  --secondary-light: #80CBC4;
-  --secondary-dark: #00897B;
-  --background: #FAFAFA;
-  --surface: #FFFFFF;
-  --error: #D32F2F;
-  --on-primary: #FFFFFF;
-  --on-secondary: #000000;
-  --on-background: #212121;
-  --on-surface: #212121;
-  --on-error: #FFFFFF;
-  --gray-light: #E0E0E0;
-  --gray-medium: #9E9E9E;
-  --gray-dark: #424242;
-  --success: #388E3C;
-  --warning: #F57C00;
-  --info: #1976D2;
-}
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #7209b7;
+      --secondary-light: #b5179e;
+      --secondary-dark: #560bad;
+      --background: #f8f9fa;
+      --surface: #ffffff;
+      --error: #f72585;
+      --on-primary: #ffffff;
+      --on-secondary: #ffffff;
+      --on-background: #212529;
+      --on-surface: #212529;
+      --on-error: #ffffff;
+      --gray-light: #e9ecef;
+      --gray-medium: #adb5bd;
+      --gray-dark: #495057;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --info: #4895ef;
+      --priority-high: #ef233c;
+      --priority-medium: #ff9e00;
+      --priority-low: #38b000;
+    }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-body {
-  background-color: var(--background);
-  color: var(--on-background);
-  transition: all 0.3s ease;
-}
+    body {
+      background-color: var(--background);
+      color: var(--on-background);
+      transition: all 0.3s ease;
+    }
 
-body.dark-theme {
-  --background: #121212;
-  --surface: #1E1E1E;
-  --on-background: #E0E0E0;
-  --on-surface: #E0E0E0;
-  --gray-light: #424242;
-  --gray-medium: #757575;
-}
+    /* App Layout */
+    .app {
+      display: grid;
+      grid-template-areas:
+        "sidebar header"
+        "sidebar main";
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: 60px 1fr;
+      min-height: 100vh;
+    }
 
-/* App Layout */
-.app {
-  display: grid;
-  grid-template-areas:
-    "sidebar header"
-    "sidebar main";
-  grid-template-columns: 240px 1fr;
-  grid-template-rows: 60px 1fr;
-  min-height: 100vh;
-}
+    /* Header Styles */
+    .header {
+      grid-area: header;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      background-color: var(--surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
 
-/* Header Styles */
-.header {
-  grid-area: header;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--on-surface);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+    }
+
+    .menu-btn:hover {
+      background-color: var(--gray-light);
+    }
+
+    .app-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .notification-wrapper {
+      position: relative;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--on-surface);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 15px;
+      height: 15px;
+      background-color: var(--error);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+    }
+
+    .notification-panel {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      width: 300px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 15px;
+      z-index: 100;
+    }
+
+    .notification-panel.hidden {
+      display: none;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      grid-area: sidebar;
+      background-color: var(--surface);
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+    }
+
+    .sidebar-logo {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .sidebar-logo h2 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: all 0.2s;
+      gap: 10px;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--gray-light);
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--primary-light);
+      color: var(--on-primary);
+    }
+
+    .sidebar-nav a.active i {
+      color: var(--on-primary);
+    }
+
+    .sidebar-nav i {
+      width: 24px;
+      text-align: center;
+      color: var(--gray-medium);
+    }
+
+    /* Sidebar Footer Styles */
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px;
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .sidebar-footer a {
+      display: block;
+      padding: 10px 0;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .sidebar-footer a:hover {
+      color: var(--primary);
+    }
+
+    .sidebar-footer a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      grid-area: main;
+      padding: 20px;
+      background-color: var(--background);
+      overflow-y: auto;
+    }
+
+    .dashboard {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.8rem;
+      color: var(--on-background);
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-item {
+      background-color: var(--surface);
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      min-width: 100px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+    }
+    /* Pomodoro Timer Styles */
+.pomodoro-timer {
   background-color: var(--surface);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+  border: 1px solid var(--border);
 }
 
-.header-left {
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 15px 0;
+  font-family: monospace;
+}
+
+.timer-controls {
   display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.menu-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: var(--on-surface);
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
-}
-
-.menu-btn:hover {
-  background-color: var(--gray-light);
-}
-
-.app-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--on-surface);
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.notification-wrapper {
-  position: relative;
-}
-
-.notification-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: var(--on-surface);
-  cursor: pointer;
-  position: relative;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 15px;
-  height: 15px;
-  background-color: var(--error);
-  border-radius: 50%;
-  border: 2px solid var(--surface);
-}
-
-.notification-panel {
-  position: absolute;
-  right: 0;
-  top: 40px;
-  width: 300px;
-  background-color: var(--surface);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 15px;
-  z-index: 100;
-}
-
-.notification-panel.hidden {
-  display: none;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  display: flex;
-  align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: bold;
-}
-
-/* Sidebar Styles */
-.sidebar {
-  grid-area: sidebar;
-  background-color: var(--surface);
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  z-index: 20;
-}
-
-.sidebar-logo {
-  padding: 20px;
-  border-bottom: 1px solid var(--gray-light);
-}
-
-.sidebar-logo h2 {
-  color: var(--primary);
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-align: center;
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 20px 0;
-}
-
-.sidebar-nav ul {
-  list-style: none;
-}
-
-.sidebar-nav li {
-  margin-bottom: 5px;
-}
-
-.sidebar-nav a {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: var(--on-surface);
-  text-decoration: none;
-  transition: all 0.2s;
-  gap: 10px;
-}
-
-.sidebar-nav a:hover {
-  background-color: var(--gray-light);
-}
-
-.sidebar-nav a.active {
-  background-color: var(--primary-light);
-  color: var(--on-primary);
-}
-
-.sidebar-nav a.active i {
-  color: var(--on-primary);
-}
-
-.sidebar-nav i {
-  width: 24px;
-  text-align: center;
-  color: var(--gray-medium);
-}
-/* Sidebar Footer Styles */
-.sidebar-footer {
-  margin-top: auto;
-  padding: 20px;
-  border-top: 1px solid var(--gray-light);
-}
-
-.sidebar-footer a {
-  display: block;
-  padding: 10px 0;
-  color: var(--on-surface);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.sidebar-footer a:hover {
-  color: var(--primary);
-}
-
-.sidebar-footer a i {
-  margin-right: 10px;
-  width: 20px;
-  text-align: center;
-}
-
-/* Main Content Styles */
-.main-content {
-  grid-area: main;
-  padding: 20px;
-  background-color: var(--background);
-  overflow-y: auto;
-}
-
-.dashboard {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.dashboard-header h2 {
-  font-size: 1.8rem;
-  color: var(--on-background);
-}
-
-.stats {
-  display: flex;
-  gap: 20px;
-}
-
-.stat-item {
-  background-color: var(--surface);
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  text-align: center;
-  min-width: 100px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: var(--gray-medium);
-}
-
-/* Dashboard Grid */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.dashboard-card {
-  background-color: var(--surface);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  transition: transform 0.2s;
-}
-
-.dashboard-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-card h3 {
-  margin-bottom: 15px;
-  color: var(--on-surface);
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-}
-
-/* Form Styles */
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 0.9rem;
-  color: var(--on-surface);
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--gray-light);
-  border-radius: 4px;
-  background-color: var(--surface);
-  color: var(--on-surface);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-row {
-  display: flex;
   gap: 15px;
+  margin-bottom: 15px;
 }
 
-.form-row .form-group {
-  flex: 1;
-}
-
-/* Button Styles */
-.btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
+.timer-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.primary-btn {
-  background-color: var(--primary);
-  color: var(--on-primary);
-}
-
-.primary-btn:hover {
-  background-color: var(--primary-dark);
-}
-
-.secondary-btn {
-  background-color: var(--secondary);
-  color: var(--on-secondary);
-}
-
-.secondary-btn:hover {
-  background-color: var(--secondary-dark);
-}
-
-/* Task List Styles */
-.task-list {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  gap: 8px;
 }
 
-.task-item {
-  background-color: var(--surface);
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid var(--gray-medium);
-}
-
-.task-item.completed {
-  opacity: 0.7;
-  border-left-color: var(--success);
-}
-
-.task-item.completed .task-header h4 {
-  text-decoration: line-through;
-}
-
-.task-header {
+.timer-status {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
-.task-header h4 {
-  font-size: 1rem;
-  color: var(--on-surface);
-}
-
-.priority-badge {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 10px;
+#timerMode {
+  color: var(--primary);
   font-weight: 600;
-  text-transform: uppercase;
 }
 
-.priority-badge.high {
-  background-color: #FFEBEE;
-  color: var(--error);
-}
-
-.priority-badge.medium {
-  background-color: #FFF8E1;
-  color: var(--warning);
-}
-
-.priority-badge.low {
-  background-color: #E8F5E9;
+/* Break mode styling */
+.break-mode .timer-display {
   color: var(--success);
 }
 
-.task-item p {
-  font-size: 0.9rem;
-  color: var(--gray-medium);
-  margin-bottom: 12px;
+.break-mode #timerMode {
+  color: var(--success);
 }
 
-.task-actions {
-  display: flex;
-  gap: 10px;
-}
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
 
-.action-btn {
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    .dashboard-card {
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      transition: transform 0.2s;
+    }
 
-.action-btn.completed {
-  background-color: var(--success);
-  color: white;
-}
+    .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-.action-btn.delete {
-  background-color: var(--error);
-  color: white;
-}
+    .dashboard-card h3 {
+      margin-bottom: 15px;
+      color: var(--on-surface);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+    }
 
-/* Productivity Tip */
-.productivity-tip .tip-content {
-  background-color: var(--primary-light);
-  color: var(--on-primary);
-  padding: 15px;
-  border-radius: 8px;
-  font-style: italic;
-}
+    /* Task List Styles */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-/* Add Task Button */
-.add-task-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 50;
-  display: flex;
+    .task-item {
+      background-color: var(--surface);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--gray-medium);
+    }
+
+    .task-item.completed {
+      opacity: 0.7;
+      border-left-color: var(--success);
+    }
+
+    .task-item.completed .task-header h4 {
+      text-decoration: line-through;
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .task-header h4 {
+      font-size: 1rem;
+      color: var(--on-surface);
+    }
+
+    .priority-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .priority-badge.high {
+      background-color: rgba(239, 35, 60, 0.1);
+      color: var(--priority-high);
+    }
+
+    .priority-badge.medium {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--priority-medium);
+    }
+
+    .priority-badge.low {
+      background-color: rgba(56, 176, 0, 0.1);
+      color: var(--priority-low);
+    }
+
+    .task-item p {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+      margin-bottom: 12px;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .action-btn.completed {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .action-btn.delete {
+      background-color: var(--error);
+      color: white;
+    }
+
+    /* Productivity Tip */
+    .productivity-tip .tip-content {
+      background-color: var(--primary-light);
+      color: var(--on-primary);
+      padding: 15px;
+      border-radius: 8px;
+      font-style: italic;
+    }
+
+    /* Task Details Modal */
+    .task-details-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-details-container {
+      background-color: var(--surface);
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .task-details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close-details-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-medium);
+    }
+
+    /* Add Task Button */
+    .add-task-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Task Form Modal */
+    .task-form-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-form-container {
+      background-color: var(--surface);
+      width: 90%;
+      max-width: 600px;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .task-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-medium);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      color: var(--on-surface);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray-light);
+      border-radius: 4px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* Button Styles */
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .primary-btn {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .primary-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .secondary-btn {
+      background-color: var(--secondary);
+      color: var(--on-secondary);
+    }
+
+    .secondary-btn:hover {
+      background-color: var(--secondary-dark);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .app {
+        grid-template-areas:
+          "header"
+          "main";
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: -240px;
+        height: calc(100vh - 60px);
+        transition: left 0.3s;
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .stats {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .stat-item {
+        flex: 1;
+        min-width: auto;
+        padding: 10px;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        padding: 0 10px;
+      }
+
+      .main-content {
+        padding: 15px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Back Button Styles */
+.back-button {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-}
-
-/* Task Form Modal */
-.task-form-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-}
-
-.task-form-container {
-  background-color: var(--surface);
-  width: 90%;
-  max-width: 600px;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.task-form-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
   margin-bottom: 20px;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  background-color: var(--background);
+  color: var(--on-surface);
+  border: 1px solid var(--gray-light);
+  border-radius: 6px;
   cursor: pointer;
-  color: var(--gray-medium);
+  transition: all 0.2s;
+  font-size: 0.95rem;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 992px) {
-  .app {
-    grid-template-areas:
-      "header"
-      "main";
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: fixed;
-    top: 60px;
-    left: -240px;
-    height: calc(100vh - 60px);
-    transition: left 0.3s;
-  }
-
-  .sidebar.active {
-    left: 0;
-  }
+.back-button:hover {
+  background-color: var(--gray-light);
 }
 
-@media (max-width: 768px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .stats {
-    width: 100%;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .stat-item {
-    flex: 1;
-    min-width: auto;
-    padding: 10px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-@media (max-width: 576px) {
-  .header {
-    padding: 0 10px;
-  }
-
-  .main-content {
-    padding: 15px;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
+.back-button i {
+  font-size: 0.9rem;
 }
   </style>
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="{% static 'accounts/style.css' %}" />
 </head>
 <body class="light-theme">
   <div class="app">
@@ -650,71 +764,102 @@ body.dark-theme {
         
         <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar"></div>
+          <div class="avatar">MH</div>
         </div>
       </div>
     </header>
 
-    <!-- Sidebar -->
+        <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <h2>TaskPlanner</h2>
-  </div>
-  <nav class="sidebar-nav">
-    <ul>
-       <li><a href="{%url 'dashboard'%}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-      <li><a href="{%url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
-      <li><a href="{%url 'schedule'%}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
-      <li><a href="{%url 'analytics'%}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-      <li><a href="{%url 'category'%}"><i class="fas fa-tags"></i> <span>Categories</span></a></li>
-      <li><a href="{%url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-    </ul>
-  </nav>
-  
-  <!-- New Login/Register Links -->
-  <div class="sidebar-footer">
-    <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-    <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
-  </div>
-</aside>
+      <div class="sidebar-logo">
+        <h2>TaskPlanner</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="index.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+          <li><a href="tasks.html"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+          <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
+          <li><a href="analytics.html"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+          <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+        </ul>
+      </nav>
+      
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
+      </div>
+    </aside>
 
     <!-- Main Content -->
     <main class="main-content">
       <div class="dashboard">
         <!-- Header -->
         <div class="dashboard-header">
-          <h2>Today's Overview</h2>
+          <div>
+            <h2>Today's Overview</h2>
+            <p class="greeting">Thursday, July 25, 2025</p>
+          </div>
           <div class="stats">
-            <div class="stat-item">
+            <div class="stat-item" id="todayTasksStat">
               <span class="stat-value">5</span>
               <span class="stat-label">Tasks Today</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item" id="completedTasksStat">
               <span class="stat-value">2</span>
               <span class="stat-label">Completed</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item" id="highPriorityStat">
               <span class="stat-value">1</span>
               <span class="stat-label">High Priority</span>
             </div>
+            <div class="stat-item" id="productivityStat">
+              <span class="stat-value">78%</span>
+              <span class="stat-label">Productivity</span>
+            </div>
           </div>
         </div>
-
-        <!-- Dashboard Grid -->
+        <main class="main-content">
+  <!-- Add this Pomodoro Timer section -->
+  <div class="pomodoro-timer">
+    <div class="timer-display">
+      <span id="minutes">25</span>:<span id="seconds">00</span>
+    </div>
+    <div class="timer-controls">
+      <button id="startTimer" class="timer-btn primary-btn">
+        <i class="fas fa-play"></i> Start
+      </button>
+      <button id="pauseTimer" class="timer-btn secondary-btn" disabled>
+        <i class="fas fa-pause"></i> Pause
+      </button>
+      <button id="resetTimer" class="timer-btn secondary-btn">
+        <i class="fas fa-redo"></i> Reset
+      </button>
+    </div>
+    <div class="timer-status">
+      <span id="timerMode">Work Session</span>
+      <span id="cycleCount">Cycle: 1/4</span>
+    </div>
+  </div>
+  <!-- Dashboard Grid -->
         <div class="dashboard-grid">
           <!-- Today's Tasks -->
           <div class="dashboard-card card today-tasks">
-            <h3>Today's Tasks</h3>
+            <h3><i class="fas fa-calendar-day"></i> Today's Tasks</h3>
             <div class="task-list" id="todayTasks">
               <div class="task-item">
                 <div class="task-header">
                   <h4>Complete project proposal</h4>
                   <span class="priority-badge high">High</span>
                 </div>
-                <p>Finish the proposal document and send to client</p>
+                <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
+                <div class="task-meta">
+                  <span><i class="fas fa-clock"></i> Due in 2 hours</span>
+                  <span><i class="fas fa-tag"></i> Work</span>
+                </div>
                 <div class="task-actions">
-                  <button class="action-btn completed">Complete</button>
-                  <button class="action-btn delete">Delete</button>
+                  <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+                  <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
                 </div>
               </div>
               <div class="task-item completed">
@@ -722,10 +867,12 @@ body.dark-theme {
                   <h4>Team meeting</h4>
                   <span class="priority-badge medium">Medium</span>
                 </div>
-                <p>Weekly team sync at 10am</p>
+                <p>Weekly team sync to discuss project progress and blockers.</p>
+                <div class="task-meta">
+                  <span><i class="fas fa-check-circle"></i> Completed at 10:30 AM</span>
+                </div>
                 <div class="task-actions">
-                  <button class="action-btn completed">Completed</button>
-                  <button class="action-btn delete">Delete</button>
+                  <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
                 </div>
               </div>
             </div>
@@ -733,17 +880,21 @@ body.dark-theme {
 
           <!-- Upcoming Tasks -->
           <div class="dashboard-card card upcoming-tasks">
-            <h3>Upcoming Tasks</h3>
+            <h3><i class="fas fa-calendar-week"></i> Upcoming Tasks</h3>
             <div class="task-list" id="upcomingTasks">
               <div class="task-item">
                 <div class="task-header">
                   <h4>Client presentation</h4>
                   <span class="priority-badge high">High</span>
                 </div>
-                <p>Prepare slides for quarterly review</p>
+                <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
+                <div class="task-meta">
+                  <span><i class="fas fa-clock"></i> Tomorrow, 10:00 AM</span>
+                  <span><i class="fas fa-tag"></i> Presentation</span>
+                </div>
                 <div class="task-actions">
-                  <button class="action-btn completed">Complete</button>
-                  <button class="action-btn delete">Delete</button>
+                  <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+                  <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
                 </div>
               </div>
               <div class="task-item">
@@ -751,10 +902,14 @@ body.dark-theme {
                   <h4>Update documentation</h4>
                   <span class="priority-badge low">Low</span>
                 </div>
-                <p>Update API documentation for new features</p>
+                <p>Update API documentation for new features released last sprint.</p>
+                <div class="task-meta">
+                  <span><i class="fas fa-clock"></i> Friday, 3:00 PM</span>
+                  <span><i class="fas fa-tag"></i> Documentation</span>
+                </div>
                 <div class="task-actions">
-                  <button class="action-btn completed">Complete</button>
-                  <button class="action-btn delete">Delete</button>
+                  <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+                  <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
                 </div>
               </div>
             </div>
@@ -762,9 +917,9 @@ body.dark-theme {
 
           <!-- Productivity Tip -->
           <div class="dashboard-card card productivity-tip">
-            <h3>Productivity Tip</h3>
+            <h3><i class="fas fa-lightbulb"></i> Productivity Tip</h3>
             <div class="tip-content">
-              <p>"Break your work into small, manageable tasks to maintain focus and momentum."</p>
+              <p>"The Pomodoro Technique can dramatically improve your focus. Work for 25 minutes, then take a 5-minute break. After four cycles, take a longer 15-30 minute break. This method helps maintain high productivity while preventing burnout."</p>
             </div>
           </div>
         </div>
@@ -777,7 +932,7 @@ body.dark-theme {
     </button>
 
     <!-- Task Form Modal -->
-    <div class="task-form-modal" id="taskFormModal">
+     <div class="task-form-modal" id="taskFormModal">
       <div class="task-form-container">
         <div class="task-form-header">
           <h3>Add New Task</h3>
@@ -786,11 +941,11 @@ body.dark-theme {
         <form id="taskForm">
           <div class="form-group">
             <label for="title">Title*</label>
-            <input type="text" id="title" required />
+            <input type="text" id="title" required placeholder="Enter task title" />
           </div>
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" rows="3"></textarea>
+            <textarea id="description" rows="3" placeholder="Add details about the task"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -802,41 +957,70 @@ body.dark-theme {
               </select>
             </div>
             <div class="form-group">
-              <label for="deadline">Deadline*</label>
-              <input type="datetime-local" id="deadline" required />
+              <label for="category">Category</label>
+              <select id="category">
+                <option value="">None</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="finance">Finance</option>
+                <option value="health">Health</option>
+              </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="category-name">Category Name*</label>
-              <input
-                type="text"
-                id="category-name"
-                placeholder="e.g. Assignment, Study, Work"
-                required />
+              <label for="deadline">Deadline*</label>
+              <input type="datetime-local" id="deadline" required />
             </div>
             <div class="form-group">
-              <label for="category-color">Color</label>
-              <input
-                type="color"
-                id="category-color"
-                value="#5D4037"
-                style="width: 100%; height: 40px; border: none; border-radius: 4px;" />
+              <label for="reminder">Reminder</label>
+              <select id="reminder">
+                <option value="">None</option>
+                <option value="15">15 minutes before</option>
+                <option value="30">30 minutes before</option>
+                <option value="60">1 hour before</option>
+                <option value="1440">1 day before</option>
+              </select>
             </div>
           </div>
-          <button type="submit" class="primary-btn btn">Add Task</button>
+          <button type="submit" class="primary-btn btn btn-block">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
         </form>
       </div>
     </div>
-  </div>
 
   <!-- JavaScript -->
   <script>
-    // Toggle Task Form Modal
+    // DOM Elements
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
     const addTaskBtn = document.getElementById('addTaskBtn');
     const taskFormModal = document.getElementById('taskFormModal');
     const closeTaskForm = document.getElementById('closeTaskForm');
+    const statsItems = document.querySelectorAll('.stat-item');
 
+    // Toggle Sidebar (for mobile)
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Toggle Notification Panel
+    notificationBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notificationPanel.classList.toggle('hidden');
+    });
+
+    // Close notification panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!notificationPanel.contains(e.target) && e.target !== notificationBtn) {
+        notificationPanel.classList.add('hidden');
+      }
+    });
+
+    // Toggle Task Form Modal
     addTaskBtn.addEventListener('click', () => {
       taskFormModal.style.display = 'flex';
     });
@@ -846,27 +1030,116 @@ body.dark-theme {
     });
 
     // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
-      if (event.target === taskFormModal) {
+    window.addEventListener('click', (e) => {
+      if (e.target === taskFormModal) {
         taskFormModal.style.display = 'none';
       }
     });
 
-    // Toggle Sidebar (for mobile)
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
+    // Make stats items clickable
+    statsItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const statType = this.id.replace('Stat', '').toLowerCase();
+        alert(`Viewing details for ${statType} tasks`);
+        // Here you would typically navigate to a filtered view or show a detailed modal
+      });
     });
 
-    // Toggle Notification Panel
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationPanel = document.getElementById('notificationPanel');
-
-    notificationBtn.addEventListener('click', () => {
-      notificationPanel.classList.toggle('hidden');
+    // Task Form Submission
+    document.getElementById('taskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Task added successfully!');
+      this.reset();
+      taskFormModal.style.display = 'none';
     });
+
+    // Complete Task Buttons
+    document.querySelectorAll('.action-btn.complete').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const taskItem = this.closest('.task-item');
+        taskItem.classList.add('completed');
+        this.innerHTML = '<i class="fas fa-check"></i> Completed';
+        this.style.backgroundColor = '#4cc9f0';
+        this.style.color = 'white';
+        // Update completed tasks count
+        const completedStat = document.getElementById('completedTasksStat');
+        const currentValue = parseInt(completedStat.querySelector('.stat-value').textContent);
+        completedStat.querySelector('.stat-value').textContent = currentValue + 1;
+      });
+    });
+
+    // Delete Task Buttons
+    document.querySelectorAll('.action-btn.delete').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to delete this task?')) {
+          this.closest('.task-item').remove();
+        }
+      });
+    });
+
+    // Pomodoro Timer Logic
+    let timerInterval = null;
+    let totalSeconds = 25 * 60;
+    let isRunning = false;
+    let isPaused = false;
+    const minutesDisplay = document.getElementById('minutes');
+    const secondsDisplay = document.getElementById('seconds');
+    const startBtn = document.getElementById('startTimer');
+    const pauseBtn = document.getElementById('pauseTimer');
+    const resetBtn = document.getElementById('resetTimer');
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      minutesDisplay.textContent = String(mins).padStart(2, '0');
+      secondsDisplay.textContent = String(secs).padStart(2, '0');
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      isPaused = false;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      timerInterval = setInterval(() => {
+        if (!isPaused && totalSeconds > 0) {
+          totalSeconds--;
+          updateTimerDisplay();
+        } else if (totalSeconds === 0) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          startBtn.disabled = false;
+          pauseBtn.disabled = true;
+          // Optionally, play a sound or show a notification here
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      if (!isRunning) return;
+      isPaused = !isPaused;
+      if (isPaused) {
+        pauseBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+      } else {
+        pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      totalSeconds = 25 * 60;
+      isRunning = false;
+      isPaused = false;
+      updateTimerDisplay();
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+    updateTimerDisplay();
   </script>
 </body>
 </html>
