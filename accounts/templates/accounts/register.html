@@ -532,15 +532,21 @@
     const registerBtn = document.getElementById('register-btn');
     
     // Mock function to simulate username check (replace with actual API call)
-    function checkUsernameAvailability(username) {
-      // In a real app, this would be an API call to your backend
-      const takenUsernames = ['admin', 'user', 'test', 'demo'];
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(!takenUsernames.includes(username.toLowerCase()));
-        }, 500);
-      });
+   function checkUsernameAvailability(username) {
+      return fetch(`/check-username/?username=${encodeURIComponent(username)}`)
+      .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+        }
+         return response.json();
+      })
+    .then(data => data.available)
+    .catch(error => {
+      console.error('Error checking username:', error);
+      return false;
+    });
     }
+
     
     usernameInput.addEventListener('blur', async function() {
       const username = this.value.trim();

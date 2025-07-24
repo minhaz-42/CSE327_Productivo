@@ -223,16 +223,17 @@
   
   <div class="auth-container">
     <h1>Login to Task Planner</h1>
-    <form action="dashboard.html" method="post" class="auth-form">
+    <form action="{% url 'login' %}" method="post" class="auth-form">
+      {% csrf_token %}
       <div class="form-group">
         <label for="username">Username*</label>
-        <input type="text" id="username" required placeholder="Enter your username" />
+        <input type="text" id="username" name = "username" required placeholder="Enter your username" />
         <i class="fas fa-user"></i>
       </div>
       
       <div class="form-group">
         <label for="password">Password*</label>
-        <input type="password" id="password" required placeholder="Enter your password" />
+        <input type="password" id="password" name = "password" required placeholder="Enter your password" />
         <i class="fas fa-lock"></i>
       </div>
       
@@ -300,4 +301,19 @@
     */
   </script>
 </body>
+ </script>
+    {% if success %}
+  <script>
+    alert("{{ success }}");
+    window.location.href = "{% url 'dashboard' %}";
+  </script>
+    {% endif %}
+
+    {% if error %}
+  <script>
+    alert("{{ error }}");
+  </script>
+    {% endif %}
+</body>
+</html>
 </html>
