@@ -1,4 +1,3 @@
-{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +13,612 @@
     .fas {
       font-family: 'Font Awesome 6 Free' !important;
     }
+    /* Base Styles & Variables */
+:root {
+  --primary: #5D4037;
+  --primary-light: #8D6E63;
+  --primary-dark: #3E2723;
+  --secondary: #26A69A;
+  --secondary-light: #80CBC4;
+  --secondary-dark: #00897B;
+  --background: #FAFAFA;
+  --surface: #FFFFFF;
+  --error: #D32F2F;
+  --on-primary: #FFFFFF;
+  --on-secondary: #000000;
+  --on-background: #212121;
+  --on-surface: #212121;
+  --on-error: #FFFFFF;
+  --gray-light: #E0E0E0;
+  --gray-medium: #9E9E9E;
+  --gray-dark: #424242;
+  --success: #388E3C;
+  --warning: #F57C00;
+  --info: #1976D2;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--on-background);
+  transition: all 0.3s ease;
+}
+
+body.dark-theme {
+  --background: #121212;
+  --surface: #1E1E1E;
+  --on-background: #E0E0E0;
+  --on-surface: #E0E0E0;
+  --gray-light: #424242;
+  --gray-medium: #757575;
+}
+
+/* App Layout */
+.app {
+  display: grid;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 60px 1fr;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+  grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background-color: var(--surface);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.menu-btn:hover {
+  background-color: var(--gray-light);
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--on-surface);
+  cursor: pointer;
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  background-color: var(--error);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+.notification-panel {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 300px;
+  background-color: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  z-index: 100;
+}
+
+.notification-panel.hidden {
+  display: none;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  grid-area: sidebar;
+  background-color: var(--surface);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.sidebar-logo {
+  padding: 20px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.sidebar-logo h2 {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+}
+
+.sidebar-nav li {
+  margin-bottom: 5px;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--on-surface);
+  text-decoration: none;
+  transition: all 0.2s;
+  gap: 10px;
+}
+
+.sidebar-nav a:hover {
+  background-color: var(--gray-light);
+}
+
+.sidebar-nav a.active {
+  background-color: var(--primary-light);
+  color: var(--on-primary);
+}
+
+.sidebar-nav a.active i {
+  color: var(--on-primary);
+}
+
+.sidebar-nav i {
+  width: 24px;
+  text-align: center;
+  color: var(--gray-medium);
+}
+/* Sidebar Footer Styles */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid var(--gray-light);
+}
+
+.sidebar-footer a {
+  display: block;
+  padding: 10px 0;
+  color: var(--on-surface);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.sidebar-footer a:hover {
+  color: var(--primary);
+}
+
+.sidebar-footer a i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+/* Main Content Styles */
+.main-content {
+  grid-area: main;
+  padding: 20px;
+  background-color: var(--background);
+  overflow-y: auto;
+}
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  font-size: 1.8rem;
+  color: var(--on-background);
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat-item {
+  background-color: var(--surface);
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  min-width: 100px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-card {
+  background-color: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card h3 {
+  margin-bottom: 15px;
+  color: var(--on-surface);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--on-surface);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--gray-light);
+  border-radius: 4px;
+  background-color: var(--surface);
+  color: var(--on-surface);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Button Styles */
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.primary-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.secondary-btn {
+  background-color: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.secondary-btn:hover {
+  background-color: var(--secondary-dark);
+}
+
+/* Task List Styles */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.task-item {
+  background-color: var(--surface);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--gray-medium);
+}
+
+.task-item.completed {
+  opacity: 0.7;
+  border-left-color: var(--success);
+}
+
+.task-item.completed .task-header h4 {
+  text-decoration: line-through;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.task-header h4 {
+  font-size: 1rem;
+  color: var(--on-surface);
+}
+
+.priority-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-badge.high {
+  background-color: #FFEBEE;
+  color: var(--error);
+}
+
+.priority-badge.medium {
+  background-color: #FFF8E1;
+  color: var(--warning);
+}
+
+.priority-badge.low {
+  background-color: #E8F5E9;
+  color: var(--success);
+}
+
+.task-item p {
+  font-size: 0.9rem;
+  color: var(--gray-medium);
+  margin-bottom: 12px;
+}
+
+.task-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.action-btn.completed {
+  background-color: var(--success);
+  color: white;
+}
+
+.action-btn.delete {
+  background-color: var(--error);
+  color: white;
+}
+
+/* Productivity Tip */
+.productivity-tip .tip-content {
+  background-color: var(--primary-light);
+  color: var(--on-primary);
+  padding: 15px;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* Add Task Button */
+.add-task-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Task Form Modal */
+.task-form-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.task-form-container {
+  background-color: var(--surface);
+  width: 90%;
+  max-width: 600px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.task-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--gray-medium);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .app {
+    grid-template-areas:
+      "header"
+      "main";
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 60px;
+    left: -240px;
+    height: calc(100vh - 60px);
+    transition: left 0.3s;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .stats {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .stat-item {
+    flex: 1;
+    min-width: auto;
+    padding: 10px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    padding: 0 10px;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
   </style>
 
   <!-- Custom Styles -->
@@ -25,7 +630,6 @@
     <header class="header">
       <div class="header-left">
         <button class="menu-btn" id="sidebarToggle">
-          
           <i class="fas fa-bars"></i>
         </button>
         <h1 class="app-title">Intelligent Task Planner</h1>
@@ -42,7 +646,6 @@
             <p>No new notifications.</p>
           </div>
         </div>
-
         
         <!-- User Avatar -->
         <div class="user-profile">
@@ -66,8 +669,13 @@
       <li><a href="{%url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
     </ul>
   </nav>
+  
+  <!-- New Login/Register Links -->
+  <div class="sidebar-footer">
+    <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
+    <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
+  </div>
 </aside>
-
 
     <!-- Main Content -->
     <main class="main-content">
@@ -93,36 +701,6 @@
 
         <!-- Dashboard Grid -->
         <div class="dashboard-grid">
-          <!-- Quick Add Task -->
-          <div class="dashboard-card card quick-add">
-            <h3>Quick Add Task</h3>
-            <form id="taskForm">
-              <div class="form-group">
-                <label for="title">Title*</label>
-                <input type="text" id="title" required />
-              </div>
-              <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" rows="3"></textarea>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="priority">Priority*</label>
-                  <select id="priority" required>
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="deadline">Deadline*</label>
-                  <input type="datetime-local" id="deadline" required />
-                </div>
-              </div>
-              <button type="submit" class="primary-btn btn">Add Task</button>
-            </form>
-          </div>
-
           <!-- Today's Tasks -->
           <div class="dashboard-card card today-tasks">
             <h3>Today's Tasks</h3>
@@ -180,35 +758,6 @@
               </div>
             </div>
           </div>
-         <!-- Category -->
-<div class="dashboard-card card quick-add">
-  <h3><i class="fas fa-tag" style="color: var(--primary); margin-right: 0.5rem;"></i>Category</h3>
-  <form id="categoryForm">
-    <div class="form-group">
-      <label for="category-name">Category Name*</label>
-      <input
-        type="text"
-        id="category-name"
-        placeholder="e.g. Assignment, Study, Work"
-        required />
-    </div>
-
-    <div class="form-group">
-      <label for="category-color">Color</label>
-      <input
-        type="color"
-        id="category-color"
-        value="#5D4037"
-        style="width: 100%; height: 40px; border: none; border-radius: 4px;" />
-    </div>
-
-    <button type="submit" class="primary-btn btn">
-      <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i>Add Category
-    </button>
-  </form>
-</div>
-
-
 
           <!-- Productivity Tip -->
           <div class="dashboard-card card productivity-tip">
@@ -220,10 +769,103 @@
         </div>
       </div>
     </main>
+
+    <!-- Add Task Floating Button -->
+    <button class="add-task-btn" id="addTaskBtn">
+      <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Task Form Modal -->
+    <div class="task-form-modal" id="taskFormModal">
+      <div class="task-form-container">
+        <div class="task-form-header">
+          <h3>Add New Task</h3>
+          <button class="close-btn" id="closeTaskForm">&times;</button>
+        </div>
+        <form id="taskForm">
+          <div class="form-group">
+            <label for="title">Title*</label>
+            <input type="text" id="title" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="priority">Priority*</label>
+              <select id="priority" required>
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="deadline">Deadline*</label>
+              <input type="datetime-local" id="deadline" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category-name">Category Name*</label>
+              <input
+                type="text"
+                id="category-name"
+                placeholder="e.g. Assignment, Study, Work"
+                required />
+            </div>
+            <div class="form-group">
+              <label for="category-color">Color</label>
+              <input
+                type="color"
+                id="category-color"
+                value="#5D4037"
+                style="width: 100%; height: 40px; border: none; border-radius: 4px;" />
+            </div>
+          </div>
+          <button type="submit" class="primary-btn btn">Add Task</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- JavaScript -->
-  <script src="js/helpers.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    // Toggle Task Form Modal
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskFormModal = document.getElementById('taskFormModal');
+    const closeTaskForm = document.getElementById('closeTaskForm');
+
+    addTaskBtn.addEventListener('click', () => {
+      taskFormModal.style.display = 'flex';
+    });
+
+    closeTaskForm.addEventListener('click', () => {
+      taskFormModal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+      if (event.target === taskFormModal) {
+        taskFormModal.style.display = 'none';
+      }
+    });
+
+    // Toggle Sidebar (for mobile)
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Toggle Notification Panel
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
+
+    notificationBtn.addEventListener('click', () => {
+      notificationPanel.classList.toggle('hidden');
+    });
+  </script>
 </body>
 </html>
