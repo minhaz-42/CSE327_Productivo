@@ -5,43 +5,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tasks | Intelligent Task Planner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tasks | Intelligent Task Planner</title>
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- Custom Styles -->
-  <!-- Custom Styles -->
   <style>
     /* Base Styles & Variables */
     :root {
-      --primary: #4361ee;
-      --primary-light: #4895ef;
-      --primary-dark: #3a0ca3;
-      --secondary: #7209b7;
-      --secondary-light: #b5179e;
-      --secondary-dark: #560bad;
-      --background: #f8f9fa;
-      --surface: #ffffff;
-      --error: #f72585;
-      --on-primary: #ffffff;
-      --on-secondary: #ffffff;
-      --on-background: #212529;
-      --on-surface: #212529;
-      --on-error: #ffffff;
-      --gray-light: #e9ecef;
-      --gray-medium: #adb5bd;
-      --gray-dark: #495057;
-      --success: #4cc9f0;
-      --warning: #f8961e;
-      --info: #4895ef;
-      --priority-high: #ef233c;
-      --priority-medium: #ff9e00;
-      --priority-low: #38b000;
       --primary: #4361ee;
       --primary-light: #4895ef;
       --primary-dark: #3a0ca3;
@@ -76,8 +48,6 @@
 
     body {
       background-color: var(--background);
-      color: var(--on-background);
-      transition: all 0.3s ease;
       color: var(--on-background);
       transition: all 0.3s ease;
     }
@@ -125,78 +95,9 @@
       background-color: var(--gray-light);
     }
 
-    .menu-btn:hover {
-      background-color: var(--gray-light);
-    }
-
     .app-title {
       font-size: 1.2rem;
       font-weight: 600;
-      color: var(--on-surface);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .notification-wrapper {
-      position: relative;
-    }
-
-    .notification-btn {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--on-surface);
-      cursor: pointer;
-      position: relative;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      width: 15px;
-      height: 15px;
-      background-color: var(--error);
-      border-radius: 50%;
-      border: 2px solid var(--surface);
-    }
-
-    .notification-panel {
-      position: absolute;
-      right: 0;
-      top: 40px;
-      width: 300px;
-      background-color: var(--surface);
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 15px;
-      z-index: 100;
-    }
-
-    .notification-panel.hidden {
-      display: none;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
       color: var(--on-surface);
     }
 
@@ -272,7 +173,6 @@
       display: flex;
       flex-direction: column;
       z-index: 20;
-      z-index: 20;
     }
 
     .sidebar-logo {
@@ -323,38 +223,8 @@
       color: var(--on-primary);
     }
 
-    .sidebar-nav a.active i {
-      color: var(--on-primary);
-    }
-
     .sidebar-nav i {
       width: 24px;
-      text-align: center;
-      color: var(--gray-medium);
-    }
-
-    /* Sidebar Footer Styles */
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 20px;
-      border-top: 1px solid var(--gray-light);
-    }
-
-    .sidebar-footer a {
-      display: block;
-      padding: 10px 0;
-      color: var(--on-surface);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .sidebar-footer a:hover {
-      color: var(--primary);
-    }
-
-    .sidebar-footer a i {
-      margin-right: 10px;
-      width: 20px;
       text-align: center;
       color: var(--gray-medium);
     }
@@ -399,39 +269,6 @@
 
     /* Tasks Header */
     .tasks-header {
-      overflow-y: auto;
-    }
-
-    .tasks-container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    /* Tasks Header */
-    .tasks-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .tasks-header h2 {
-      font-size: 1.8rem;
-      color: var(--on-background);
-    }
-
-    .tasks-actions {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    /* Filter and Search Controls */
-    .tasks-controls {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -440,37 +277,6 @@
       gap: 15px;
     }
 
-    .search-box {
-      position: relative;
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 10px 15px 10px 40px;
-      border: 1px solid var(--gray-light);
-      border-radius: 6px;
-      background-color: var(--surface);
-      color: var(--on-surface);
-      transition: all 0.3s;
-    }
-
-    .search-box input:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray-medium);
-    }
-
-    .filter-controls {
     .tasks-header h2 {
       font-size: 1.8rem;
       color: var(--on-background);
@@ -555,8 +361,6 @@
     .task-list {
       display: flex;
       flex-direction: column;
-      display: flex;
-      flex-direction: column;
       gap: 15px;
     }
 
@@ -566,12 +370,6 @@
       padding: 15px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border-left: 4px solid var(--gray-medium);
-      transition: all 0.2s;
-    }
-
-    .task-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       transition: all 0.2s;
     }
 
@@ -589,10 +387,6 @@
       text-decoration: line-through;
     }
 
-    .task-item.completed .task-header h4 {
-      text-decoration: line-through;
-    }
-
     .task-header {
       display: flex;
       justify-content: space-between;
@@ -601,14 +395,11 @@
     }
 
     .task-header h4 {
-    .task-header h4 {
       font-size: 1rem;
-      color: var(--on-surface);
       color: var(--on-surface);
       font-weight: 600;
     }
 
-    .priority-badge {
     .priority-badge {
       font-size: 0.7rem;
       padding: 3px 8px;
@@ -620,14 +411,8 @@
     .priority-badge.high {
       background-color: rgba(239, 35, 60, 0.1);
       color: var(--priority-high);
-    .priority-badge.high {
-      background-color: rgba(239, 35, 60, 0.1);
-      color: var(--priority-high);
     }
 
-    .priority-badge.medium {
-      background-color: rgba(248, 150, 30, 0.1);
-      color: var(--priority-medium);
     .priority-badge.medium {
       background-color: rgba(248, 150, 30, 0.1);
       color: var(--priority-medium);
@@ -636,12 +421,8 @@
     .priority-badge.low {
       background-color: rgba(56, 176, 0, 0.1);
       color: var(--priority-low);
-    .priority-badge.low {
-      background-color: rgba(56, 176, 0, 0.1);
-      color: var(--priority-low);
     }
 
-    .task-item p {
     .task-item p {
       font-size: 0.9rem;
       color: var(--gray-medium);
@@ -651,20 +432,9 @@
     .task-meta {
       display: flex;
       gap: 15px;
-      gap: 15px;
       font-size: 0.8rem;
       color: var(--gray-medium);
       margin-bottom: 12px;
-    }
-
-    .task-meta span {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .task-meta i {
-      font-size: 0.9rem;
     }
 
     .task-meta span {
@@ -681,21 +451,14 @@
       display: flex;
       gap: 10px;
       justify-content: flex-end;
-      justify-content: flex-end;
     }
 
-    .action-btn {
-      padding: 6px 12px;
-      font-size: 0.8rem;
     .action-btn {
       padding: 6px 12px;
       font-size: 0.8rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
       display: flex;
       align-items: center;
       gap: 5px;
@@ -856,71 +619,7 @@
       justify-content: center;
     }
 
-    .close-details-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--gray-medium);
-    }
-
-    .task-details-content {
-      margin-bottom: 20px;
-    }
-
-    .task-details-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .task-details-meta div {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.9rem;
-    }
-
-    .task-details-meta i {
-      color: var(--gray-medium);
-    }
-
-    .task-details-description {
-      background-color: var(--background);
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-
-    .task-details-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    /* Add Task Button */
-    .add-task-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     /* Task Form Modal */
-    .task-form-modal {
     .task-form-modal {
       display: none;
       position: fixed;
@@ -935,7 +634,6 @@
     }
 
     .task-form-container {
-    .task-form-container {
       background-color: var(--surface);
       width: 90%;
       max-width: 600px;
@@ -944,7 +642,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .task-form-header {
     .task-form-header {
       display: flex;
       justify-content: space-between;
@@ -961,7 +658,6 @@
     }
 
     /* Form Styles */
-    /* Form Styles */
     .form-group {
       margin-bottom: 15px;
     }
@@ -970,7 +666,6 @@
       display: block;
       margin-bottom: 5px;
       font-size: 0.9rem;
-      color: var(--on-surface);
       color: var(--on-surface);
     }
 
@@ -988,7 +683,6 @@
     .form-group textarea {
       resize: vertical;
       min-height: 80px;
-      min-height: 80px;
     }
 
     .form-row {
@@ -1000,36 +694,6 @@
       flex: 1;
     }
 
-    /* Button Styles */
-    .btn {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .primary-btn {
-      background-color: var(--primary);
-      color: var(--on-primary);
-    }
-
-    .primary-btn:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .secondary-btn {
-      background-color: var(--secondary);
-      color: var(--on-secondary);
-    }
-
-    .secondary-btn:hover {
-      background-color: var(--secondary-dark);
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 992px) {
     /* Button Styles */
     .btn {
       padding: 10px 15px;
@@ -1076,50 +740,7 @@
       }
 
       .sidebar.active {
-      .sidebar.active {
         left: 0;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .tasks-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .tasks-actions {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .filter-controls {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .form-row {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .header {
-        padding: 0 10px;
-      }
-
-      .main-content {
-        padding: 15px;
-      }
-
-      .task-actions {
-        flex-wrap: wrap;
-        justify-content: flex-start;
-      }
-
-      .action-btn {
-        flex: 1;
-        justify-content: center;
       }
     }
 
@@ -1177,14 +798,7 @@
         <h1 class="app-title">Intelligent Task Planner</h1>
       </div>
 
-
       <div class="header-right">
-        <!-- Logout Button -->
-  <a href="{% url 'logout'%}" class="logout-btn">
-    <i class="fas fa-sign-out-alt"></i>
-    <span>Logout</span>
-  </a>
-        <!-- Notification Bell -->
         <!-- Logout Button -->
   <a href="{% url 'logout'%}" class="logout-btn">
     <i class="fas fa-sign-out-alt"></i>
@@ -1195,7 +809,6 @@
           <button class="notification-btn" id="notificationBtn">
             <i class="fas fa-bell"></i>
             <span class="notification-badge"></span>
-            <span class="notification-badge"></span>
           </button>
           <div class="notification-panel hidden" id="notificationPanel">
             <p>No new notifications.</p>
@@ -1203,14 +816,8 @@
         </div>
         
         <!-- User Avatar -->
-          <div class="notification-panel hidden" id="notificationPanel">
-            <p>No new notifications.</p>
-          </div>
-        </div>
-        
-        <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar">{{user.username|slice:"0:1"|upper}}</div>
+          <div class="avatar">{{ user.first_name|slice:"0:1"|upper }}</div>
         </div>
       </div>
     </header>
@@ -1227,15 +834,7 @@
           <li><a href="{% url 'schedule' %}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
           <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
           <li><a href="{% url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-          <li><a href="{% url 'dashboard'%}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-          <li><a href="{% url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
-          <li><a href="{% url 'schedule' %}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
-          <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-          <li><a href="{% url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
       </nav>
-      
-      <!-- Sidebar Footer -->
-
       
       <!-- Sidebar Footer -->
 
@@ -1243,13 +842,6 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="tasks-container">
-        <!-- Tasks Header -->
-        <div class="tasks-header">
-          <h2><i class="fas fa-tasks"></i> My Tasks</h2>
-          <div class="tasks-actions">
-            <button class="primary-btn" id="createTaskBtn">
-              <i class="fas fa-plus"></i> Create Task
       <div class="tasks-container">
         <!-- Tasks Header -->
         <div class="tasks-header">
@@ -1280,14 +872,6 @@
             <button class="filter-btn" data-filter="completed">
               <i class="fas fa-check-circle"></i> Completed
             </button>
-            <button class="filter-btn" data-filter="today">
-              <i class="fas fa-calendar-day"></i> Today
-            </button>
-            <button class="filter-btn" data-filter="upcoming">
-              <i class="fas fa-calendar-week"></i> Upcoming
-            </button>
-            <button class="filter-btn" data-filter="completed">
-              <i class="fas fa-check-circle"></i> Completed
           </div>
         </div>
 
@@ -1295,31 +879,22 @@
         <div class="task-list" id="taskList">
           <!-- Task Item 1 -->
           <div class="task-item" data-priority="high" data-due="2025-07-25" data-status="pending">
-          <div class="task-item" data-priority="high" data-due="2025-07-25" data-status="pending">
             <div class="task-header">
-              <h4>Complete project proposal</h4>
-              <span class="priority-badge high">High</span>
               <h4>Complete project proposal</h4>
               <span class="priority-badge high">High</span>
             </div>
             <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
-            <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
             <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due today, 5:00 PM</span>
               <span><i class="fas fa-clock"></i> Due today, 5:00 PM</span>
               <span><i class="fas fa-tag"></i> Work</span>
             </div>
             <div class="task-actions">
               <button class="action-btn edit" data-task-id="1">
                 <i class="fas fa-pencil-alt"></i> Edit
-              <button class="action-btn edit" data-task-id="1">
-                <i class="fas fa-pencil-alt"></i> Edit
               </button>
-              <button class="action-btn complete" data-task-id="1">
               <button class="action-btn complete" data-task-id="1">
                 <i class="fas fa-check"></i> Complete
               </button>
-              <button class="action-btn delete" data-task-id="1">
               <button class="action-btn delete" data-task-id="1">
                 <i class="fas fa-trash"></i> Delete
               </button>
@@ -1328,41 +903,12 @@
 
           <!-- Task Item 2 -->
           <div class="task-item" data-priority="medium" data-due="2025-07-26" data-status="pending">
-          <div class="task-item" data-priority="medium" data-due="2025-07-26" data-status="pending">
             <div class="task-header">
-              <h4>Client presentation</h4>
-              <span class="priority-badge medium">Medium</span>
               <h4>Client presentation</h4>
               <span class="priority-badge medium">Medium</span>
             </div>
             <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
-            <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
             <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due tomorrow, 10:00 AM</span>
-              <span><i class="fas fa-tag"></i> Presentation</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit" data-task-id="2">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete" data-task-id="2">
-                <i class="fas fa-check"></i> Complete
-              </button>
-              <button class="action-btn delete" data-task-id="2">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-
-          <!-- Task Item 3 -->
-          <div class="task-item completed" data-priority="low" data-due="2025-07-24" data-status="completed">
-            <div class="task-header">
-              <h4>Team meeting</h4>
-              <span class="priority-badge low">Low</span>
-            </div>
-            <p>Weekly team sync to discuss project progress and blockers.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-check-circle"></i> Completed yesterday</span>
               <span><i class="fas fa-clock"></i> Due tomorrow, 10:00 AM</span>
               <span><i class="fas fa-tag"></i> Presentation</span>
             </div>
@@ -1393,26 +939,7 @@
             <div class="task-actions">
               <button class="action-btn delete" data-task-id="3">
                 <i class="fas fa-trash"></i> Delete
-              <button class="action-btn delete" data-task-id="3">
-                <i class="fas fa-trash"></i> Delete
               </button>
-            </div>
-          </div>
-
-          <!-- Task Item 4 -->
-          <div class="task-item" data-priority="high" data-due="2025-07-27" data-status="pending">
-            <div class="task-header">
-              <h4>Submit quarterly report</h4>
-              <span class="priority-badge high">High</span>
-            </div>
-            <p>Compile and submit the Q3 financial report to management.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due in 2 days</span>
-              <span><i class="fas fa-tag"></i> Finance</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit" data-task-id="4">
-                <i class="fas fa-pencil-alt"></i> Edit
             </div>
           </div>
 
@@ -1435,24 +962,10 @@
                 <i class="fas fa-check"></i> Complete
               </button>
               <button class="action-btn delete" data-task-id="4">
-              <button class="action-btn complete" data-task-id="4">
-                <i class="fas fa-check"></i> Complete
-              </button>
-              <button class="action-btn delete" data-task-id="4">
                 <i class="fas fa-trash"></i> Delete
               </button>
             </div>
           </div>
-        </div>
-
-        <!-- Empty State (hidden by default) -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-          <i class="fas fa-tasks"></i>
-          <h3>No tasks found</h3>
-          <p>Create a new task or adjust your filters to see more tasks.</p>
-          <button class="primary-btn" id="createTaskEmptyBtn">
-            <i class="fas fa-plus"></i> Create Task
-          </button>
         </div>
 
         <!-- Empty State (hidden by default) -->
@@ -1472,17 +985,7 @@
       <i class="fas fa-plus"></i>
     </button>
 
-    <!-- Add Task Floating Button -->
-    <button class="add-task-btn" id="addTaskBtn">
-      <i class="fas fa-plus"></i>
-    </button>
-
     <!-- Task Form Modal -->
-    <div class="task-form-modal" id="taskFormModal">
-      <div class="task-form-container">
-        <div class="task-form-header">
-          <h3>Add New Task</h3>
-          <button class="close-btn" id="closeTaskForm">&times;</button>
     <div class="task-form-modal" id="taskFormModal">
       <div class="task-form-container">
         <div class="task-form-header">
@@ -1493,19 +996,13 @@
           <div class="form-group">
             <label for="title">Title*</label>
             <input type="text" id="title" required placeholder="Enter task title" />
-            <label for="title">Title*</label>
-            <input type="text" id="title" required placeholder="Enter task title" />
           </div>
           <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" rows="3" placeholder="Add details about the task"></textarea>
             <label for="description">Description</label>
             <textarea id="description" rows="3" placeholder="Add details about the task"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="priority">Priority*</label>
-              <select id="priority" required>
               <label for="priority">Priority*</label>
               <select id="priority" required>
                 <option value="low">Low</option>
@@ -1522,35 +1019,8 @@
                 <option value="finance">Finance</option>
                 <option value="health">Health</option>
               </select>
-              <label for="category">Category</label>
-              <select id="category">
-                <option value="">None</option>
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="finance">Finance</option>
-                <option value="health">Health</option>
-              </select>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="deadline">Deadline*</label>
-              <input type="datetime-local" id="deadline" required />
-            </div>
-            <div class="form-group">
-              <label for="reminder">Reminder</label>
-              <select id="reminder">
-                <option value="">None</option>
-                <option value="15">15 minutes before</option>
-                <option value="30">30 minutes before</option>
-                <option value="60">1 hour before</option>
-                <option value="1440">1 day before</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="primary-btn btn btn-block">
-            <i class="fas fa-plus"></i> Add Task
-          </button>
           <div class="form-row">
             <div class="form-group">
               <label for="deadline">Deadline*</label>
@@ -1624,14 +1094,7 @@
     const sidebar = document.getElementById('sidebar');
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationPanel = document.getElementById('notificationPanel');
-    const sidebar = document.getElementById('sidebar');
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationPanel = document.getElementById('notificationPanel');
     const addTaskBtn = document.getElementById('addTaskBtn');
-    const createTaskBtn = document.getElementById('createTaskBtn');
-    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
-    const taskFormModal = document.getElementById('taskFormModal');
-    const closeTaskForm = document.getElementById('closeTaskForm');
     const createTaskBtn = document.getElementById('createTaskBtn');
     const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
     const taskFormModal = document.getElementById('taskFormModal');
@@ -1697,71 +1160,9 @@
     // Current filter state
     let currentFilter = "all";
     let currentSearch = "";
-    const taskList = document.getElementById('taskList');
-    const emptyState = document.getElementById('emptyState');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const taskSearch = document.getElementById('taskSearch');
-    const taskDetailsModal = document.getElementById('taskDetailsModal');
-    const closeTaskDetails = document.getElementById('closeTaskDetails');
-    const editTaskBtn = document.getElementById('editTaskBtn');
-    const completeTaskBtn = document.getElementById('completeTaskBtn');
 
-    // Sample tasks data
-    let tasks = [
-      {
-        id: 1,
-        title: "Complete project proposal",
-        description: "Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.",
-        priority: "high",
-        category: "work",
-        dueDate: "2025-07-25T17:00",
-        reminder: "60",
-        status: "pending",
-        completedAt: null
-      },
-      {
-        id: 2,
-        title: "Client presentation",
-        description: "Prepare slides and demo for quarterly review meeting with key stakeholders.",
-        priority: "medium",
-        category: "presentation",
-        dueDate: "2025-07-26T10:00",
-        reminder: "1440",
-        status: "pending",
-        completedAt: null
-      },
-      {
-        id: 3,
-        title: "Team meeting",
-        description: "Weekly team sync to discuss project progress and blockers.",
-        priority: "low",
-        category: "meeting",
-        dueDate: "2025-07-24T10:30",
-        reminder: "",
-        status: "completed",
-        completedAt: "2025-07-24T10:30"
-      },
-      {
-        id: 4,
-        title: "Submit quarterly report",
-        description: "Compile and submit the Q3 financial report to management.",
-        priority: "high",
-        category: "finance",
-        dueDate: "2025-07-27T09:00",
-        reminder: "1440",
-        status: "pending",
-        completedAt: null
-      }
-    ];
-
-    // Current filter state
-    let currentFilter = "all";
-    let currentSearch = "";
-
-    // Toggle Sidebar (for mobile)
     // Toggle Sidebar (for mobile)
     sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
       sidebar.classList.toggle('active');
     });
 
