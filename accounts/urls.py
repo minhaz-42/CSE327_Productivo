@@ -13,6 +13,7 @@ urlpatterns = [
    path('analytics/', views.analytics, name = "analytics"),
    path('category/', views.category, name = "category"),
    path('settings/', views.settings, name = "settings"),
+   path('logout/', views.logout_view, name = "logout"),
 
    
 ]

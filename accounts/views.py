@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Student
 # Create your views here.
@@ -92,5 +92,10 @@ def analytics(request):
 def settings(request):
     return render(request, 'accounts/settings.html')
 
+
+def logout_view(request):
+
+    logout(request)
+    return redirect('home')
 
 
