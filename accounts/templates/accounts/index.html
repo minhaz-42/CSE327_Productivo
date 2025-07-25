@@ -1,6 +1,5 @@
-
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,6 +7,7 @@
   <title>Intelligent Task Planner</title>
 
   <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- Custom Styles -->
@@ -751,6 +751,11 @@
       </div>
 
       <div class="header-right">
+        <!-- Logout Button -->
+  <a href="{% url 'logout'%}" class="logout-btn">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Logout</span>
+  </a>
         <!-- Notification Bell -->
         <div class="notification-wrapper">
           <button class="notification-btn" id="notificationBtn">
@@ -764,32 +769,26 @@
         
         <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar">MH</div>
+          <div class="avatar">{{user.username|slice:"0:1"|upper}}</div>
         </div>
       </div>
     </header>
 
         <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <h2>TaskPlanner</h2>
-      </div>
-      <nav class="sidebar-nav">
-        <ul>
-          <li><a href="{% url 'home'%}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-          <li><a href="{% url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
-          <li><a href="{% url 'schedule' %}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
-          <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-          <li><a href="{% url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-        </ul>
-      </nav>
-      
-      <!-- Sidebar Footer -->
-      <div class="sidebar-footer">
-        <a href="{% url 'logout'%}"><i class="fas fa-sign-in-alt"></i> Logout</a>
-        <!--<a href="register.html"><i class="fas fa-user-plus"></i> Register</a>-->
-      </div>
-    </aside>
+  <div class="sidebar-logo">
+    <h2>TaskPlanner</h2>
+  </div>
+  <nav class="sidebar-nav">
+    <ul>
+      <li><a href="{% url 'dashboard'%}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+      <li><a href="{% url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+      <li><a href="{% url 'schedule' %}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
+      <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+      <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+    </ul>
+  </nav>
+</aside>
 
     <!-- Main Content -->
     <main class="main-content">
