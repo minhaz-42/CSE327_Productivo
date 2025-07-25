@@ -3,27 +3,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Task Management - Task Planner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tasks | Intelligent Task Planner</title>
 
-  <!-- Font Awesome -->
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+  <!-- Custom Styles -->
   <style>
     /* Base Styles & Variables */
     :root {
-      --primary: #5D4037;
-      --primary-light: #8D6E63;
-      --primary-dark: #3E2723;
-      --background: #FAFAFA;
-      --surface: #FFFFFF;
-      --error: #D32F2F;
-      --on-primary: #FFFFFF;
-      --on-surface: #212121;
-      --gray-light: #E0E0E0;
-      --gray-medium: #9E9E9E;
-      --success: #388E3C;
-      --warning: #F57C00;
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #7209b7;
+      --secondary-light: #b5179e;
+      --secondary-dark: #560bad;
+      --background: #f8f9fa;
+      --surface: #ffffff;
+      --error: #f72585;
+      --on-primary: #ffffff;
+      --on-secondary: #ffffff;
+      --on-background: #212529;
+      --on-surface: #212529;
+      --on-error: #ffffff;
+      --gray-light: #e9ecef;
+      --gray-medium: #adb5bd;
+      --gray-dark: #495057;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --info: #4895ef;
+      --priority-high: #ef233c;
+      --priority-medium: #ff9e00;
+      --priority-low: #38b000;
     }
 
     * {
@@ -35,7 +48,8 @@
 
     body {
       background-color: var(--background);
-      color: var(--on-surface);
+      color: var(--on-background);
+      transition: all 0.3s ease;
     }
 
     /* App Layout */
@@ -77,9 +91,78 @@
       border-radius: 4px;
     }
 
+    .menu-btn:hover {
+      background-color: var(--gray-light);
+    }
+
     .app-title {
       font-size: 1.2rem;
       font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .notification-wrapper {
+      position: relative;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--on-surface);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 15px;
+      height: 15px;
+      background-color: var(--error);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+    }
+
+    .notification-panel {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      width: 300px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 15px;
+      z-index: 100;
+    }
+
+    .notification-panel.hidden {
+      display: none;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
     }
 
     /* Sidebar Styles */
@@ -89,6 +172,7 @@
       box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
+      z-index: 20;
     }
 
     .sidebar-logo {
@@ -135,8 +219,38 @@
       color: var(--on-primary);
     }
 
+    .sidebar-nav a.active i {
+      color: var(--on-primary);
+    }
+
     .sidebar-nav i {
       width: 24px;
+      text-align: center;
+      color: var(--gray-medium);
+    }
+
+    /* Sidebar Footer Styles */
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px;
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .sidebar-footer a {
+      display: block;
+      padding: 10px 0;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .sidebar-footer a:hover {
+      color: var(--primary);
+    }
+
+    .sidebar-footer a i {
+      margin-right: 10px;
+      width: 20px;
       text-align: center;
     }
 
@@ -145,27 +259,108 @@
       grid-area: main;
       padding: 20px;
       background-color: var(--background);
+      overflow-y: auto;
     }
 
-    /* Task List Styles */
-    .task-list-container {
-      margin-top: 20px;
+    .tasks-container {
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    .task-list-header {
+    /* Tasks Header */
+    .tasks-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
-    .task-list-actions {
+    .tasks-header h2 {
+      font-size: 1.8rem;
+      color: var(--on-background);
+    }
+
+    .tasks-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    /* Filter and Search Controls */
+    .tasks-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 15px 10px 40px;
+      border: 1px solid var(--gray-light);
+      border-radius: 6px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+      transition: all 0.3s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-medium);
+    }
+
+    .filter-controls {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
+    .filter-btn {
+      padding: 8px 15px;
+      background-color: var(--surface);
+      border: 1px solid var(--gray-light);
+      border-radius: 6px;
+      color: var(--on-surface);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--gray-light);
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+
+    /* Task List Styles */
     .task-list {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 15px;
     }
 
@@ -175,11 +370,21 @@
       padding: 15px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       border-left: 4px solid var(--gray-medium);
+      transition: all 0.2s;
+    }
+
+    .task-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .task-item.completed {
       opacity: 0.7;
       border-left-color: var(--success);
+    }
+
+    .task-item.completed .task-header h4 {
+      text-decoration: line-through;
     }
 
     .task-header {
@@ -189,12 +394,13 @@
       margin-bottom: 8px;
     }
 
-    .task-title {
+    .task-header h4 {
       font-size: 1rem;
+      color: var(--on-surface);
       font-weight: 600;
     }
 
-    .task-priority {
+    .priority-badge {
       font-size: 0.7rem;
       padding: 3px 8px;
       border-radius: 10px;
@@ -202,22 +408,22 @@
       text-transform: uppercase;
     }
 
-    .priority-high {
-      background-color: #FFEBEE;
-      color: var(--error);
+    .priority-badge.high {
+      background-color: rgba(239, 35, 60, 0.1);
+      color: var(--priority-high);
     }
 
-    .priority-medium {
-      background-color: #FFF8E1;
-      color: var(--warning);
+    .priority-badge.medium {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--priority-medium);
     }
 
-    .priority-low {
-      background-color: #E8F5E9;
-      color: var(--success);
+    .priority-badge.low {
+      background-color: rgba(56, 176, 0, 0.1);
+      color: var(--priority-low);
     }
 
-    .task-description {
+    .task-item p {
       font-size: 0.9rem;
       color: var(--gray-medium);
       margin-bottom: 12px;
@@ -225,39 +431,98 @@
 
     .task-meta {
       display: flex;
-      justify-content: space-between;
+      gap: 15px;
       font-size: 0.8rem;
       color: var(--gray-medium);
       margin-bottom: 12px;
     }
 
+    .task-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .task-meta i {
+      font-size: 0.9rem;
+    }
+
     .task-actions {
       display: flex;
       gap: 10px;
+      justify-content: flex-end;
     }
 
-    .btn {
-      padding: 8px 12px;
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
       border: none;
       border-radius: 4px;
-      font-weight: 500;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       transition: all 0.2s;
     }
 
-    .btn-primary {
-      background-color: var(--primary);
-      color: var(--on-primary);
+    .action-btn i {
+      font-size: 0.9rem;
     }
 
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--gray-medium);
-      color: var(--on-surface);
+    .action-btn.edit {
+      background-color: var(--info);
+      color: white;
     }
 
-    /* Task Form Modal */
-    .modal {
+    .action-btn.edit:hover {
+      background-color: #3a7fc4;
+    }
+
+    .action-btn.complete {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .action-btn.complete:hover {
+      background-color: #3aa8d0;
+    }
+
+    .action-btn.delete {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .action-btn.delete:hover {
+      background-color: #d41a5c;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--gray-light);
+      margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+      color: var(--gray-medium);
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: var(--gray-medium);
+      margin-bottom: 20px;
+    }
+
+    /* Task Details Modal */
+    .task-details-modal {
       display: none;
       position: fixed;
       top: 0;
@@ -270,7 +535,7 @@
       justify-content: center;
     }
 
-    .modal-content {
+    .task-details-container {
       background-color: var(--surface);
       width: 90%;
       max-width: 600px;
@@ -279,7 +544,105 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .modal-header {
+    .task-details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .task-details-header h3 {
+      font-size: 1.5rem;
+      color: var(--on-surface);
+    }
+
+    .close-details-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-medium);
+    }
+
+    .task-details-content {
+      margin-bottom: 20px;
+    }
+
+    .task-details-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .task-details-meta div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+    }
+
+    .task-details-meta i {
+      color: var(--gray-medium);
+    }
+
+    .task-details-description {
+      background-color: var(--background);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .task-details-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Add Task Button */
+    .add-task-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Task Form Modal */
+    .task-form-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-form-container {
+      background-color: var(--surface);
+      width: 90%;
+      max-width: 600px;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .task-form-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -294,6 +657,7 @@
       color: var(--gray-medium);
     }
 
+    /* Form Styles */
     .form-group {
       margin-bottom: 15px;
     }
@@ -302,6 +666,7 @@
       display: block;
       margin-bottom: 5px;
       font-size: 0.9rem;
+      color: var(--on-surface);
     }
 
     .form-group input,
@@ -317,7 +682,7 @@
 
     .form-group textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 80px;
     }
 
     .form-row {
@@ -329,8 +694,36 @@
       flex: 1;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* Button Styles */
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .primary-btn {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .primary-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .secondary-btn {
+      background-color: var(--secondary);
+      color: var(--on-secondary);
+    }
+
+    .secondary-btn:hover {
+      background-color: var(--secondary-dark);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
       .app {
         grid-template-areas:
           "header"
@@ -346,8 +739,50 @@
         transition: left 0.3s;
       }
 
-      .sidebar.open {
+      .sidebar.active {
         left: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tasks-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .tasks-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .filter-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        padding: 0 10px;
+      }
+
+      .main-content {
+        padding: 15px;
+      }
+
+      .task-actions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .action-btn {
+        flex: 1;
+        justify-content: center;
       }
     }
   </style>
@@ -362,15 +797,27 @@
         </button>
         <h1 class="app-title">Intelligent Task Planner</h1>
       </div>
+
       <div class="header-right">
+        <!-- Logout Button -->
+  <a href="{% url 'logout'%}" class="logout-btn">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Logout</span>
+  </a>
+        <!-- Notification Bell -->
         <div class="notification-wrapper">
           <button class="notification-btn" id="notificationBtn">
             <i class="fas fa-bell"></i>
-            <span class="notification-badge">0</span>
+            <span class="notification-badge"></span>
           </button>
+          <div class="notification-panel hidden" id="notificationPanel">
+            <p>No new notifications.</p>
+          </div>
         </div>
+        
+        <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar">U</div>
+          <div class="avatar">MH</div>
         </div>
       </div>
     </header>
@@ -382,239 +829,678 @@
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
-          <li><a href="tasks.html" class="active"><i class="fas fa-tasks"></i> Tasks</a></li>
-          <li><a href="schedule.html"><i class="fas fa-calendar-alt"></i> Schedule</a></li>
-          <li><a href="analytics.html"><i class="fas fa-chart-bar"></i> Analytics</a></li>
-          <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
-        </ul>
+          <li><a href="{% url 'dashboard'%}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+          <li><a href="{% url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+          <li><a href="{% url 'schedule' %}"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
+          <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+          <li><a href="{% url 'settings'%}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
       </nav>
-      <div class="sidebar-footer">
-        <a href="login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-        <a href="register.html"><i class="fas fa-user-plus"></i> Register</a>
-      </div>
+      
+      <!-- Sidebar Footer -->
+
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="task-list-container">
-        <div class="task-list-header">
-          <h2>My Tasks</h2>
-          <div class="task-list-actions">
-            <button class="btn btn-primary" id="addTaskBtn">
-              <i class="fas fa-plus"></i> Add Task
-            </button>
-            <button class="btn btn-outline">
-              <i class="fas fa-filter"></i> Filter
+      <div class="tasks-container">
+        <!-- Tasks Header -->
+        <div class="tasks-header">
+          <h2><i class="fas fa-tasks"></i> My Tasks</h2>
+          <div class="tasks-actions">
+            <button class="primary-btn" id="createTaskBtn">
+              <i class="fas fa-plus"></i> Create Task
             </button>
           </div>
         </div>
 
-        <div class="task-list">
+        <!-- Filter and Search Controls -->
+        <div class="tasks-controls">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search tasks..." id="taskSearch">
+          </div>
+          <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">
+              <i class="fas fa-list"></i> All
+            </button>
+            <button class="filter-btn" data-filter="today">
+              <i class="fas fa-calendar-day"></i> Today
+            </button>
+            <button class="filter-btn" data-filter="upcoming">
+              <i class="fas fa-calendar-week"></i> Upcoming
+            </button>
+            <button class="filter-btn" data-filter="completed">
+              <i class="fas fa-check-circle"></i> Completed
+            </button>
+          </div>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-list" id="taskList">
           <!-- Task Item 1 -->
-          <div class="task-item">
+          <div class="task-item" data-priority="high" data-due="2025-07-25" data-status="pending">
             <div class="task-header">
-              <h3 class="task-title">Complete project proposal</h3>
-              <span class="task-priority priority-high">High</span>
+              <h4>Complete project proposal</h4>
+              <span class="priority-badge high">High</span>
             </div>
-            <p class="task-description">Finish the proposal document and send to client by Friday</p>
+            <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
             <div class="task-meta">
-              <span><i class="fas fa-calendar-alt"></i> Due: May 15, 2023</span>
+              <span><i class="fas fa-clock"></i> Due today, 5:00 PM</span>
               <span><i class="fas fa-tag"></i> Work</span>
             </div>
             <div class="task-actions">
-              <button class="btn btn-primary edit-task" data-task-id="1">
-                <i class="fas fa-edit"></i> Edit
+              <button class="action-btn edit" data-task-id="1">
+                <i class="fas fa-pencil-alt"></i> Edit
               </button>
-              <button class="btn btn-outline complete-task" data-task-id="1">
+              <button class="action-btn complete" data-task-id="1">
                 <i class="fas fa-check"></i> Complete
               </button>
-              <button class="btn btn-outline delete-task" data-task-id="1">
+              <button class="action-btn delete" data-task-id="1">
                 <i class="fas fa-trash"></i> Delete
               </button>
             </div>
           </div>
 
           <!-- Task Item 2 -->
-          <div class="task-item completed">
+          <div class="task-item" data-priority="medium" data-due="2025-07-26" data-status="pending">
             <div class="task-header">
-              <h3 class="task-title">Team meeting</h3>
-              <span class="task-priority priority-medium">Medium</span>
+              <h4>Client presentation</h4>
+              <span class="priority-badge medium">Medium</span>
             </div>
-            <p class="task-description">Weekly team sync at 10am in Conference Room B</p>
+            <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
             <div class="task-meta">
-              <span><i class="fas fa-calendar-alt"></i> Completed: May 10, 2023</span>
+              <span><i class="fas fa-clock"></i> Due tomorrow, 10:00 AM</span>
+              <span><i class="fas fa-tag"></i> Presentation</span>
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit" data-task-id="2">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </button>
+              <button class="action-btn complete" data-task-id="2">
+                <i class="fas fa-check"></i> Complete
+              </button>
+              <button class="action-btn delete" data-task-id="2">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Task Item 3 -->
+          <div class="task-item completed" data-priority="low" data-due="2025-07-24" data-status="completed">
+            <div class="task-header">
+              <h4>Team meeting</h4>
+              <span class="priority-badge low">Low</span>
+            </div>
+            <p>Weekly team sync to discuss project progress and blockers.</p>
+            <div class="task-meta">
+              <span><i class="fas fa-check-circle"></i> Completed yesterday</span>
               <span><i class="fas fa-tag"></i> Meeting</span>
             </div>
             <div class="task-actions">
-              <button class="btn btn-outline edit-task" data-task-id="2">
-                <i class="fas fa-edit"></i> Edit
+              <button class="action-btn delete" data-task-id="3">
+                <i class="fas fa-trash"></i> Delete
               </button>
-              <button class="btn btn-primary undo-complete" data-task-id="2">
-                <i class="fas fa-undo"></i> Undo
+            </div>
+          </div>
+
+          <!-- Task Item 4 -->
+          <div class="task-item" data-priority="high" data-due="2025-07-27" data-status="pending">
+            <div class="task-header">
+              <h4>Submit quarterly report</h4>
+              <span class="priority-badge high">High</span>
+            </div>
+            <p>Compile and submit the Q3 financial report to management.</p>
+            <div class="task-meta">
+              <span><i class="fas fa-clock"></i> Due in 2 days</span>
+              <span><i class="fas fa-tag"></i> Finance</span>
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit" data-task-id="4">
+                <i class="fas fa-pencil-alt"></i> Edit
               </button>
-              <button class="btn btn-outline delete-task" data-task-id="2">
+              <button class="action-btn complete" data-task-id="4">
+                <i class="fas fa-check"></i> Complete
+              </button>
+              <button class="action-btn delete" data-task-id="4">
                 <i class="fas fa-trash"></i> Delete
               </button>
             </div>
           </div>
         </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <i class="fas fa-tasks"></i>
+          <h3>No tasks found</h3>
+          <p>Create a new task or adjust your filters to see more tasks.</p>
+          <button class="primary-btn" id="createTaskEmptyBtn">
+            <i class="fas fa-plus"></i> Create Task
+          </button>
+        </div>
       </div>
     </main>
 
+    <!-- Add Task Floating Button -->
+    <button class="add-task-btn" id="addTaskBtn">
+      <i class="fas fa-plus"></i>
+    </button>
+
     <!-- Task Form Modal -->
-    <div class="modal" id="taskModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="modalTitle">Add New Task</h3>
-          <button class="close-btn" id="closeModal">&times;</button>
+    <div class="task-form-modal" id="taskFormModal">
+      <div class="task-form-container">
+        <div class="task-form-header">
+          <h3>Add New Task</h3>
+          <button class="close-btn" id="closeTaskForm">&times;</button>
         </div>
         <form id="taskForm">
-          <input type="hidden" id="taskId">
           <div class="form-group">
-            <label for="taskTitle">Title*</label>
-            <input type="text" id="taskTitle" required>
+            <label for="title">Title*</label>
+            <input type="text" id="title" required placeholder="Enter task title" />
           </div>
           <div class="form-group">
-            <label for="taskDescription">Description</label>
-            <textarea id="taskDescription" rows="4"></textarea>
+            <label for="description">Description</label>
+            <textarea id="description" rows="3" placeholder="Add details about the task"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="taskPriority">Priority*</label>
-              <select id="taskPriority" required>
+              <label for="priority">Priority*</label>
+              <select id="priority" required>
                 <option value="low">Low</option>
                 <option value="medium" selected>Medium</option>
                 <option value="high">High</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="taskDueDate">Due Date*</label>
-              <input type="date" id="taskDueDate" required>
+              <label for="category">Category</label>
+              <select id="category">
+                <option value="">None</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="finance">Finance</option>
+                <option value="health">Health</option>
+              </select>
             </div>
           </div>
-          <div class="form-group">
-            <label for="taskCategory">Category</label>
-            <input type="text" id="taskCategory" placeholder="e.g. Work, Personal">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="deadline">Deadline*</label>
+              <input type="datetime-local" id="deadline" required />
+            </div>
+            <div class="form-group">
+              <label for="reminder">Reminder</label>
+              <select id="reminder">
+                <option value="">None</option>
+                <option value="15">15 minutes before</option>
+                <option value="30">30 minutes before</option>
+                <option value="60">1 hour before</option>
+                <option value="1440">1 day before</option>
+              </select>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary">Save Task</button>
+          <button type="submit" class="primary-btn btn btn-block">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
         </form>
+      </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div class="task-details-modal" id="taskDetailsModal">
+      <div class="task-details-container">
+        <div class="task-details-header">
+          <h3 id="taskDetailsTitle">Task Details</h3>
+          <button class="close-details-btn" id="closeTaskDetails">&times;</button>
+        </div>
+        <div class="task-details-content">
+          <div class="task-details-meta">
+            <div id="taskDetailsPriority">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>High Priority</span>
+            </div>
+            <div id="taskDetailsDue">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Due: Today, 5:00 PM</span>
+            </div>
+            <div id="taskDetailsCategory">
+              <i class="fas fa-tag"></i>
+              <span>Work</span>
+            </div>
+            <div id="taskDetailsStatus">
+              <i class="fas fa-info-circle"></i>
+              <span>Status: Pending</span>
+            </div>
+          </div>
+          <div class="task-details-description">
+            <h4>Description</h4>
+            <p id="taskDetailsDesc">Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
+          </div>
+        </div>
+        <div class="task-details-actions">
+          <button class="btn secondary-btn" id="editTaskBtn">
+            <i class="fas fa-pencil-alt"></i> Edit
+          </button>
+          <button class="btn primary-btn" id="completeTaskBtn">
+            <i class="fas fa-check"></i> Complete
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- JavaScript -->
   <script>
     // DOM Elements
-    const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
     const addTaskBtn = document.getElementById('addTaskBtn');
-    const taskModal = document.getElementById('taskModal');
-    const closeModal = document.getElementById('closeModal');
-    const modalTitle = document.getElementById('modalTitle');
+    const createTaskBtn = document.getElementById('createTaskBtn');
+    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
+    const taskFormModal = document.getElementById('taskFormModal');
+    const closeTaskForm = document.getElementById('closeTaskForm');
     const taskForm = document.getElementById('taskForm');
-    const editButtons = document.querySelectorAll('.edit-task');
-    const completeButtons = document.querySelectorAll('.complete-task');
-    const deleteButtons = document.querySelectorAll('.delete-task');
-    const undoButtons = document.querySelectorAll('.undo-complete');
+    const taskList = document.getElementById('taskList');
+    const emptyState = document.getElementById('emptyState');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const taskSearch = document.getElementById('taskSearch');
+    const taskDetailsModal = document.getElementById('taskDetailsModal');
+    const closeTaskDetails = document.getElementById('closeTaskDetails');
+    const editTaskBtn = document.getElementById('editTaskBtn');
+    const completeTaskBtn = document.getElementById('completeTaskBtn');
 
-    // Toggle Sidebar (mobile)
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
-
-    // Task Modal Functions
-    function openModal(title, isEdit = false) {
-      modalTitle.textContent = title;
-      taskModal.style.display = 'flex';
-      if (isEdit) {
-        // For demo purposes, we'll just clear the form
-        taskForm.reset();
-        document.getElementById('taskId').value = '';
+    // Sample tasks data
+    let tasks = [
+      {
+        id: 1,
+        title: "Complete project proposal",
+        description: "Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.",
+        priority: "high",
+        category: "work",
+        dueDate: "2025-07-25T17:00",
+        reminder: "60",
+        status: "pending",
+        completedAt: null
+      },
+      {
+        id: 2,
+        title: "Client presentation",
+        description: "Prepare slides and demo for quarterly review meeting with key stakeholders.",
+        priority: "medium",
+        category: "presentation",
+        dueDate: "2025-07-26T10:00",
+        reminder: "1440",
+        status: "pending",
+        completedAt: null
+      },
+      {
+        id: 3,
+        title: "Team meeting",
+        description: "Weekly team sync to discuss project progress and blockers.",
+        priority: "low",
+        category: "meeting",
+        dueDate: "2025-07-24T10:30",
+        reminder: "",
+        status: "completed",
+        completedAt: "2025-07-24T10:30"
+      },
+      {
+        id: 4,
+        title: "Submit quarterly report",
+        description: "Compile and submit the Q3 financial report to management.",
+        priority: "high",
+        category: "finance",
+        dueDate: "2025-07-27T09:00",
+        reminder: "1440",
+        status: "pending",
+        completedAt: null
       }
-    }
+    ];
 
-    function closeModalFunc() {
-      taskModal.style.display = 'none';
-    }
+    // Current filter state
+    let currentFilter = "all";
+    let currentSearch = "";
 
-    // Event Listeners
-    addTaskBtn.addEventListener('click', () => {
-      openModal('Add New Task');
+    // Toggle Sidebar (for mobile)
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
     });
 
-    closeModal.addEventListener('click', closeModalFunc);
+    // Toggle Notification Panel
+    notificationBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notificationPanel.classList.toggle('hidden');
+    });
+
+    // Close notification panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!notificationPanel.contains(e.target) && e.target !== notificationBtn) {
+        notificationPanel.classList.add('hidden');
+      }
+    });
+
+    // Toggle Task Form Modal
+    function openTaskForm() {
+      taskFormModal.style.display = 'flex';
+    }
+
+    [addTaskBtn, createTaskBtn, createTaskEmptyBtn].forEach(btn => {
+      btn.addEventListener('click', openTaskForm);
+    });
+
+    closeTaskForm.addEventListener('click', () => {
+      taskFormModal.style.display = 'none';
+    });
 
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
-      if (e.target === taskModal) {
-        closeModalFunc();
+      if (e.target === taskFormModal) {
+        taskFormModal.style.display = 'none';
+      }
+      if (e.target === taskDetailsModal) {
+        taskDetailsModal.style.display = 'none';
       }
     });
 
-    // Edit Task buttons
-    editButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const taskId = e.target.getAttribute('data-task-id');
-        // In a real app, you would fetch task data here
-        openModal('Edit Task', true);
-        document.getElementById('taskId').value = taskId;
-        
-        // For demo, we'll just fill with sample data
-        if (taskId === '1') {
-          document.getElementById('taskTitle').value = 'Complete project proposal';
-          document.getElementById('taskDescription').value = 'Finish the proposal document and send to client by Friday';
-          document.getElementById('taskPriority').value = 'high';
-          document.getElementById('taskDueDate').value = '2023-05-15';
-          document.getElementById('taskCategory').value = 'Work';
-        } else if (taskId === '2') {
-          document.getElementById('taskTitle').value = 'Team meeting';
-          document.getElementById('taskDescription').value = 'Weekly team sync at 10am in Conference Room B';
-          document.getElementById('taskPriority').value = 'medium';
-          document.getElementById('taskDueDate').value = '2023-05-10';
-          document.getElementById('taskCategory').value = 'Meeting';
-        }
-      });
-    });
-
-    // Form Submission
-    taskForm.addEventListener('submit', (e) => {
+    // Task Form Submission
+    taskForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      const taskId = document.getElementById('taskId').value;
       
-      if (taskId) {
-        alert(`Task ${taskId} updated successfully!`);
+      const newTask = {
+        id: tasks.length + 1,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        dueDate: document.getElementById('deadline').value,
+        reminder: document.getElementById('reminder').value,
+        status: "pending",
+        completedAt: null
+      };
+      
+      tasks.push(newTask);
+      renderTasks();
+      
+      alert('Task added successfully!');
+      this.reset();
+      taskFormModal.style.display = 'none';
+    });
+
+    // Filter Tasks
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        renderTasks();
+      });
+    });
+
+    // Search Tasks
+    taskSearch.addEventListener('input', function() {
+      currentSearch = this.value.toLowerCase();
+      renderTasks();
+    });
+
+    // Render Tasks based on filter and search
+    function renderTasks() {
+      const today = new Date().toISOString().split('T')[0];
+      
+      let filteredTasks = tasks.filter(task => {
+        // Apply search filter
+        if (currentSearch && !task.title.toLowerCase().includes(currentSearch) && 
+            !task.description.toLowerCase().includes(currentSearch)) {
+          return false;
+        }
+        
+        // Apply status filter
+        if (currentFilter === "completed" && task.status !== "completed") return false;
+        if (currentFilter === "pending" && task.status === "completed") return false;
+        
+        // Apply date filters
+        if (currentFilter === "today") {
+          const taskDate = task.dueDate.split('T')[0];
+          return taskDate === today && task.status !== "completed";
+        }
+        
+        if (currentFilter === "upcoming") {
+          const taskDate = task.dueDate.split('T')[0];
+          return taskDate > today && task.status !== "completed";
+        }
+        
+        return true;
+      });
+      
+      // Sort tasks by priority and due date
+      filteredTasks.sort((a, b) => {
+        const priorityOrder = { high: 1, medium: 2, low: 3 };
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        }
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      });
+      
+      // Display empty state if no tasks
+      if (filteredTasks.length === 0) {
+        taskList.style.display = 'none';
+        emptyState.style.display = 'block';
       } else {
-        alert('New task added successfully!');
+        taskList.style.display = 'flex';
+        emptyState.style.display = 'none';
+        
+        // Clear existing tasks
+        taskList.innerHTML = '';
+        
+        // Add filtered tasks
+        filteredTasks.forEach(task => {
+          const taskDate = new Date(task.dueDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          let dueText = '';
+          if (task.status === "completed") {
+            dueText = `Completed at ${formatTime(task.completedAt)}`;
+          } else if (taskDate.toISOString().split('T')[0] === today.toISOString().split('T')[0]) {
+            dueText = `Due today, ${formatTime(task.dueDate)}`;
+          } else if (taskDate < today) {
+            dueText = `Overdue since ${formatDate(task.dueDate)}`;
+          } else {
+            dueText = `Due ${formatDate(task.dueDate)}`;
+          }
+          
+          const taskItem = document.createElement('div');
+          taskItem.className = `task-item ${task.status === "completed" ? 'completed' : ''}`;
+          taskItem.dataset.priority = task.priority;
+          taskItem.dataset.due = task.dueDate.split('T')[0];
+          taskItem.dataset.status = task.status;
+          
+          taskItem.innerHTML = `
+            <div class="task-header">
+              <h4>${task.title}</h4>
+              <span class="priority-badge ${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+            </div>
+            <p>${task.description}</p>
+            <div class="task-meta">
+              <span><i class="fas fa-clock"></i> ${dueText}</span>
+              ${task.category ? `<span><i class="fas fa-tag"></i> ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}</span>` : ''}
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit" data-task-id="${task.id}">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </button>
+              ${task.status !== "completed" ? `
+              <button class="action-btn complete" data-task-id="${task.id}">
+                <i class="fas fa-check"></i> Complete
+              </button>
+              ` : ''}
+              <button class="action-btn delete" data-task-id="${task.id}">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          `;
+          
+          taskList.appendChild(taskItem);
+        });
       }
       
-      closeModalFunc();
-    });
-
-    // Complete/Delete Task buttons (demo functionality)
-    completeButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const taskItem = e.target.closest('.task-item');
-        taskItem.classList.add('completed');
-        alert('Task marked as completed!');
+      // Add event listeners to new task buttons
+      document.querySelectorAll('.action-btn.complete').forEach(btn => {
+        btn.addEventListener('click', completeTask);
       });
-    });
-
-    undoButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const taskItem = e.target.closest('.task-item');
-        taskItem.classList.remove('completed');
-        alert('Task status undone!');
+      
+      document.querySelectorAll('.action-btn.delete').forEach(btn => {
+        btn.addEventListener('click', deleteTask);
       });
-    });
+      
+      document.querySelectorAll('.action-btn.edit').forEach(btn => {
+        btn.addEventListener('click', viewTaskDetails);
+      });
+      
+      document.querySelectorAll('.task-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          if (!e.target.closest('.task-actions')) {
+            viewTaskDetails.call(this.querySelector('.edit'));
+          }
+        });
+      });
+    }
+    
+    // Helper functions for date formatting
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { weekday: 'long', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+    
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
 
-    deleteButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        if (confirm('Are you sure you want to delete this task?')) {
-          e.target.closest('.task-item').remove();
-          alert('Task deleted!');
+    // Task Actions
+    function completeTask() {
+      const taskId = parseInt(this.dataset.taskId);
+      const task = tasks.find(t => t.id === taskId);
+      
+      if (task) {
+        task.status = "completed";
+        task.completedAt = new Date().toISOString();
+        renderTasks();
+      }
+    }
+    
+    function deleteTask() {
+      if (confirm('Are you sure you want to delete this task?')) {
+        const taskId = parseInt(this.dataset.taskId);
+        tasks = tasks.filter(t => t.id !== taskId);
+        renderTasks();
+      }
+    }
+    
+    function viewTaskDetails() {
+      const taskId = parseInt(this.dataset.taskId);
+      const task = tasks.find(t => t.id === taskId);
+      
+      if (task) {
+        document.getElementById('taskDetailsTitle').textContent = task.title;
+        document.getElementById('taskDetailsDesc').textContent = task.description;
+        
+        // Update priority
+        const priorityElement = document.getElementById('taskDetailsPriority');
+        priorityElement.querySelector('span').textContent = `${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority`;
+        
+        // Update due date
+        const dueElement = document.getElementById('taskDetailsDue');
+        dueElement.querySelector('span').textContent = `Due: ${formatDate(task.dueDate)} at ${formatTime(task.dueDate)}`;
+        
+        // Update category
+        const categoryElement = document.getElementById('taskDetailsCategory');
+        if (task.category) {
+          categoryElement.style.display = 'flex';
+          categoryElement.querySelector('span').textContent = task.category.charAt(0).toUpperCase() + task.category.slice(1);
+        } else {
+          categoryElement.style.display = 'none';
         }
-      });
+        
+        // Update status
+        const statusElement = document.getElementById('taskDetailsStatus');
+        statusElement.querySelector('span').textContent = `Status: ${task.status.charAt(0).toUpperCase() + task.status.slice(1)}`;
+        
+        // Set task ID on action buttons
+        completeTaskBtn.dataset.taskId = task.id;
+        editTaskBtn.dataset.taskId = task.id;
+        
+        // Show modal
+        taskDetailsModal.style.display = 'flex';
+      }
+    }
+    
+    // Task Details Actions
+    completeTaskBtn.addEventListener('click', function() {
+      const taskId = parseInt(this.dataset.taskId);
+      const task = tasks.find(t => t.id === taskId);
+      
+      if (task) {
+        task.status = "completed";
+        task.completedAt = new Date().toISOString();
+        renderTasks();
+        taskDetailsModal.style.display = 'none';
+      }
     });
+    
+    editTaskBtn.addEventListener('click', function() {
+      const taskId = parseInt(this.dataset.taskId);
+      const task = tasks.find(t => t.id === taskId);
+      
+      if (task) {
+        // Fill form with task data
+        document.getElementById('title').value = task.title;
+        document.getElementById('description').value = task.description;
+        document.getElementById('priority').value = task.priority;
+        document.getElementById('category').value = task.category || '';
+        document.getElementById('deadline').value = task.dueDate.substring(0, 16);
+        document.getElementById('reminder').value = task.reminder || '';
+        
+        // Change form to edit mode
+        taskForm.querySelector('h3').textContent = 'Edit Task';
+        taskForm.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        
+        // Remove existing submit listener
+        taskForm.replaceWith(taskForm.cloneNode(true));
+        
+        // Add new submit listener for edit
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          task.title = document.getElementById('title').value;
+          task.description = document.getElementById('description').value;
+          task.priority = document.getElementById('priority').value;
+          task.category = document.getElementById('category').value;
+          task.dueDate = document.getElementById('deadline').value;
+          task.reminder = document.getElementById('reminder').value;
+          
+          renderTasks();
+          alert('Task updated successfully!');
+          taskFormModal.style.display = 'none';
+          
+          // Reset form to add mode
+          taskForm.querySelector('h3').textContent = 'Add New Task';
+          taskForm.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add Task';
+          taskForm.reset();
+        });
+        
+        // Close details modal and open form
+        taskDetailsModal.style.display = 'none';
+        taskFormModal.style.display = 'flex';
+      }
+    });
+    
+    closeTaskDetails.addEventListener('click', () => {
+      taskDetailsModal.style.display = 'none';
+    });
+
+    // Initial render
+    renderTasks();
   </script>
 </body>
 </html>
