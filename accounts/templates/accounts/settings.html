@@ -1466,7 +1466,7 @@
   </div>
 
   <!-- JavaScript -->
-  <script>
+ <script>
     // DOM Elements
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
@@ -1479,6 +1479,7 @@
     const avatarInitials = document.getElementById('avatarInitials');
     const removeAvatarBtn = document.getElementById('removeAvatar');
     const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    const profileForm = document.getElementById('profileForm');
 
     // Toggle Sidebar (for mobile)
     sidebarToggle.addEventListener('click', () => {
@@ -1517,38 +1518,104 @@
       });
     });
 
-    // Avatar Upload
-    avatarUpload.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          avatarPreview.src = event.target.result;
-          avatarPreview.style.display = 'block';
-          avatarInitials.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+    // Enhanced Avatar Upload with Preview
+    if (avatarUpload) {
+      avatarUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Validate file type
+          if (!file.type.match('image.*')) {
+            alert('Please select a valid image file (JPEG, PNG, GIF)');
+            this.value = '';
+            return;
+          }
 
-    // Remove Avatar
-    removeAvatarBtn.addEventListener('click', function() {
-      avatarPreview.src = '';
-      avatarPreview.style.display = 'none';
-      avatarInitials.style.display = 'flex';
-      avatarUpload.value = '';
-    });
+          // Validate file size (2MB max)
+          if (file.size > 2 * 1024 * 1024) {
+            alert('Image size must be less than 2MB');
+            this.value = '';
+            return;
+          }
 
-    // Form Submissions
-    
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (confirm('Are you sure you want to update your account?')) {
-      this.submit();
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            // Create image preview if it doesn't exist
+            let previewImg = avatarPreview;
+            if (!previewImg) {
+              previewImg = document.createElement('img');
+              previewImg.id = 'avatarPreview';
+              previewImg.alt = 'Profile Preview';
+              previewImg.style.display = 'block';
+              document.querySelector('.avatar-preview').appendChild(previewImg);
+            }
+            
+            previewImg.src = event.target.result;
+            previewImg.style.display = 'block';
+            
+            if (avatarInitials) {
+              avatarInitials.style.display = 'none';
+            }
+          };
+          reader.onerror = function() {
+            alert('Error reading the file');
+            avatarUpload.value = '';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
-    })
 
-    
+    // Enhanced Remove Avatar Function
+    if (removeAvatarBtn) {
+      removeAvatarBtn.addEventListener('click', function() {
+        if (avatarPreview) {
+          avatarPreview.src = '';
+          avatarPreview.style.display = 'none';
+        }
+        if (avatarInitials) {
+          avatarInitials.style.display = 'flex';
+        }
+        if (avatarUpload) {
+          avatarUpload.value = '';
+        }
+        
+        // Add hidden field to notify server to remove avatar
+        const existingRemoveField = document.querySelector('input[name="remove_avatar"]');
+        if (!existingRemoveField && profileForm) {
+          const removeField = document.createElement('input');
+          removeField.type = 'hidden';
+          removeField.name = 'remove_avatar';
+          removeField.value = 'true';
+          profileForm.appendChild(removeField);
+        }
+      });
+    }
+
+    // Profile Form Submission with Validation
+    if (profileForm) {
+      profileForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const emailInput = document.getElementById('email');
+        const email = emailInput ? emailInput.value.trim() : '';
+        
+        // Email validation
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+        
+        if (confirm('Are you sure you want to update your profile information?')) {
+          // Show loading state
+          const saveBtn = this.querySelector('button[type="submit"]');
+          if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+          }
+          this.submit();
+        }
+      });
+    }
 
     document.getElementById('preferencesForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -1589,21 +1656,3 @@
       document.getElementById('timeFormat').value = '12';
     });
   </script>
-</body>
-    {% if updated %}
-  <script>
-    alert("{{ updated }}");
-    window.location.href = "{% url 'settings' %}";
-  </script>
-    {% endif %}
-
-    {% if error %}
-  <script>
-    alert("{{ error }}");
-  </script>
-    {% endif %}
-</html>
-
-
-              
-              
