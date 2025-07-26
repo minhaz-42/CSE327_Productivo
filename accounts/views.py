@@ -1,3 +1,4 @@
+from pyexpat.errors import messages
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
@@ -94,8 +95,25 @@ def settings(request):
 
 
 def logout_view(request):
-
     logout(request)
     return redirect('home')
+
+def profile_update(request):
+     
+     context = {}  ##context dictionary
+     if request.method == "POST":
+         user = request.user
+         profile_picture = request.FILES.get('profile_picture')
+         user.first_name = request.POST.get('first_name', user.first_name)
+         user.last_name = request.POST.get('last_name', user.last_name)
+         user.email = request.POST.get('email', user.email)
+         user.save()
+         context['updated'] = "Profile Updated Successfully!"
+    
+   
+     context['error'] = "Error in updating!"
+
+     return render(request, "accounts/settings.html", context)
+
 
 
