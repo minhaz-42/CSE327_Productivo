@@ -1263,7 +1263,7 @@
             <div class="avatar-upload">
               <div class="avatar-preview">
                 {% if user.student.profile_pic %}
-                <img src="{{ user.student.profile_pic.url }}" alt="Profile Preview" id="avatarPreview">
+                <img src="{{ user.student.profile_pic.url }}" alt="No Photo" id="avatarPreview">
                 {% else %}
                 <div class="avatar-initials" id="avatarInitials">{{ user.username|slice:"0:1"|upper}}</div>
                 <!--<div class="avatar-initials" id="avatarInitials">MH</div>-->

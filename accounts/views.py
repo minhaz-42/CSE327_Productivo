@@ -74,22 +74,27 @@ def login(request):
 
     return render(request, 'accounts/login.html', context)
 
-@login_required
+@login_required(login_url= 'login')
 def dashboard(request):
     return render(request, 'accounts/index.html')
 
+@login_required
 def task(request):
     return render(request, 'accounts/tasks.html')
 
+@login_required
 def schedule(request):
     return render(request, 'accounts/schedule.html')
 
+@login_required
 def category(request):
     return render(request, 'accounts/category.html')
 
+@login_required
 def analytics(request):
     return render(request, 'accounts/analytics.html')
 
+@login_required
 def settings(request):
     return render(request, 'accounts/settings.html')
 
@@ -103,15 +108,30 @@ def profile_update(request):
      context = {}  ##context dictionary
      if request.method == "POST":
          user = request.user
-         profile_picture = request.FILES.get('profile_picture')
+         student = user.student
          user.first_name = request.POST.get('first_name', user.first_name)
          user.last_name = request.POST.get('last_name', user.last_name)
          user.email = request.POST.get('email', user.email)
          user.save()
+
+        #remove avatar 
+         if request.POST.get('remove_avatar') == 'true':
+             if student.profile_pic:
+                student.profile_pic.delete(save=False)  # delete file
+                student.profile_pic = None
+                student.save()
+            
+        #store profile pic
+         profile_pic = request.FILES.get('profile_pic')
+         if(profile_pic):
+              student.profile_pic = profile_pic
+              student.save()
+
          context['updated'] = "Profile Updated Successfully!"
     
    
-     context['error'] = "Error in updating!"
+     else:
+         context['error'] = "Error in updating!"
 
      return render(request, "accounts/settings.html", context)
 
