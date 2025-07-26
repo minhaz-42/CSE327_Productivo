@@ -73,30 +73,24 @@ def login(request):
 
     return render(request, 'accounts/login.html', context)
 
-@login_required(login_url= 'login')
-def dashboard(request):
-    user = request.user ##getting the user which logged in
-    return render(request, 'accounts/index.html', {'user': user})
-
 @login_required
+def dashboard(request):
+    return render(request, 'accounts/index.html')
+
 def task(request):
     return render(request, 'accounts/tasks.html')
 
-@login_required
 def schedule(request):
     return render(request, 'accounts/schedule.html')
 
-@login_required
 def category(request):
     return render(request, 'accounts/category.html')
 
-@login_required
 def analytics(request):
     return render(request, 'accounts/analytics.html')
 
-@login_required
 def settings(request):
-    return render(request, 'accounts/settings.html',{'user': request.user})
+    return render(request, 'accounts/settings.html')
 
 
 def logout_view(request):

@@ -817,7 +817,7 @@
         
         <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar">{{ user.first_name|slice:"0:1"|upper }}</div>
+          <div class="avatar">MH</div>
         </div>
       </div>
     </header>
@@ -846,11 +846,6 @@
         <!-- Tasks Header -->
         <div class="tasks-header">
           <h2><i class="fas fa-tasks"></i> My Tasks</h2>
-          <div class="tasks-actions">
-            <button class="primary-btn" id="createTaskBtn">
-              <i class="fas fa-plus"></i> Create Task
-            </button>
-          </div>
         </div>
 
         <!-- Filter and Search Controls -->
@@ -1095,8 +1090,6 @@
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationPanel = document.getElementById('notificationPanel');
     const addTaskBtn = document.getElementById('addTaskBtn');
-    const createTaskBtn = document.getElementById('createTaskBtn');
-    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
     const taskFormModal = document.getElementById('taskFormModal');
     const closeTaskForm = document.getElementById('closeTaskForm');
     const taskForm = document.getElementById('taskForm');
@@ -1108,6 +1101,7 @@
     const closeTaskDetails = document.getElementById('closeTaskDetails');
     const editTaskBtn = document.getElementById('editTaskBtn');
     const completeTaskBtn = document.getElementById('completeTaskBtn');
+    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
 
     // Sample tasks data
     let tasks = [
@@ -1184,7 +1178,7 @@
       taskFormModal.style.display = 'flex';
     }
 
-    [addTaskBtn, createTaskBtn, createTaskEmptyBtn].forEach(btn => {
+    [addTaskBtn, createTaskEmptyBtn].forEach(btn => {
       btn.addEventListener('click', openTaskForm);
     });
 

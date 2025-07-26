@@ -1295,10 +1295,7 @@
               <input type="email" id="email" placeholder="Enter your email" value="{{ user.email }}">
             </div>
             
-            <div class="form-group">
-              <label for="bio">Bio</label>
-              <textarea id="bio" placeholder="Tell us about yourself">Productivity enthusiast and task management expert. Helping people organize their work and life more efficiently.</textarea>
-            </div>
+            
             
             <button type="submit" class="btn primary-btn">
               <i class="fas fa-save"></i> Save Changes
@@ -1580,6 +1577,12 @@
       document.getElementById('defaultView').value = 'dashboard';
       document.getElementById('weekStart').value = 'monday';
       document.getElementById('timeFormat').value = '12';
+    });
+    function openEventForm() {
+  eventFormModal.style.display = 'flex';
+}
+    closeEventForm.addEventListener('click', () => {
+      eventFormModal.style.display = 'none';
     });
   </script>
 </body>
