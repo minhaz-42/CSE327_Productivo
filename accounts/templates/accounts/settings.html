@@ -1431,15 +1431,16 @@
         <!-- Account Settings -->
         <div class="settings-section" id="account-section">
           <h3>Account Settings</h3>
-          <form id="accountForm">
+          <form id="accountForm" method = "POST"  action = "{% url 'reset_password'%}">
+            {% csrf_token %} 
             <div class="form-group">
               <label for="currentPassword">Current Password</label>
-              <input type="password" id="currentPassword" placeholder="Enter your current password">
+              <input type="password" name = "password" id="currentPassword" placeholder="Enter your current password">
             </div>
             
             <div class="form-group">
               <label for="newPassword">New Password</label>
-              <input type="password" id="newPassword" placeholder="Enter new password">
+              <input type="password" name = "new_password" id="newPassword" placeholder="Enter new password">
             </div>
             
             <div class="form-group">
@@ -1636,9 +1637,7 @@
         alert('Passwords do not match!');
         return;
       }
-      
-      alert('Password changed successfully!');
-      this.reset();
+      this.submit();
     });
 
     // Delete Account Confirmation
@@ -1656,3 +1655,16 @@
       document.getElementById('timeFormat').value = '12';
     });
   </script>
+  {% if success %}
+  <script>
+    alert("{{ success }}")
+   window.location.href = "{% url 'settings' %}";
+  </script>
+    {% endif %}
+
+    {% if error %}
+  <script>
+    alert("{{ error }}");
+  </script>
+    {% endif %}
+    

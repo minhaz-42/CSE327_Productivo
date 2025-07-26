@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth import authenticate, login as auth_login, logout,update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from .models import Student
 # Create your views here.
@@ -135,5 +135,24 @@ def profile_update(request):
 
      return render(request, "accounts/settings.html", context)
 
+def reset_password(request):
+      context = {} #context dictinary
 
+      if request.method == "POST":
+        user = request.user
+        current_password = request.POST.get('password')
 
+        if user.check_password(current_password):
+           new_pass = request.POST.get('new_password')
+           user.set_password(new_pass)
+           user.save()
+
+           update_session_auth_hash(request, user)
+           context['success'] = "Password changed successfull!"
+        
+    
+      
+         
+        context['error'] = "Error in changing password!"
+
+      return render(request, "accounts/settings.html", context)

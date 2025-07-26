@@ -15,7 +15,9 @@ urlpatterns = [
    path('category/', views.category, name = "category"),
    path('settings/', views.settings, name = "settings"),
    path('logout/', views.logout_view, name = "logout"),
-   path('profile_update/', views.profile_update, name = "profile_update")
+   path('profile_update/', views.profile_update, name = "profile_update"),
+   path('reset_password/', views.reset_password, name = "reset_password"),
+
 
    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
