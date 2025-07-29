@@ -17,7 +17,8 @@ urlpatterns = [
    path('logout/', views.logout_view, name = "logout"),
    path('profile_update/', views.profile_update, name = "profile_update"),
    path('reset_password/', views.reset_password, name = "reset_password"),
-
+ # ✅ New route for task creation
+    path('add-task/', views.add_task, name='add-task'),
 
    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

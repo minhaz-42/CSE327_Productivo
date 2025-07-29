@@ -904,76 +904,66 @@
           <!-- Dashboard Grid -->
           <div class="dashboard-grid">
             <!-- Today's Tasks -->
-            <div class="dashboard-card card today-tasks">
-              <h3><i class="fas fa-calendar-day"></i> Today's Tasks</h3>
-              <div class="task-list" id="todayTasks">
-                <div class="task-item">
-                  <div class="task-header">
-                    <h4>Complete project proposal</h4>
-                    <span class="priority-badge high">High</span>
-                  </div>
-                  <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
-                  <div class="task-meta">
-                    <span><i class="fas fa-clock"></i> Due in 2 hours</span>
-                    <span><i class="fas fa-tag"></i> Work</span>
-                  </div>
-                  <div class="task-actions">
-                    <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
-                    <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
-                  </div>
-                </div>
-                <div class="task-item completed">
-                  <div class="task-header">
-                    <h4>Team meeting</h4>
-                    <span class="priority-badge medium">Medium</span>
-                  </div>
-                  <p>Weekly team sync to discuss project progress and blockers.</p>
-                  <div class="task-meta">
-                    <span><i class="fas fa-check-circle"></i> Completed at 10:30 AM</span>
-                  </div>
-                  <div class="task-actions">
-                    <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+<div class="dashboard-card card today-tasks">
+  <h3><i class="fas fa-calendar-day"></i> Today's Tasks</h3>
+  <div class="task-list" id="todayTasks">
+    {% for task in today_tasks %}
+      <div class="task-item {% if task.completed %}completed{% endif %}">
+        <div class="task-header">
+          <h4>{{ task.title }}</h4>
+          <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
+        </div>
+        <p>{{ task.description }}</p>
+        <div class="task-meta">
+          <span><i class="fas fa-clock"></i> Due: {{ task.deadline|date:"g:i A" }}</span>
+          {% if task.category %}
+            <span><i class="fas fa-tag"></i> {{ task.category }}</span>
+          {% endif %}
+        </div>
+        <div class="task-actions">
+          <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+          {% if not task.completed %}
+            <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
+          {% else %}
+            <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p>No tasks due today.</p>
+    {% endfor %}
+  </div>
+</div>
+
 
             <!-- Upcoming Tasks -->
-            <div class="dashboard-card card upcoming-tasks">
-              <h3><i class="fas fa-calendar-week"></i> Upcoming Tasks</h3>
-              <div class="task-list" id="upcomingTasks">
-                <div class="task-item">
-                  <div class="task-header">
-                    <h4>Client presentation</h4>
-                    <span class="priority-badge high">High</span>
-                  </div>
-                  <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
-                  <div class="task-meta">
-                    <span><i class="fas fa-clock"></i> Tomorrow, 10:00 AM</span>
-                    <span><i class="fas fa-tag"></i> Presentation</span>
-                  </div>
-                  <div class="task-actions">
-                    <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
-                    <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
-                  </div>
-                </div>
-                <div class="task-item">
-                  <div class="task-header">
-                    <h4>Update documentation</h4>
-                    <span class="priority-badge low">Low</span>
-                  </div>
-                  <p>Update API documentation for new features released last sprint.</p>
-                  <div class="task-meta">
-                    <span><i class="fas fa-clock"></i> Friday, 3:00 PM</span>
-                    <span><i class="fas fa-tag"></i> Documentation</span>
-                  </div>
-                  <div class="task-actions">
-                    <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
-                    <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <!-- Upcoming Tasks -->
+<div class="dashboard-card card upcoming-tasks">
+  <h3><i class="fas fa-calendar-week"></i> Upcoming Tasks</h3>
+  <div class="task-list" id="upcomingTasks">
+    {% for task in upcoming_tasks %}
+      <div class="task-item">
+        <div class="task-header">
+          <h4>{{ task.title }}</h4>
+          <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
+        </div>
+        <p>{{ task.description }}</p>
+        <div class="task-meta">
+          <span><i class="fas fa-clock"></i> {{ task.deadline|date:"D, g:i A" }}</span>
+          {% if task.category %}
+            <span><i class="fas fa-tag"></i> {{ task.category }}</span>
+          {% endif %}
+        </div>
+        <div class="task-actions">
+          <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+          <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
+        </div>
+      </div>
+    {% empty %}
+      <p>No upcoming tasks.</p>
+    {% endfor %}
+  </div>
+</div>
 
             <!-- Productivity Tip -->
             <div class="dashboard-card card productivity-tip">
@@ -1113,14 +1103,59 @@
         // Here you would typically navigate to a filtered view or show a detailed modal
       });
     });
+function getCSRFToken() {
+  const name = 'csrftoken';
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.startsWith(name + '=')) {
+      return decodeURIComponent(cookie.substring(name.length + 1));
+    }
+  }
+  return null;
+}
 
-    // Task Form Submission
-    document.getElementById('taskForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Task added successfully!');
-      this.reset();
-      taskFormModal.style.display = 'none';
-    });
+    // Task Form Submission (AJAX)
+document.getElementById('taskForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const csrfToken = getCSRFToken(); // Helper to get CSRF token
+
+  const title = document.getElementById('title').value;
+  const description = document.getElementById('description').value;
+  const priority = document.getElementById('priority').value;
+  const category = document.getElementById('category').value || 'none';
+  const deadline = document.getElementById('deadline').value;
+  const reminder = document.getElementById('reminder').value || 'none';
+
+  const response = await fetch('/add-task/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({
+      title,
+      description,
+      priority,
+      category,
+      deadline,
+      reminder,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    alert('✅ Task added successfully!');
+    this.reset();
+    taskFormModal.style.display = 'none';
+    location.reload(); // Reload page to show the new task
+  } else {
+    alert('❌ Failed to add task.');
+  }
+});
+
 
     // Complete Task Buttons
     document.querySelectorAll('.action-btn.complete').forEach(btn => {
