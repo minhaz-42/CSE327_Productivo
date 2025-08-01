@@ -198,3 +198,12 @@ def add_task(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def task(request):
+    user = request.user
+    tasks = Task.objects.filter(user=user).order_by('-deadline')  # or any other sorting you want
+    context = {
+        'tasks': tasks
+    }
+    return render(request, 'accounts/tasks.html', context)

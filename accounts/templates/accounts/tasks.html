@@ -905,96 +905,36 @@
 
         <!-- Task List -->
         <div class="task-list" id="taskList">
-          <!-- Task Item 1 -->
-          <div class="task-item" data-priority="high" data-due="2025-07-25" data-status="pending">
-            <div class="task-header">
-              <h4>Complete project proposal</h4>
-              <span class="priority-badge high">High</span>
-            </div>
-            <p>Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due today, 5:00 PM</span>
-              <span><i class="fas fa-tag"></i> Work</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit" data-task-id="1">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete" data-task-id="1">
-                <i class="fas fa-check"></i> Complete
-              </button>
-              <button class="action-btn delete" data-task-id="1">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-
-          <!-- Task Item 2 -->
-          <div class="task-item" data-priority="medium" data-due="2025-07-26" data-status="pending">
-            <div class="task-header">
-              <h4>Client presentation</h4>
-              <span class="priority-badge medium">Medium</span>
-            </div>
-            <p>Prepare slides and demo for quarterly review meeting with key stakeholders.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due tomorrow, 10:00 AM</span>
-              <span><i class="fas fa-tag"></i> Presentation</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit" data-task-id="2">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete" data-task-id="2">
-                <i class="fas fa-check"></i> Complete
-              </button>
-              <button class="action-btn delete" data-task-id="2">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-
-          <!-- Task Item 3 -->
-          <div class="task-item completed" data-priority="low" data-due="2025-07-24" data-status="completed">
-            <div class="task-header">
-              <h4>Team meeting</h4>
-              <span class="priority-badge low">Low</span>
-            </div>
-            <p>Weekly team sync to discuss project progress and blockers.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-check-circle"></i> Completed yesterday</span>
-              <span><i class="fas fa-tag"></i> Meeting</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn delete" data-task-id="3">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-
-          <!-- Task Item 4 -->
-          <div class="task-item" data-priority="high" data-due="2025-07-27" data-status="pending">
-            <div class="task-header">
-              <h4>Submit quarterly report</h4>
-              <span class="priority-badge high">High</span>
-            </div>
-            <p>Compile and submit the Q3 financial report to management.</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Due in 2 days</span>
-              <span><i class="fas fa-tag"></i> Finance</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit" data-task-id="4">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete" data-task-id="4">
-                <i class="fas fa-check"></i> Complete
-              </button>
-              <button class="action-btn delete" data-task-id="4">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
+  {% if tasks %}
+    {% for task in tasks %}
+      <div class="task-item {% if task.completed %}completed{% endif %}">
+        <div class="task-header">
+          <h4>{{ task.title }}</h4>
+          <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
         </div>
+        <p>{{ task.description }}</p>
+        <div class="task-meta">
+          <span><i class="fas fa-clock"></i> {{ task.deadline|date:"M d, Y - g:i A" }}</span>
+          {% if task.category %}
+            <span><i class="fas fa-tag"></i> {{ task.category }}</span>
+          {% endif %}
+        </div>
+        <div class="task-actions">
+          <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+          {% if not task.completed %}
+            <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
+          {% else %}
+            <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No tasks found.</p>
+  {% endif %}
+</div>
+
+         
 
         <!-- Empty State (hidden by default) -->
         <div class="empty-state" id="emptyState" style="display: none;">
