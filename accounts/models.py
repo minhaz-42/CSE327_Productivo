@@ -24,7 +24,7 @@ class Task(models.Model):
     REMINDER_CHOICES = [
         ('none', 'None'),
         ('10min', '10 minutes before'),
-        ('30min', '30 minutes before'),
+        ('15min', '15 minutes before'),
         ('1hr', '1 hour before'),
         ('1day', '1 day before'),
     ]

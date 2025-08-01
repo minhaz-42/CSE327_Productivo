@@ -1014,7 +1014,7 @@
     </button>
 
     <!-- Task Form Modal -->
-    <div class="task-form-modal" id="taskFormModal">
+     <div class="task-form-modal" id="taskFormModal">
       <div class="task-form-container">
         <div class="task-form-header">
           <h3>Add New Task</h3>
@@ -1137,54 +1137,7 @@
     const completeTaskBtn = document.getElementById('completeTaskBtn');
     const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
 
-    // Sample tasks data
-    let tasks = [
-      {
-        id: 1,
-        title: "Complete project proposal",
-        description: "Finish the proposal document and send to client by EOD. Include all requirements and budget estimates.",
-        priority: "high",
-        category: "work",
-        dueDate: "2025-07-25T17:00",
-        reminder: "60",
-        status: "pending",
-        completedAt: null
-      },
-      {
-        id: 2,
-        title: "Client presentation",
-        description: "Prepare slides and demo for quarterly review meeting with key stakeholders.",
-        priority: "medium",
-        category: "presentation",
-        dueDate: "2025-07-26T10:00",
-        reminder: "1440",
-        status: "pending",
-        completedAt: null
-      },
-      {
-        id: 3,
-        title: "Team meeting",
-        description: "Weekly team sync to discuss project progress and blockers.",
-        priority: "low",
-        category: "meeting",
-        dueDate: "2025-07-24T10:30",
-        reminder: "",
-        status: "completed",
-        completedAt: "2025-07-24T10:30"
-      },
-      {
-        id: 4,
-        title: "Submit quarterly report",
-        description: "Compile and submit the Q3 financial report to management.",
-        priority: "high",
-        category: "finance",
-        dueDate: "2025-07-27T09:00",
-        reminder: "1440",
-        status: "pending",
-        completedAt: null
-      }
-    ];
-
+   
     // Current filter state
     let currentFilter = "all";
     let currentSearch = "";
@@ -1236,30 +1189,58 @@
         taskDetailsModal.style.display = 'none';
       }
     });
+function getCSRFToken() {
+  const name = 'csrftoken';
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.startsWith(name + '=')) {
+      return decodeURIComponent(cookie.substring(name.length + 1));
+    }
+  }
+  return null;
+}
+     // Task Form Submission (AJAX)
+document.getElementById('taskForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
 
-    // Task Form Submission
-    taskForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const newTask = {
-        id: tasks.length + 1,
-        title: document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        priority: document.getElementById('priority').value,
-        category: document.getElementById('category').value,
-        dueDate: document.getElementById('deadline').value,
-        reminder: document.getElementById('reminder').value,
-        status: "pending",
-        completedAt: null
-      };
-      
-      tasks.push(newTask);
-      renderTasks();
-      
-      alert('Task added successfully!');
-      this.reset();
-      taskFormModal.style.display = 'none';
-    });
+  const csrfToken = getCSRFToken(); // Helper to get CSRF token
+
+  const title = document.getElementById('title').value;
+  const description = document.getElementById('description').value;
+  const priority = document.getElementById('priority').value;
+  const category = document.getElementById('category').value || 'none';
+  const deadline = document.getElementById('deadline').value;
+  const reminder = document.getElementById('reminder').value || 'none';
+
+  const response = await fetch('/add-task/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({
+      title,
+      description,
+      priority,
+      category,
+      deadline,
+      reminder,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    alert('✅ Task added successfully!');
+    this.reset();
+    taskFormModal.style.display = 'none';
+    location.reload(); // Reload page to show the new task
+  } else {
+    alert('❌ Failed to add task.');
+  }
+});
+
 
     // Filter Tasks
     filterBtns.forEach(btn => {
