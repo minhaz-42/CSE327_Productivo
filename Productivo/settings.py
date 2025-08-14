@@ -136,3 +136,8 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'zuhayer.islam@northsouth.edu'
 EMAIL_HOST_PASSWORD = 'clzp nbmu hcih gerf'
+import os
+
+# Where collectstatic will put all static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / "static"]

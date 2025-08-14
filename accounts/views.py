@@ -9,7 +9,6 @@ import json
 
 from .models import Student, Task
 
-
 # ------------------ PUBLIC VIEWS ------------------
 
 def home(request):
@@ -96,7 +95,33 @@ def dashboard(request):
 
 @login_required
 def task(request):
-    return render(request, 'accounts/tasks.html')
+    """
+    Render task page with both HTML tasks and JSON for JS.
+    """
+    user = request.user
+    tasks = Task.objects.filter(user=user).order_by('-deadline')
+
+    # Convert tasks to JSON with only needed fields for JS
+    tasks_json_list = []
+    for t in tasks:
+        tasks_json_list.append({
+            'pk': t.id,
+            'fields': {
+                'title': t.title,
+                'description': t.description,
+                'priority': t.priority,
+                'category': t.category or 'none',
+                'deadline': t.deadline.isoformat(),
+                'reminder': t.reminder or 'none',
+                'completed': t.completed
+            }
+        })
+
+    context = {
+        'tasks': tasks,
+        'tasks_json': json.dumps(tasks_json_list)  # safely serialized for JS
+    }
+    return render(request, 'accounts/tasks.html', context)
 
 
 @login_required
@@ -168,7 +193,7 @@ def reset_password(request):
 # ------------------ TASK FUNCTIONALITY ------------------
 
 @login_required(login_url='login')
-@csrf_exempt  # Required if CSRF token is not included in fetch header
+@csrf_exempt
 def add_task(request):
     if request.method == 'POST':
         try:
@@ -199,11 +224,58 @@ def add_task(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+
 @login_required
-def task(request):
-    user = request.user
-    tasks = Task.objects.filter(user=user).order_by('-deadline')  # or any other sorting you want
-    context = {
-        'tasks': tasks
-    }
-    return render(request, 'accounts/tasks.html', context)
+@csrf_exempt
+def edit_task(request, task_id):
+    if request.method == 'POST':
+        try:
+            task = Task.objects.get(id=task_id, user=request.user)
+            data = json.loads(request.body)
+
+            task.title = data.get('title', task.title)
+            task.description = data.get('description', task.description)
+            task.priority = data.get('priority', task.priority)
+            task.category = data.get('category', task.category)
+            task.deadline = data.get('deadline', task.deadline)
+            task.reminder = data.get('reminder', task.reminder)
+            task.save()
+
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+@csrf_exempt
+def complete_task(request, task_id):
+    if request.method == 'POST':
+        try:
+            task = Task.objects.get(pk=task_id, user=request.user)
+            task.completed = True
+            task.save()
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+@csrf_exempt
+def delete_task(request, task_id):
+    if request.method == 'DELETE':
+        try:
+            task = Task.objects.get(pk=task_id, user=request.user)
+            task.delete()
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
