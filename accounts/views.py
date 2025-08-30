@@ -6,6 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.db.models import Count, Q
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import Student, Task
 
@@ -84,11 +87,30 @@ def dashboard(request):
 
     today = now().date()
     today_tasks = tasks.filter(deadline__date=today)
-    upcoming_tasks = tasks.exclude(deadline__date=today)
+    upcoming_tasks = tasks.filter(deadline__date__gt=today)[:5]  # Limit to 5 upcoming tasks
+    
+    # Calculate statistics for dashboard
+    completed_tasks_count = tasks.filter(completed=True).count()
+    high_priority_count = tasks.filter(priority='high', completed=False).count()
+    
+    # Calculate productivity score (percentage of completed tasks)
+    total_tasks = tasks.count()
+    productivity_score = 0
+    if total_tasks > 0:
+        productivity_score = round((completed_tasks_count / total_tasks) * 100)
+
+    # Get notifications for dashboard
+    notifications = get_user_notifications(user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
 
     context = {
         'today_tasks': today_tasks,
         'upcoming_tasks': upcoming_tasks,
+        'completed_tasks_count': completed_tasks_count,
+        'high_priority_count': high_priority_count,
+        'productivity_score': productivity_score,
+        'notifications': notifications,
+        'unread_count': unread_count,
     }
     return render(request, 'accounts/index.html', context)
 
@@ -117,31 +139,56 @@ def task(request):
             }
         })
 
+    # Get notifications
+    notifications = get_user_notifications(user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
+
     context = {
         'tasks': tasks,
-        'tasks_json': json.dumps(tasks_json_list)  # safely serialized for JS
+        'tasks_json': json.dumps(tasks_json_list),  # safely serialized for JS
+        'notifications': notifications,
+        'unread_count': unread_count,
     }
     return render(request, 'accounts/tasks.html', context)
 
 
 @login_required
 def schedule(request):
-    return render(request, 'accounts/schedule.html')
+    # Get notifications
+    notifications = get_user_notifications(request.user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
+    
+    context = {
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'accounts/schedule.html', context)
 
 
 @login_required
 def category(request):
-    return render(request, 'accounts/category.html')
-
-
-@login_required
-def analytics(request):
-    return render(request, 'accounts/analytics.html')
+    # Get notifications
+    notifications = get_user_notifications(request.user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
+    
+    context = {
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'accounts/category.html', context)
 
 
 @login_required
 def settings(request):
-    return render(request, 'accounts/settings.html')
+    # Get notifications
+    notifications = get_user_notifications(request.user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
+    
+    context = {
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'accounts/settings.html', context)
 
 
 @login_required
@@ -278,4 +325,316 @@ def delete_task(request, task_id):
             return JsonResponse({'success': False, 'error': 'Task not found'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
+@csrf_exempt
+def get_task(request, task_id):
+    """Get task details for editing"""
+    if request.method == 'GET':
+        try:
+            task = Task.objects.get(pk=task_id, user=request.user)
+            return JsonResponse({
+                'success': True,
+                'task': {
+                    'id': task.id,
+                    'title': task.title,
+                    'description': task.description,
+                    'priority': task.priority,
+                    'category': task.category,
+                    'deadline': task.deadline.isoformat(),
+                    'reminder': task.reminder,
+                    'completed': task.completed
+                }
+            })
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+# ------------------ ANALYTICS & NOTIFICATIONS ------------------
+
+@login_required
+def analytics(request):
+    # Get all tasks for the current user
+    tasks = Task.objects.filter(user=request.user)
+    total_tasks = tasks.count()
+    
+    # Calculate completed tasks
+    completed_tasks = tasks.filter(completed=True).count()
+    
+    # Calculate in-progress tasks (not completed)
+    in_progress_tasks = tasks.filter(completed=False).count()
+    
+    # Calculate overdue tasks (tasks not completed with deadline in the past)
+    overdue_tasks = tasks.filter(completed=False, deadline__lt=timezone.now()).count()
+    
+    # Calculate completion rate (avoid division by zero)
+    completion_rate = 0
+    if total_tasks > 0:
+        completion_rate = round((completed_tasks / total_tasks) * 100)
+    
+    # Calculate priority distribution
+    high_priority_tasks = tasks.filter(priority='high').count()
+    medium_priority_tasks = tasks.filter(priority='medium').count()
+    low_priority_tasks = tasks.filter(priority='low').count()
+    
+    # Calculate priority percentages
+    high_priority_percent = 0
+    medium_priority_percent = 0
+    low_priority_percent = 0
+    
+    if total_tasks > 0:
+        high_priority_percent = round((high_priority_tasks / total_tasks) * 100)
+        medium_priority_percent = round((medium_priority_tasks / total_tasks) * 100)
+        low_priority_percent = round((low_priority_tasks / total_tasks) * 100)
+    
+    # Calculate status percentages
+    in_progress_percent = 0
+    overdue_percent = 0
+    
+    if total_tasks > 0:
+        in_progress_percent = round((in_progress_tasks / total_tasks) * 100)
+        overdue_percent = round((overdue_tasks / total_tasks) * 100)
+    
+    # Calculate high priority completion stats
+    high_priority_completed = tasks.filter(priority='high', completed=True).count()
+    high_priority_total = high_priority_tasks
+    
+    # Get time period from request (default to 'week')
+    period = request.GET.get('period', 'week')
+    
+    # Generate data for charts based on selected period
+    chart_data = generate_chart_data(request.user, period)
+    
+    # Get notifications for the user
+    notifications = get_user_notifications(request.user)
+    unread_count = sum(1 for notification in notifications if notification['unread'])
+    
+    context = {
+        'completed_tasks': completed_tasks,
+        'completion_rate': completion_rate,
+        'in_progress_tasks': in_progress_tasks,
+        'total_tasks': total_tasks,
+        'overdue_tasks': overdue_tasks,
+        'high_priority_percent': high_priority_percent,
+        'medium_priority_percent': medium_priority_percent,
+        'low_priority_percent': low_priority_percent,
+        'in_progress_percent': in_progress_percent,
+        'overdue_percent': overdue_percent,
+        'high_priority_completed': high_priority_completed,
+        'high_priority': high_priority_total,
+        'chart_data_json': json.dumps(chart_data),  # For JavaScript charts
+        'period': period,
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    
+    return render(request, 'accounts/analytics.html', context)
+
+
+def generate_chart_data(user, period):
+    """Generate data for completion trend and priority distribution charts"""
+    now = timezone.now()
+    today = now.date()
+    
+    if period == 'week':
+        # Last 7 days including today
+        dates = []
+        completion_trend = []
+        
+        for i in range(6, -1, -1):
+            current_date = today - timedelta(days=i)
+            dates.append(current_date.strftime('%a'))
+            
+            # Count tasks completed on this specific day
+            count = Task.objects.filter(
+                user=user,
+                completed=True,
+                deadline__date=current_date
+            ).count()
+            completion_trend.append(count)
+            
+    elif period == 'month':
+        # Last 4 weeks (each week Monday to Sunday)
+        dates = []
+        completion_trend = []
+        
+        for i in range(4):
+            week_end = today - timedelta(days=(i * 7))
+            week_start = week_end - timedelta(days=6)
+            dates.append(f'Wk {4-i}')
+            
+            # Count tasks completed in this week
+            count = Task.objects.filter(
+                user=user,
+                completed=True,
+                deadline__date__gte=week_start,
+                deadline__date__lte=week_end
+            ).count()
+            completion_trend.append(count)
+            
+        # Reverse to show oldest to newest
+        dates.reverse()
+        completion_trend.reverse()
+            
+    elif period == 'quarter':
+        # Last 3 months
+        dates = []
+        completion_trend = []
+        
+        for i in range(3):
+            month_start = today - timedelta(days=(90 - (i * 30)))
+            month_end = month_start + timedelta(days=29)
+            dates.append(month_start.strftime('%b'))
+            
+            # Count tasks completed in this month
+            count = Task.objects.filter(
+                user=user,
+                completed=True,
+                deadline__date__gte=month_start,
+                deadline__date__lte=month_end
+            ).count()
+            completion_trend.append(count)
+            
+    else:
+        # Default to week
+        dates = []
+        completion_trend = []
+        
+        for i in range(6, -1, -1):
+            current_date = today - timedelta(days=i)
+            dates.append(current_date.strftime('%a'))
+            
+            count = Task.objects.filter(
+                user=user,
+                completed=True,
+                deadline__date=current_date
+            ).count()
+            completion_trend.append(count)
+    
+    # Get priority distribution for ALL tasks (not just completed ones)
+    priority_data = Task.objects.filter(user=user).values('priority').annotate(count=Count('id'))
+    
+    # Convert to dictionary format
+    priority_dict = {item['priority']: item['count'] for item in priority_data}
+    
+    # Calculate percentages
+    total_all_tasks = sum(priority_dict.values())
+    priority_percentages = {
+        'high': round((priority_dict.get('high', 0) / total_all_tasks * 100)) if total_all_tasks > 0 else 0,
+        'medium': round((priority_dict.get('medium', 0) / total_all_tasks * 100)) if total_all_tasks > 0 else 0,
+        'low': round((priority_dict.get('low', 0) / total_all_tasks * 100)) if total_all_tasks > 0 else 0,
+    }
+    
+    return {
+        'dates': dates,
+        'completion_trend': completion_trend,
+        'priority_data': priority_percentages,
+        'total_period_tasks': sum(completion_trend),
+    }
+
+
+def get_user_notifications(user):
+    """Generate real notifications based on user's tasks"""
+    now = timezone.now()
+    
+    notifications = []
+    
+    # Get user's tasks
+    tasks = Task.objects.filter(user=user)
+    
+    # 1. Due soon notifications (tasks due in next 24 hours)
+    due_soon = tasks.filter(
+        completed=False,
+        deadline__gt=now,
+        deadline__lte=now + timedelta(hours=24)
+    )
+    
+    for task in due_soon:
+        time_left = task.deadline - now
+        hours_left = int(time_left.total_seconds() // 3600)
+        
+        notifications.append({
+            'type': 'due_soon',
+            'message': f'Task "{task.title}" is due in {hours_left} hours',
+            'time': task.deadline,
+            'unread': True,
+            'icon': 'fas fa-tasks'
+        })
+    
+    # 2. Overdue notifications
+    overdue = tasks.filter(
+        completed=False,
+        deadline__lt=now
+    )
+    
+    for task in overdue:
+        notifications.append({
+            'type': 'overdue',
+            'message': f'Task "{task.title}" is overdue',
+            'time': task.deadline,
+            'unread': True,
+            'icon': 'fas fa-exclamation-triangle'
+        })
+    
+    # 3. Recent completions (tasks completed in last 24 hours)
+    recent_completions = tasks.filter(
+        completed=True,
+        deadline__gte=now - timedelta(hours=24)
+    )
+    
+    if recent_completions.count() > 0:
+        notifications.append({
+            'type': 'completion',
+            'message': f'You completed {recent_completions.count()} tasks recently',
+            'time': now,
+            'unread': True,
+            'icon': 'fas fa-check-circle'
+        })
+    
+    # 4. Productivity insights
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(completed=True).count()
+    
+    if total_tasks > 0:
+        completion_rate = (completed_tasks / total_tasks) * 100
+        if completion_rate > 75:
+            notifications.append({
+                'type': 'productivity',
+                'message': f'Your productivity rate is {completion_rate:.1f}% - Great job!',
+                'time': now,
+                'unread': True,
+                'icon': 'fas fa-chart-line'
+            })
+    
+    # Sort notifications by time (newest first)
+    notifications.sort(key=lambda x: x['time'], reverse=True)
+    
+    # Format time for display
+    for notification in notifications:
+        time_diff = now - notification['time']
+        if time_diff.total_seconds() < 3600:  # Less than 1 hour
+            minutes = int(time_diff.total_seconds() // 60)
+            notification['time_display'] = f'{minutes} minutes ago'
+        elif time_diff.total_seconds() < 86400:  # Less than 1 day
+            hours = int(time_diff.total_seconds() // 3600)
+            notification['time_display'] = f'{hours} hours ago'
+        else:
+            days = int(time_diff.total_seconds() // 86400)
+            notification['time_display'] = f'{days} days ago'
+    
+    return notifications
+
+
+@login_required
+@csrf_exempt
+def mark_notifications_read(request):
+    if request.method == 'POST':
+        # In a real application, you would update a Notification model
+        # to mark notifications as read for this user
+        return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

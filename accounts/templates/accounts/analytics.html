@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,15 +6,14 @@
   <title>Analytics | Intelligent Task Planner</title>
 
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
 
-  <!-- Custom Styles -->
   <style>
-    /* Base Styles & Variables */
+    /* Your existing CSS styles here */
     :root {
       --primary: #4361ee;
       --primary-light: #4895ef;
@@ -75,7 +73,7 @@
       padding: 0 20px;
       background-color: var(--surface);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      z-index: 10;
+      z-index: 100;
     }
 
     .header-left {
@@ -92,6 +90,7 @@
       cursor: pointer;
       padding: 5px;
       border-radius: 4px;
+      display: none;
     }
 
     .menu-btn:hover {
@@ -121,33 +120,109 @@
       color: var(--on-surface);
       cursor: pointer;
       position: relative;
+      padding: 5px;
+      border-radius: 4px;
+    }
+
+    .notification-btn:hover {
+      background-color: var(--gray-light);
     }
 
     .notification-badge {
       position: absolute;
       top: -5px;
       right: -5px;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       background-color: var(--error);
       border-radius: 50%;
       border: 2px solid var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
     }
 
     .notification-panel {
       position: absolute;
       right: 0;
-      top: 40px;
-      width: 300px;
+      top: 50px;
+      width: 350px;
+      max-width: 90vw;
       background-color: var(--surface);
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 15px;
-      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      padding: 0;
+      z-index: 1000;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
     }
 
-    .notification-panel.hidden {
-      display: none;
+    .notification-panel.active {
+      display: block;
+    }
+
+    .notification-header {
+      padding: 15px;
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-header h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .mark-all-read {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .notification-list {
+      padding: 0;
+    }
+
+    .notification-item {
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--gray-light);
+      display: flex;
+      gap: 10px;
+    }
+
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item.unread {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .notification-item i {
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-top: 2px;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-content p {
+      margin: 0 0 5px 0;
+      font-size: 0.9rem;
+    }
+
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--gray-medium);
     }
 
     .user-profile {
@@ -157,8 +232,8 @@
     }
 
     .avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       background-color: var(--primary);
       display: flex;
@@ -166,6 +241,23 @@
       justify-content: center;
       color: white;
       font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--on-surface);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .logout-btn:hover {
+      background-color: var(--gray-light);
+      text-decoration: none;
     }
 
     /* Sidebar Styles */
@@ -175,12 +267,13 @@
       box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
-      z-index: 20;
+      z-index: 90;
     }
 
     .sidebar-logo {
       padding: 20px;
       border-bottom: 1px solid var(--gray-light);
+      position: relative;
     }
 
     .sidebar-logo h2 {
@@ -188,6 +281,19 @@
       font-size: 1.5rem;
       font-weight: 700;
       text-align: center;
+      margin: 0;
+    }
+
+    .close-sidebar {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--gray-medium);
+      cursor: pointer;
+      display: none;
     }
 
     .sidebar-nav {
@@ -197,6 +303,8 @@
 
     .sidebar-nav ul {
       list-style: none;
+      padding: 0;
+      margin: 0;
     }
 
     .sidebar-nav li {
@@ -223,7 +331,7 @@
     }
 
     .sidebar-nav a.active {
-      background-color: var(--primary-light);
+      background-color: var(--primary);
       color: var(--on-primary);
     }
 
@@ -245,7 +353,8 @@
     }
 
     .sidebar-footer a {
-      display: block;
+      display: flex;
+      align-items: center;
       padding: 10px 0;
       color: var(--on-surface);
       text-decoration: none;
@@ -260,6 +369,18 @@
       margin-right: 10px;
       width: 20px;
       text-align: center;
+    }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 80;
     }
 
     /* Main Content Styles */
@@ -288,6 +409,9 @@
     .analytics-header h2 {
       font-size: 1.8rem;
       color: var(--on-background);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .time-period-selector {
@@ -305,6 +429,11 @@
       cursor: pointer;
       font-weight: 500;
       color: var(--gray-medium);
+      transition: all 0.2s;
+    }
+
+    .time-period-btn:hover {
+      background-color: var(--gray-light);
     }
 
     .time-period-btn.active {
@@ -325,7 +454,7 @@
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .stat-card:hover {
@@ -467,6 +596,9 @@
       margin-bottom: 15px;
       font-size: 1.1rem;
       color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .tip-item {
@@ -477,12 +609,37 @@
       margin-bottom: 15px;
     }
 
+    .tip-item:last-child {
+      margin-bottom: 0;
+    }
+
     .tip-item h4 {
       margin-bottom: 8px;
       color: var(--on-surface);
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .tip-item p {
+      margin: 0;
+      color: var(--gray-dark);
+      line-height: 1.5;
+    }
+
+    /* Loading indicator */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* Responsive Adjustments */
@@ -494,16 +651,30 @@
         grid-template-columns: 1fr;
       }
 
+      .menu-btn {
+        display: block;
+      }
+
       .sidebar {
         position: fixed;
-        top: 60px;
+        top: 0;
         left: -240px;
-        height: calc(100vh - 60px);
-        transition: left 0.3s;
+        height: 100vh;
+        width: 240px;
+        transition: left 0.3s ease;
+        z-index: 1000;
       }
 
       .sidebar.active {
         left: 0;
+      }
+
+      .close-sidebar {
+        display: block;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
       }
     }
 
@@ -525,11 +696,16 @@
       .charts-grid {
         grid-template-columns: 1fr;
       }
+      
+      .notification-panel {
+        width: 300px;
+        right: -20px;
+      }
     }
 
     @media (max-width: 576px) {
       .header {
-        padding: 0 10px;
+        padding: 0 15px;
       }
 
       .main-content {
@@ -539,7 +715,25 @@
       .stats-overview {
         grid-template-columns: 1fr;
       }
+      
+      .header-right {
+        gap: 15px;
+      }
+      
+      .notification-panel {
+        width: 280px;
+        right: -40px;
+      }
+      
+      .chart-container {
+        height: 250px;
+      }
     }
+    .empty-notifications {
+  padding: 20px;
+  text-align: center;
+  color: var(--gray-medium);
+}
   </style>
 </head>
 <body class="light-theme">
@@ -547,7 +741,7 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <button class="menu-btn" id="sidebarToggle">
+        <button class="menu-btn" id="sidebarToggle" aria-label="Toggle sidebar">
           <i class="fas fa-bars"></i>
         </button>
         <h1 class="app-title">Intelligent Task Planner</h1>
@@ -559,29 +753,57 @@
           <i class="fas fa-sign-out-alt"></i>
           <span>Logout</span>
         </a>
-        <!-- Notification Bell -->
-        <div class="notification-wrapper">
-          <button class="notification-btn" id="notificationBtn">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge"></span>
-            <span class="notification-badge"></span>
-          </button>
-          <div class="notification-panel hidden" id="notificationPanel">
-            <p>No new notifications.</p>
+       <!-- Notification Bell -->
+<div class="notification-wrapper">
+  <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+    <i class="fas fa-bell"></i>
+    {% if unread_count > 0 %}
+    <span class="notification-badge">{{ unread_count }}</span>
+    {% endif %}
+  </button>
+  <div class="notification-panel" id="notificationPanel">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button class="mark-all-read" id="markAllRead">Mark all as read</button>
+    </div>
+    <div class="notification-list">
+      {% if notifications %}
+        {% for notification in notifications %}
+          <div class="notification-item {% if notification.unread %}unread{% endif %}">
+            <i class="{{ notification.icon }}"></i>
+            <div class="notification-content">
+              <p>{{ notification.message }}</p>
+              <span class="notification-time">{{ notification.time_display }}</span>
+            </div>
           </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-notifications">
+          <p>No notifications</p>
         </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
         
         <!-- User Avatar -->
         <div class="user-profile">
           <div class="avatar">{{user.username|slice:"0:1"|upper}}</div>
+          <span class="username" style="font-weight: 500;">{{ user.username }}</span>
         </div>
       </div>
     </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <h2>TaskPlanner</h2>
+        <button class="close-sidebar" id="closeSidebar" aria-label="Close sidebar">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
       <nav class="sidebar-nav">
         <ul>
@@ -608,33 +830,37 @@
         </div>
 
         <!-- Stats Overview -->
-        <div class="stats-overview">
+        <div class="stats-overview" id="statsOverview">
           <div class="stat-card">
             <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> Tasks Completed</h3>
-            <div class="stat-value">24</div>
+            <div class="stat-value" id="completedTasks">{{ completed_tasks }}</div>
             <div class="stat-change positive">
-              <i class="fas fa-arrow-up"></i> 12% from last week
+                <i class="fas fa-arrow-up"></i> <span id="completionRate">{{ completion_rate }}</span>% completion rate
             </div>
           </div>
           <div class="stat-card">
-            <h3><i class="fas fa-clock" style="color: var(--warning);"></i> Average Completion Time</h3>
-            <div class="stat-value">2.4h</div>
-            <div class="stat-change negative">
-              <i class="fas fa-arrow-down"></i> 8% from last week
+            <h3><i class="fas fa-clock" style="color: var(--warning);"></i> In Progress</h3>
+            <div class="stat-value" id="inProgressTasks">{{ in_progress_tasks }}</div>
+            <div class="stat-change">
+                <span id="totalTasks">{{ total_tasks }}</span> total tasks
             </div>
           </div>
           <div class="stat-card">
             <h3><i class="fas fa-bolt" style="color: var(--primary);"></i> Productivity Score</h3>
-            <div class="stat-value">82%</div>
+            <div class="stat-value" id="productivityScore">{{ completion_rate }}%</div>
             <div class="stat-change positive">
-              <i class="fas fa-arrow-up"></i> 5% from last week
+                <i class="fas fa-arrow-up"></i> <span id="productivityStatus">Good progress</span>
             </div>
           </div>
           <div class="stat-card">
             <h3><i class="fas fa-calendar-times" style="color: var(--error);"></i> Overdue Tasks</h3>
-            <div class="stat-value">3</div>
-            <div class="stat-change negative">
-              <i class="fas fa-arrow-up"></i> 1 from last week
+            <div class="stat-value" id="overdueTasks">{{ overdue_tasks }}</div>
+            <div class="stat-change" id="overdueStatus">
+                {% if overdue_tasks > 0 %}
+                <i class="fas fa-arrow-up"></i> Needs attention
+                {% else %}
+                <i class="fas fa-check"></i> All caught up
+                {% endif %}
             </div>
           </div>
         </div>
@@ -648,9 +874,9 @@
             </div>
           </div>
           <div class="chart-card">
-            <h3>Time Spent by Category</h3>
+            <h3>Priority Distribution</h3>
             <div class="chart-container">
-              <canvas id="timeSpentChart"></canvas>
+              <canvas id="priorityChart"></canvas>
             </div>
           </div>
         </div>
@@ -659,16 +885,16 @@
         <div class="task-distribution">
           <div class="distribution-card">
             <h3>Task Distribution by Priority</h3>
-            <div class="distribution-list">
+            <div class="distribution-list" id="priorityDistribution">
               <div class="distribution-item">
                 <div class="distribution-label">
                   <div class="distribution-color" style="background-color: var(--priority-high);"></div>
                   <span>High Priority</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 25%; background-color: var(--priority-high);"></div>
+                  <div class="distribution-progress" id="highPriorityBar" style="width: {{ high_priority_percent }}%; background-color: var(--priority-high);"></div>
                 </div>
-                <div class="distribution-value">25%</div>
+                <div class="distribution-value" id="highPriorityValue">{{ high_priority_percent }}%</div>
               </div>
               <div class="distribution-item">
                 <div class="distribution-label">
@@ -676,9 +902,9 @@
                   <span>Medium Priority</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 45%; background-color: var(--priority-medium);"></div>
+                  <div class="distribution-progress" id="mediumPriorityBar" style="width: {{ medium_priority_percent }}%; background-color: var(--priority-medium);"></div>
                 </div>
-                <div class="distribution-value">45%</div>
+                <div class="distribution-value" id="mediumPriorityValue">{{ medium_priority_percent }}%</div>
               </div>
               <div class="distribution-item">
                 <div class="distribution-label">
@@ -686,24 +912,24 @@
                   <span>Low Priority</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 30%; background-color: var(--priority-low);"></div>
+                  <div class="distribution-progress" id="lowPriorityBar" style="width: {{ low_priority_percent }}%; background-color: var(--priority-low);"></div>
                 </div>
-                <div class="distribution-value">30%</div>
+                <div class="distribution-value" id="lowPriorityValue">{{ low_priority_percent }}%</div>
               </div>
             </div>
           </div>
           <div class="distribution-card">
             <h3>Task Completion Rate</h3>
-            <div class="distribution-list">
+            <div class="distribution-list" id="completionDistribution">
               <div class="distribution-item">
                 <div class="distribution-label">
                   <div class="distribution-color" style="background-color: var(--success);"></div>
                   <span>Completed</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 75%; background-color: var(--success);"></div>
+                  <div class="distribution-progress" id="completedBar" style="width: {{ completion_rate }}%; background-color: var(--success);"></div>
                 </div>
-                <div class="distribution-value">75%</div>
+                <div class="distribution-value" id="completedValue">{{ completion_rate }}%</div>
               </div>
               <div class="distribution-item">
                 <div class="distribution-label">
@@ -711,9 +937,9 @@
                   <span>In Progress</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 15%; background-color: var(--warning);"></div>
+                  <div class="distribution-progress" id="inProgressBar" style="width: {{ in_progress_percent }}%; background-color: var(--warning);"></div>
                 </div>
-                <div class="distribution-value">15%</div>
+                <div class="distribution-value" id="inProgressValue">{{ in_progress_percent }}%</div>
               </div>
               <div class="distribution-item">
                 <div class="distribution-label">
@@ -721,20 +947,20 @@
                   <span>Overdue</span>
                 </div>
                 <div class="distribution-bar">
-                  <div class="distribution-progress" style="width: 10%; background-color: var(--error);"></div>
+                  <div class="distribution-progress" id="overdueBar" style="width: {{ overdue_percent }}%; background-color: var(--error);"></div>
                 </div>
-                <div class="distribution-value">10%</div>
+                <div class="distribution-value" id="overdueValue">{{ overdue_percent }}%</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Productivity Tips -->
-        <div class="productivity-tips">
+        <div class="productivity-tips" id="productivityTips">
           <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
           <div class="tip-item">
             <h4><i class="fas fa-check-circle"></i> Focus on High-Impact Tasks</h4>
-            <p>You've completed 75% of your high-priority tasks this week. Try to maintain this focus on important tasks.</p>
+            <p id="priorityTip">You've completed {{ high_priority_completed }}/{{ high_priority }} of your high-priority tasks this week. Try to maintain this focus on important tasks.</p>
           </div>
           <div class="tip-item">
             <h4><i class="fas fa-clock"></i> Time Blocking</h4>
@@ -742,7 +968,7 @@
           </div>
           <div class="tip-item">
             <h4><i class="fas fa-calendar-alt"></i> Plan Ahead</h4>
-            <p>Your completion rate is highest in the morning. Schedule important tasks during this peak productivity time.</p>
+            <p id="planningTip">Your completion rate is {{ completion_rate }}%. Try to maintain consistency in your task completion.</p>
           </div>
         </div>
       </div>
@@ -751,172 +977,316 @@
 
   <!-- JavaScript -->
   <script>
-    // DOM Elements
+    // ======================
+    // DOM ELEMENT SELECTORS
+    // ======================
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationPanel = document.getElementById('notificationPanel');
+    const markAllRead = document.getElementById('markAllRead');
     const timePeriodBtns = document.querySelectorAll('.time-period-btn');
 
-    // Toggle Sidebar (for mobile)
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-    });
+    // ======================
+    // GLOBAL VARIABLES
+    // ======================
+    let completionChart = null;
+    let priorityChart = null;
+    let currentPeriod = 'week';
+    
+    // Get chart data from Django template
+    let chartData = {};
+    try {
+        chartData = JSON.parse('{{ chart_data_json|escapejs }}');
+        console.log('Chart data loaded:', chartData);
+    } catch (e) {
+        console.error('Error parsing chart data:', e);
+        // Fallback data if parsing fails
+        chartData = {
+            dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            completion_trend: [0, 0, 0, 0, 0, 0, 0],
+            priority_data: {high: 0, medium: 0, low: 0},
+            total_period_tasks: 0
+        };
+    }
 
-    // Toggle Notification Panel
-    notificationBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      notificationPanel.classList.toggle('hidden');
-    });
+    // ======================
+    // NOTIFICATION BELL LOGIC
+    // ======================
+    function toggleNotificationPanel() {
+        notificationPanel.classList.toggle('active');
+        
+        // Close other open panels if any
+        document.querySelectorAll('.notification-panel.active').forEach(panel => {
+            if (panel !== notificationPanel) {
+                panel.classList.remove('active');
+            }
+        });
+    }
+
+    function closeNotificationPanel() {
+        notificationPanel.classList.remove('active');
+    }
+
+    function markNotificationsAsRead() {
+        const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+        unreadNotifications.forEach(notification => {
+            notification.classList.remove('unread');
+        });
+        
+        // Update badge count
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            badge.textContent = '0';
+            badge.style.display = 'none';
+        }
+    }
+
+    // Event listeners for notification bell
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleNotificationPanel();
+        });
+    }
 
     // Close notification panel when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!notificationPanel.contains(e.target) && e.target !== notificationBtn) {
-        notificationPanel.classList.add('hidden');
-      }
+    document.addEventListener('click', function(e) {
+        if (notificationPanel.classList.contains('active') && 
+            !notificationPanel.contains(e.target) && 
+            !notificationBtn.contains(e.target)) {
+            closeNotificationPanel();
+        }
     });
 
-    // Time Period Selector
+    // Mark all as read functionality
+    // Mark all notifications as read
+if (markAllRead) {
+    markAllRead.addEventListener('click', function() {
+        // This would typically make an AJAX call to your backend
+        // to mark notifications as read in the database
+        const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+        unreadNotifications.forEach(notification => {
+            notification.classList.remove('unread');
+        });
+        
+        // Update badge count
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+        
+        // In a real application, you would also send an AJAX request
+        // to update the server-side read status
+        fetch('/mark-notifications-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({mark_all_read: true})
+        }).catch(error => console.error('Error:', error));
+    });
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+    // ======================
+    // SIDEBAR FUNCTIONALITY
+    // ======================
+    function toggleSidebar() {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.classList.toggle('active');
+      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+
+    if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // ======================
+    // TIME PERIOD SELECTOR
+    // ======================
     timePeriodBtns.forEach(btn => {
       btn.addEventListener('click', function() {
         timePeriodBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-        updateCharts(this.dataset.period);
+        const period = this.dataset.period;
+        
+        // Reload page with new period parameter
+        window.location.href = `{% url 'analytics' %}?period=${period}`;
       });
     });
 
-    // Initialize Charts
-    function initCharts() {
-      // Task Completion Trend Chart
-      const completionCtx = document.getElementById('completionChart').getContext('2d');
-      const completionChart = new Chart(completionCtx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Tasks Completed',
-            data: [3, 5, 4, 6, 4, 2, 0],
-            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-            borderColor: 'var(--primary)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }, {
-            label: 'Tasks Planned',
-            data: [5, 6, 5, 7, 5, 3, 1],
-            backgroundColor: 'rgba(114, 9, 183, 0.1)',
-            borderColor: 'var(--secondary)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 2
-              }
-            }
-          }
+    // ======================
+    // CHART FUNCTIONS
+    // ======================
+    function initializeCharts() {
+        // Destroy existing charts if they exist
+        if (completionChart) {
+            completionChart.destroy();
         }
-      });
-
-      // Time Spent by Category Chart
-      const timeSpentCtx = document.getElementById('timeSpentChart').getContext('2d');
-      const timeSpentChart = new Chart(timeSpentCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Work', 'Personal', 'Health', 'Learning'],
-          datasets: [{
-            data: [12, 5, 3, 4],
-            backgroundColor: [
-              'var(--primary)',
-              'var(--secondary)',
-              'var(--success)',
-              'var(--warning)'
-            ],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right',
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.label || '';
-                  const value = context.raw || 0;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const percentage = Math.round((value / total) * 100);
-                  return `${label}: ${value}h (${percentage}%)`;
+        if (priorityChart) {
+            priorityChart.destroy();
+        }
+        
+        // Create completion trend chart
+        const completionCtx = document.getElementById('completionChart');
+        if (completionCtx) {
+            const maxValue = Math.max(...chartData.completion_trend, 1);
+            const stepSize = maxValue <= 5 ? 1 : Math.ceil(maxValue / 5);
+            
+            completionChart = new Chart(completionCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Tasks Completed',
+                        data: chartData.completion_trend || [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderColor: '#4361ee',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#4361ee',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: maxValue + 1,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                stepSize: stepSize
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
                 }
-              }
-            }
-          },
-          cutout: '70%'
+            });
         }
-      });
-
-      // Store chart instances for updates
-      window.charts = {
-        completion: completionChart,
-        timeSpent: timeSpentChart
-      };
+        
+        // Create priority distribution chart
+        const priorityCtx = document.getElementById('priorityChart');
+        if (priorityCtx) {
+            priorityChart = new Chart(priorityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+                    datasets: [{
+                        data: [
+                            chartData.priority_data?.high || 0, 
+                            chartData.priority_data?.medium || 0, 
+                            chartData.priority_data?.low || 0
+                        ],
+                        backgroundColor: [
+                            '#ef233c', // High priority
+                            '#ff9e00', // Medium priority
+                            '#38b000'  // Low priority
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
-    // Update Charts based on time period
-    function updateCharts(period) {
-      // This would normally fetch new data based on the selected period
-      // For demo purposes, we'll just simulate different data
-      let completionData, plannedData, timeSpentData;
-      
-      switch(period) {
-        case 'week':
-          completionData = [3, 5, 4, 6, 4, 2, 0];
-          plannedData = [5, 6, 5, 7, 5, 3, 1];
-          timeSpentData = [12, 5, 3, 4];
-          break;
-        case 'month':
-          completionData = [12, 18, 15, 22, 17, 9, 3];
-          plannedData = [15, 20, 18, 25, 20, 12, 5];
-          timeSpentData = [45, 18, 12, 15];
-          break;
-        case 'quarter':
-          completionData = [42, 56, 48, 65];
-          plannedData = [50, 60, 55, 70];
-          timeSpentData = [120, 50, 30, 40];
-          break;
-      }
-
-      // Update completion chart
-      window.charts.completion.data.datasets[0].data = completionData;
-      window.charts.completion.data.datasets[1].data = plannedData;
-      window.charts.completion.update();
-
-      // Update time spent chart
-      window.charts.timeSpent.data.datasets[0].data = timeSpentData;
-      window.charts.timeSpent.update();
-    }
-
-    // Initialize charts when page loads
-    document.addEventListener('DOMContentLoaded', initCharts);
+    // ======================
+    // INITIALIZATION
+    // ======================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set active time period button based on current period
+        const currentPeriod = '{{ period }}';
+        const activeButton = document.querySelector(`.time-period-btn[data-period="${currentPeriod}"]`);
+        if (activeButton) {
+            timePeriodBtns.forEach(btn => btn.classList.remove('active'));
+            activeButton.classList.add('active');
+        }
+        
+        // Initialize charts
+        initializeCharts();
+        
+        // Set up notification badge
+        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+        }
+        
+        // Close any open notification panels when page loads
+        closeNotificationPanel();
+    });
   </script>
 </body>
 </html>
