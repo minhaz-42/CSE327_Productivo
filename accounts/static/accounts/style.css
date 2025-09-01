@@ -562,3 +562,51 @@ body.dark-theme {
 .full-width {
   width: 100%;
 }
+
+/* Modal animation */
+.modal-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.plan-modal {
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Calendar day styling */
+.calendar-day {
+  padding: 8px;
+  text-align: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+  background-color: #f0f0f0;
+}
+
+.calendar-day.has-tasks {
+  background-color: var(--secondary-light);
+  color: white;
+}
+
+.calendar-day.selected {
+  background-color: var(--secondary);
+  color: white;
+}

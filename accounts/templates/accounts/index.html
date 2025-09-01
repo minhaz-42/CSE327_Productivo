@@ -880,8 +880,44 @@
           </div>
         </div>
         <main class="main-content">
-          <!-- Add this Pomodoro Timer section -->
-          <div class="pomodoro-timer">
+          <!-- Today's Task & Pomodoro Section -->
+          <div class="dashboard-card card today-task-pomodoro" style="margin-bottom: 28px; border: none; border-radius: 20px; box-shadow: 0 8px 32px rgba(67,97,238,0.13); background: linear-gradient(120deg, #4895ef 0%, #b5179e 100%); position: relative; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 18px; padding: 28px 28px 18px 28px;">
+              <div style="background: rgba(255,255,255,0.18); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(67,97,238,0.10);">
+                <i class="fas fa-calendar-day" style="font-size: 2.2rem; color: #fff;"></i>
+              </div>
+              <span style="font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: 1px;">Today's Task</span>
+            </div>
+            <div style="padding: 0 28px 22px 28px;">
+            {% if today_tasks and today_tasks.0 %}
+              <div class="task-item" style="margin-bottom: 22px; background: rgba(255,255,255,0.85); border-radius: 14px; box-shadow: 0 2px 12px rgba(67,97,238,0.10); border-left: 7px solid #4895ef; padding: 22px 20px;">
+                <div class="task-header" style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+                  <h4 id="pomodoroTaskTitle" style="font-size: 1.25rem; font-weight: 800; color: #3a0ca3; margin-bottom: 2px;">{{ today_tasks.0.title }}</h4>
+                  <span class="priority-badge {{ today_tasks.0.priority|lower }}" style="margin-left: 0; font-size: 0.95rem; padding: 5px 14px; border-radius: 12px; font-weight: 700; background: linear-gradient(90deg, #ef233c 0%, #ff9e00 100%); color: #fff; box-shadow: 0 1px 4px rgba(239,35,60,0.10);">{{ today_tasks.0.priority }}</span>
+                </div>
+                <div class="task-meta" style="font-size: 1.08rem; color: #560bad; font-weight: 500;">
+                  <span style="display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-clock" style="color: #4895ef;"></i> <b>Due:</b> {{ today_tasks.0.deadline|date:"g:i A, M d" }}</span>
+                </div>
+              </div>
+              <button id="startPomodoroBtn" class="btn primary-btn" style="margin-bottom: 10px; font-size: 1.15rem; padding: 14px 36px; border-radius: 10px; font-weight: 700; letter-spacing: 0.7px; background: linear-gradient(90deg, #4895ef 0%, #b5179e 100%); color: #fff; box-shadow: 0 4px 16px rgba(67,97,238,0.18); border: none; transition: box-shadow 0.2s, transform 0.2s; position: relative; overflow: hidden;">
+                <span style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(76,201,240,0.18) 0%, rgba(72,149,239,0.08) 80%); z-index: 0;"></span>
+                <span style="position: relative; z-index: 1;"><i class="fas fa-stopwatch"></i> Start Pomodoro Timer</span>
+              </button>
+              <style>
+                #startPomodoroBtn:hover {
+                  box-shadow: 0 8px 32px rgba(72,149,239,0.28);
+                  transform: translateY(-2px) scale(1.04);
+                  background: linear-gradient(90deg, #4895ef 0%, #7209b7 100%);
+                }
+              </style>
+            {% else %}
+              <p style="font-size: 1.12rem; color: #fff; margin: 22px 0; font-weight: 500;">No tasks due today.</p>
+            {% endif %}
+            </div>
+            <div style="position: absolute; right: -60px; top: -60px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(76,201,240,0.18) 0%, rgba(72,149,239,0.08) 80%); z-index: 0;"></div>
+          </div>
+          <!-- Pomodoro Timer (hidden by default) -->
+          <div class="pomodoro-timer" id="pomodoroTimerBox" style="display:none;">
             <div class="timer-display">
               <span id="minutes">25</span>:<span id="seconds">00</span>
             </div>
@@ -922,14 +958,7 @@
             <span><i class="fas fa-tag"></i> {{ task.category }}</span>
           {% endif %}
         </div>
-        <div class="task-actions">
-          <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
-          {% if not task.completed %}
-            <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
-          {% else %}
-            <button class="action-btn delete"><i class="fas fa-trash"></i> Delete</button>
-          {% endif %}
-        </div>
+        
       </div>
     {% empty %}
       <p>No tasks due today.</p>
@@ -1299,6 +1328,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const startBtn = document.getElementById('startTimer');
   const pauseBtn = document.getElementById('pauseTimer');
   const resetBtn = document.getElementById('resetTimer');
+  const startPomodoroBtn = document.getElementById('startPomodoroBtn');
 
   function updateTimerDisplay() {
     const mins = Math.floor(totalSeconds / 60);
@@ -1349,7 +1379,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startBtn) startBtn.addEventListener('click', startTimer);
   if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
   if (resetBtn) resetBtn.addEventListener('click', resetTimer);
-
+  if (startPomodoroBtn) {
+    startPomodoroBtn.addEventListener('click', () => {
+      const pomodoroBox = document.getElementById('pomodoroTimerBox');
+      if (pomodoroBox) {
+        pomodoroBox.style.display = 'block';
+        startTimer();
+        window.scrollTo({ top: pomodoroBox.offsetTop - 60, behavior: 'smooth' });
+      }
+    });
+  }
   updateTimerDisplay();
 });
 </script>

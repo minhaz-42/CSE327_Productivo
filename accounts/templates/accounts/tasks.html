@@ -81,6 +81,55 @@
       gap: 15px;
     }
 
+    /* Modal animation */
+    .modal-overlay {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .plan-modal {
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Calendar day styling */
+    .calendar-day {
+      padding: 8px;
+      text-align: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .calendar-day:hover {
+      background-color: #f0f0f0;
+    }
+
+    .calendar-day.has-tasks {
+      background-color: var(--secondary-light);
+      color: white;
+    }
+
+    .calendar-day.selected {
+      background-color: var(--secondary);
+      color: white;
+    }
+    }
+
     .menu-btn {
       background: none;
       border: none;
@@ -735,6 +784,60 @@
         justify-content: center;
       }
     }
+    /* New styles for the Plan button */
+    .plan-btn {
+      padding: 8px 15px;
+      background-color: var(--secondary);
+      border: 1px solid var(--secondary);
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .plan-btn:hover {
+      background-color: var(--secondary-dark);
+      border-color: var(--secondary-dark);
+    }
+
+    /* Adjust search box size */
+    .search-box {
+      position: relative;
+      flex: 0 0 200px; /* Reduced from full width */
+      min-width: 200px; /* Reduced from 250px */
+    }
+
+    /* Adjust filter controls layout */
+    .filter-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .search-box {
+        flex: 0 0 100%;
+        min-width: 100%;
+      }
+      
+      .filter-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .plan-btn {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+      }
+    }
 
     /* input polish */
     #taskId { display: none; }
@@ -751,6 +854,54 @@
         </button>
         <h1 class="app-title">Intelligent Task Planner</h1>
       </div>
+
+        <!-- Planned Task Modal (for Plan Your Task) -->
+        <div class="task-form-modal" id="plannedTaskFormModal" style="display:none;">
+          <div class="task-form-container">
+            <div class="task-form-header">
+              <h3 id="plannedTaskFormTitle">Add Planned Task</h3>
+              <button class="close-btn" id="closePlannedTaskForm">&times;</button>
+            </div>
+            <form id="plannedTaskForm">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="plannedTitle">Title*</label>
+                <input type="text" id="plannedTitle" required placeholder="Enter task title" />
+              </div>
+              <div class="form-group">
+                <label for="plannedDescription">Description</label>
+                <textarea id="plannedDescription" rows="3" placeholder="Add details about the task"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="plannedPriority">Priority*</label>
+                  <select id="plannedPriority" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="plannedCategory">Category</label>
+                  <select id="plannedCategory">
+                    <option value="">None</option>
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="finance">Finance</option>
+                    <option value="health">Health</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="plannedDuration">Duration*</label>
+                <input type="text" id="plannedDuration" required placeholder="e.g. 2 hours, 30 minutes" />
+              </div>
+              <button type="submit" class="primary-btn btn btn-block">
+                <i class="fas fa-plus"></i> Save Planned Task
+              </button>
+            </form>
+          </div>
+        </div>
 
       <div class="header-right">
         <!-- Logout Button -->
@@ -803,7 +954,7 @@
           <h2><i class="fas fa-tasks"></i> My Tasks</h2>
         </div>
 
-        <!-- Filter and Search Controls -->
+        <!-- Filter and Search Controls - MODIFIED -->
         <div class="tasks-controls">
           <div class="search-box">
             <i class="fas fa-search"></i>
@@ -821,6 +972,10 @@
             </button>
             <button class="filter-btn" data-filter="completed">
               <i class="fas fa-check-circle"></i> Completed
+            </button>
+            <!-- NEW BUTTON -->
+            <button class="plan-btn" id="planTasksBtn">
+              <i class="fas fa-calendar-plus"></i> Plan Your Tasks
             </button>
           </div>
         </div>
@@ -921,10 +1076,12 @@
           </div>
           <div class="form-row">
             <div class="form-group">
+
               <label for="start_time">Start-Time*</label>
               <input type="datetime-local" id="start_time" required />
               <label for="end_time">End-Time*</label>
               <input type="datetime-local" id="end_time" required />
+
             </div>
             <div class="form-group">
               <label for="reminder">Reminder</label>
@@ -1274,6 +1431,20 @@ if (start >= end) {
       resetTaskForm();
     });
 
+    // Planned Task modal close
+    document.getElementById('closePlannedTaskForm').addEventListener('click', function() {
+      document.getElementById('plannedTaskFormModal').style.display = 'none';
+      document.getElementById('plannedTaskForm').reset();
+    });
+
+    // Planned Task form submit (demo only)
+    document.getElementById('plannedTaskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Planned Task saved (demo only)!');
+      document.getElementById('plannedTaskFormModal').style.display = 'none';
+      document.getElementById('plannedTaskForm').reset();
+    });
+
     // Submit
     taskForm.addEventListener('submit', handleTaskFormSubmit);
 
@@ -1310,6 +1481,185 @@ if (start >= end) {
 
     // Init
     renderTasks();
+    // Plan Tasks Button Functionality
+    document.getElementById('planTasksBtn').addEventListener('click', function() {
+      // Create modal overlay
+      const modalOverlay = document.createElement('div');
+      modalOverlay.className = 'modal-overlay';
+      modalOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      // Create modal content
+      const modalContent = document.createElement('div');
+      modalContent.className = 'plan-modal';
+      modalContent.style.cssText = `
+        background-color: white;
+        border-radius: 10px;
+        padding: 25px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+      `;
+      // Modal header
+      const modalHeader = document.createElement('div');
+      modalHeader.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      `;
+      const modalTitle = document.createElement('h2');
+      modalTitle.textContent = 'Plan Your Tasks';
+      modalTitle.style.cssText = `
+        margin: 0;
+        color: var(--primary);
+        font-size: 1.5rem;
+      `;
+      const closeButton = document.createElement('button');
+      closeButton.innerHTML = '&times;';
+      closeButton.style.cssText = `
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #999;
+      `;
+      closeButton.addEventListener('click', function() {
+        document.body.removeChild(modalOverlay);
+      });
+      modalHeader.appendChild(modalTitle);
+      modalHeader.appendChild(closeButton);
+      // Modal body with calendar view
+      const modalBody = document.createElement('div');
+      modalBody.innerHTML = `
+          <form class="plan-task-form" style="display: flex; flex-direction: column; gap: 18px; width: 100%;">
+            <div style="display: flex; gap: 16px;">
+              <div style="flex: 1;">
+                <label for="planDate" style="font-weight: 500; margin-bottom: 6px; display: block;">Date</label>
+                <input type="date" id="planDate" name="planDate" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+              </div>
+              <div style="flex: 1;">
+                <label for="preferredStart" style="font-weight: 500; margin-bottom: 6px; display: block;">Preferred Start Time</label>
+                <input type="time" id="preferredStart" name="preferredStart" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+              </div>
+              <div style="flex: 1;">
+                <label for="preferredEnd" style="font-weight: 500; margin-bottom: 6px; display: block;">Preferred End Time</label>
+                <input type="time" id="preferredEnd" name="preferredEnd" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 18px; align-items: center;">
+          <button id="openAddTaskFromPlan" style="padding: 10px 20px; background-color: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; margin-bottom: 16px;">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button id="savePlan" type="submit" style="padding: 8px 15px; background-color: var(--secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Save Plan</button>
+              <button id="cancelPlan" type="button" style="padding: 8px 15px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      `;
+      // Append elements
+      modalContent.appendChild(modalHeader);
+      modalContent.appendChild(modalBody);
+      modalOverlay.appendChild(modalContent);
+      document.body.appendChild(modalOverlay);
+      // Add Task button in Plan modal opens the main Add Task modal
+      const openAddTaskFromPlanBtn = modalContent.querySelector('#openAddTaskFromPlan');
+      if (openAddTaskFromPlanBtn) {
+          openAddTaskFromPlanBtn.addEventListener('click', function() {
+            document.body.removeChild(modalOverlay);
+            document.getElementById('plannedTaskFormModal').style.display = 'flex';
+          });
+      }
+      // Close modal when clicking outside
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          document.body.removeChild(modalOverlay);
+        }
+      });
+      // Add calendar navigation functionality
+      const prevMonthBtn = modalContent.querySelector('#prevMonth');
+      const nextMonthBtn = modalContent.querySelector('#nextMonth');
+      const currentMonthEl = modalContent.querySelector('#currentMonth');
+      let currentDate = new Date();
+      function updateCalendar() {
+    // Render month/year
+    currentMonthEl.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+    // Get calendar grid
+    const calendarGrid = modalContent.querySelector('.calendar-grid');
+    // Remove previous days (keep days of week)
+    while (calendarGrid.children.length > 7) {
+      calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+    // Get first day of month
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Add empty slots for days before first day
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      calendarGrid.appendChild(empty);
+    }
+    // Add days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'calendar-day';
+      dayDiv.textContent = d;
+      dayDiv.dataset.date = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      calendarGrid.appendChild(dayDiv);
+    }
+    // Highlight selected day
+    if (window.selectedCalendarDay) {
+      const sel = calendarGrid.querySelector(`[data-date='${window.selectedCalendarDay}']`);
+      if (sel) sel.classList.add('selected');
+    }
+    // Add click listeners for day selection
+    calendarGrid.querySelectorAll('.calendar-day').forEach(day => {
+      day.onclick = function() {
+        calendarGrid.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+        this.classList.add('selected');
+        window.selectedCalendarDay = this.dataset.date;
+      };
+    });
+      }
+      prevMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendar();
+      });
+      nextMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendar();
+      });
+      // Save plan functionality
+      const savePlanBtn = modalContent.querySelector('#savePlan');
+      savePlanBtn.addEventListener('click', function() {
+        // In a real implementation, this would save the scheduled tasks
+        alert('Your task plan has been saved!');
+        document.body.removeChild(modalOverlay);
+      });
+      // Cancel button
+      const cancelBtn = modalContent.querySelector('#cancelPlan');
+      cancelBtn.addEventListener('click', function() {
+        document.body.removeChild(modalOverlay);
+      });
+      // Initialize calendar
+      updateCalendar();
+    });
   </script>
 </body>
 </html>
