@@ -858,23 +858,23 @@
         <div class="dashboard-header">
           <div>
             <h2>Today's Overview</h2>
-            <p class="greeting">Thursday, July 25, 2025</p>
+            <p class="greeting">{% now "l, F d, Y" %}</p>
           </div>
           <div class="stats">
             <div class="stat-item" id="todayTasksStat">
-              <span class="stat-value">5</span>
+              <span class="stat-value">{{ today_tasks.count }}</span>
               <span class="stat-label">Tasks Today</span>
             </div>
             <div class="stat-item" id="completedTasksStat">
-              <span class="stat-value">2</span>
+              <span class="stat-value">{{ completed_tasks_count }}</span>
               <span class="stat-label">Completed</span>
             </div>
             <div class="stat-item" id="highPriorityStat">
-              <span class="stat-value">1</span>
+              <span class="stat-value">{{ high_priority_count }}</span>
               <span class="stat-label">High Priority</span>
             </div>
             <div class="stat-item" id="productivityStat">
-              <span class="stat-value">78%</span>
+              <span class="stat-value">{{ productivity_score }}</span>
               <span class="stat-label">Productivity</span>
             </div>
           </div>
