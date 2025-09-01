@@ -56,7 +56,7 @@ def registration(request):
 
     return render(request, "accounts/register.html", context)
 
-
+##login logic
 def login(request):
     context = {}
     if request.method == 'POST':
@@ -73,6 +73,7 @@ def login(request):
     return render(request, 'accounts/login.html', context)
 
 
+##logout logic
 def logout_view(request):
     logout(request)
     return redirect('home')
@@ -87,7 +88,7 @@ def dashboard(request):
 
     today = now().date()
     today_tasks = tasks.filter(deadline__date=today)
-    upcoming_tasks = tasks.filter(deadline__date__gt=today)[:5]  # Limit to 5 upcoming tasks
+    upcoming_tasks = tasks.filter(completed = False, deadline__date__gt=today)[:5]  # Limit to 5 upcoming tasks which are not completed
     
     # Calculate statistics for dashboard
     completed_tasks_count = tasks.filter(completed=True).count()
@@ -114,7 +115,7 @@ def dashboard(request):
     }
     return render(request, 'accounts/index.html', context)
 
-
+##adding task
 @login_required
 def task(request):
     """

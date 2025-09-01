@@ -1168,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
           this.reset();
           this.removeAttribute('data-editing');
           taskFormModal.style.display = 'none';
-          location.reload(); // Reload page or update DOM dynamically if you want
+          location.reload(); // Reload page or update DOM dynamically
         } else {
           alert('❌ Failed to add/update task.');
         }
@@ -1181,9 +1181,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Complete Task
   document.querySelectorAll('.action-btn.complete').forEach(btn => {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click',async function () {
       const taskItem = this.closest('.task-item');
+      const taskId = taskItem.dataset.taskId;
+
+      if (!taskItem.classList.contains('completed')) { //prevents double completion of a task
+      const csrfToken = getCSRFToken(); // Your function to get CSRF token
+
+      try {
+        const response = await fetch(`/complete-task/${taskId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({ task_id: taskId }) // send task ID 
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Only update UI if backend confirms success
+          taskItem.classList.add('completed');
+          this.innerHTML = '<i class="fas fa-check"></i> Completed';
+          this.style.backgroundColor = '#4cc9f0';
+          this.style.color = 'white';
+          location.reload(); //reload page
+
+          const completedStat = document.getElementById('completedTasksStat');
+          if (completedStat) {
+            const currentValue = parseInt(completedStat.querySelector('.stat-value').textContent);
+            completedStat.querySelector('.stat-value').textContent = currentValue + 1;
+          }
+        } else {
+          alert('❌ Failed to complete task: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ An error occurred while completing the task.');
+      }
+    }
+
+      /*
       if (!taskItem.classList.contains('completed')) {
+      
         taskItem.classList.add('completed');
         this.innerHTML = '<i class="fas fa-check"></i> Completed';
         this.style.backgroundColor = '#4cc9f0';
@@ -1194,7 +1235,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const currentValue = parseInt(completedStat.querySelector('.stat-value').textContent);
           completedStat.querySelector('.stat-value').textContent = currentValue + 1;
         }
+        
       }
+        */
     });
   });
 
