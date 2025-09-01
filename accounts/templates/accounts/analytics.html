@@ -1062,6 +1062,7 @@
     });
 
     // Mark all as read functionality
+    // Mark all notifications as read
 if (markAllRead) {
     markAllRead.addEventListener('click', function() {
         // This would typically make an AJAX call to your backend
@@ -1136,7 +1137,7 @@ function getCookie(name) {
     // CHART FUNCTIONS
     // ======================
     function initializeCharts() {
-        
+        // Destroy existing charts if they exist
         if (completionChart) {
             completionChart.destroy();
         }
