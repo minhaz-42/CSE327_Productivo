@@ -6,11 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django.db.models import Count, Q
+from django.db.models import Count, Q   
 from django.utils import timezone
 from datetime import timedelta
-
 from .models import Student, Task
+from django.utils.dateparse import parse_datetime
+
 
 # ------------------ PUBLIC VIEWS ------------------
 
@@ -84,11 +85,11 @@ def logout_view(request):
 @login_required(login_url='login')
 def dashboard(request):
     user = request.user
-    tasks = Task.objects.filter(user=user).order_by('deadline')
+    tasks = Task.objects.filter(user=user).order_by('end_time')
 
     today = now().date()
-    today_tasks = tasks.filter(deadline__date=today)
-    upcoming_tasks = tasks.filter(completed = False, deadline__date__gt=today)[:5]  # Limit to 5 upcoming tasks which are not completed
+    today_tasks = tasks.filter(end_time__date=today)
+    upcoming_tasks = tasks.filter(completed = False, end_time__date__gt=today)[:5]  # Limit to 5 upcoming tasks which are not completed
     
     # Calculate statistics for dashboard
     completed_tasks_count = tasks.filter(completed=True).count()
@@ -122,7 +123,7 @@ def task(request):
     Render task page with both HTML tasks and JSON for JS.
     """
     user = request.user
-    tasks = Task.objects.filter(user=user).order_by('-deadline')
+    tasks = Task.objects.filter(user=user).order_by('-end_time')
 
     # Convert tasks to JSON with only needed fields for JS
     tasks_json_list = []
@@ -134,7 +135,8 @@ def task(request):
                 'description': t.description,
                 'priority': t.priority,
                 'category': t.category or 'none',
-                'deadline': t.deadline.isoformat(),
+                'start_time': t.start_time.isoformat() if t.start_time else None,
+                'end_time': t.end_time.isoformat() if t.end_time else None,
                 'reminder': t.reminder or 'none',
                 'completed': t.completed
             }
@@ -251,11 +253,22 @@ def add_task(request):
             description = data.get('description', '')
             priority = data.get('priority', 'medium')
             category = data.get('category') or 'none'
-            deadline = data.get('deadline')
+            start_time = data.get('start_time')
+            end_time = data.get('end_time')
             reminder = data.get('reminder') or 'none'
 
-            if not title or not deadline:
-                return JsonResponse({'success': False, 'error': 'Title and deadline are required.'})
+            if not title or not start_time or not end_time:
+                return JsonResponse({'success': False, 'error': 'Title and Start-time and End-time are required.'})
+            
+             # Check for time clash with existing tasks
+            clash_exists = Task.objects.filter(
+                user=request.user,
+                start_time__lt=end_time,
+                end_time__gt=start_time
+            ).exists()
+
+            if clash_exists:
+                return JsonResponse({'success': False, 'error': 'Task timing clashes with an existing task.'})
 
             Task.objects.create(
                 user=request.user,
@@ -263,10 +276,13 @@ def add_task(request):
                 description=description,
                 priority=priority,
                 category=category,
-                deadline=deadline,
+                start_time=start_time,
+                end_time=end_time,
                 reminder=reminder
             )
+
             return JsonResponse({'success': True})
+
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
@@ -281,21 +297,37 @@ def edit_task(request, task_id):
             task = Task.objects.get(id=task_id, user=request.user)
             data = json.loads(request.body)
 
+            new_start_time = parse_datetime(data.get('start_time')) or task.start_time
+            new_end_time = parse_datetime(data.get('end_time')) or task.end_time
+
+            # Check for time clash with other tasks (excluding current task)
+            clash_exists = Task.objects.filter(
+                user=request.user,
+                start_time__lt=new_end_time,
+                end_time__gt=new_start_time
+            ).exclude(id=task.id).exists()
+
+            if clash_exists:
+                return JsonResponse({'success': False, 'error': 'Task timing clashes with another existing task.'})
+
             task.title = data.get('title', task.title)
             task.description = data.get('description', task.description)
             task.priority = data.get('priority', task.priority)
             task.category = data.get('category', task.category)
-            task.deadline = data.get('deadline', task.deadline)
+            task.start_time = new_start_time
+            task.end_time = new_end_time
             task.reminder = data.get('reminder', task.reminder)
             task.save()
 
             return JsonResponse({'success': True})
+
         except Task.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 
 
 @login_required
@@ -344,7 +376,8 @@ def get_task(request, task_id):
                     'description': task.description,
                     'priority': task.priority,
                     'category': task.category,
-                    'deadline': task.deadline.isoformat(),
+                    'start_time': task.deadline.isoformat(),
+                    'end_time': task.end_time.isoformat(),
                     'reminder': task.reminder,
                     'completed': task.completed
                 }
@@ -370,8 +403,8 @@ def analytics(request):
     # Calculate in-progress tasks (not completed)
     in_progress_tasks = tasks.filter(completed=False).count()
     
-    # Calculate overdue tasks (tasks not completed with deadline in the past)
-    overdue_tasks = tasks.filter(completed=False, deadline__lt=timezone.now()).count()
+    # Calculate overdue tasks (tasks not completed with end_time in the past)
+    overdue_tasks = tasks.filter(completed=False, end_time__lt=timezone.now()).count()
     
     # Calculate completion rate (avoid division by zero)
     completion_rate = 0
@@ -455,7 +488,7 @@ def generate_chart_data(user, period):
             count = Task.objects.filter(
                 user=user,
                 completed=True,
-                deadline__date=current_date
+                end_time__date=current_date
             ).count()
             completion_trend.append(count)
             
@@ -473,8 +506,8 @@ def generate_chart_data(user, period):
             count = Task.objects.filter(
                 user=user,
                 completed=True,
-                deadline__date__gte=week_start,
-                deadline__date__lte=week_end
+                end_time__date__gte=week_start,
+                end_time__date__lte=week_end
             ).count()
             completion_trend.append(count)
             
@@ -496,8 +529,8 @@ def generate_chart_data(user, period):
             count = Task.objects.filter(
                 user=user,
                 completed=True,
-                deadline__date__gte=month_start,
-                deadline__date__lte=month_end
+                end_time__date__gte=month_start,
+                end_time__date__lte=month_end
             ).count()
             completion_trend.append(count)
             
@@ -513,7 +546,7 @@ def generate_chart_data(user, period):
             count = Task.objects.filter(
                 user=user,
                 completed=True,
-                deadline__date=current_date
+                end_time__date=current_date
             ).count()
             completion_trend.append(count)
     
@@ -551,18 +584,18 @@ def get_user_notifications(user):
     # 1. Due soon notifications (tasks due in next 24 hours)
     due_soon = tasks.filter(
         completed=False,
-        deadline__gt=now,
-        deadline__lte=now + timedelta(hours=24)
+        end_time__gt=now,
+        end_time__lte=now + timedelta(hours=24)
     )
     
     for task in due_soon:
-        time_left = task.deadline - now
+        time_left = task.end_time - now
         hours_left = int(time_left.total_seconds() // 3600)
         
         notifications.append({
             'type': 'due_soon',
             'message': f'Task "{task.title}" is due in {hours_left} hours',
-            'time': task.deadline,
+            'time': task.end_time,
             'unread': True,
             'icon': 'fas fa-tasks'
         })
@@ -570,14 +603,14 @@ def get_user_notifications(user):
     # 2. Overdue notifications
     overdue = tasks.filter(
         completed=False,
-        deadline__lt=now
+        end_time__lt=now
     )
     
     for task in overdue:
         notifications.append({
             'type': 'overdue',
             'message': f'Task "{task.title}" is overdue',
-            'time': task.deadline,
+            'time': task.end_time,
             'unread': True,
             'icon': 'fas fa-exclamation-triangle'
         })
@@ -585,7 +618,7 @@ def get_user_notifications(user):
     # 3. Recent completions (tasks completed in last 24 hours)
     recent_completions = tasks.filter(
         completed=True,
-        deadline__gte=now - timedelta(hours=24)
+        end_time__gte=now - timedelta(hours=24)
     )
     
     if recent_completions.count() > 0:

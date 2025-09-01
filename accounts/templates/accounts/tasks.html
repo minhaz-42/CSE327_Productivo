@@ -831,7 +831,7 @@
             {% for task in tasks %}
               <div class="task-item {% if task.completed %}completed{% endif %}" 
                    data-task-id="{{ task.id }}"
-                   data-deadline-iso="{{ task.deadline|date:'c' }}">
+                   data-end_time-iso="{{ task.end_time|date:'c' }}">
                 <div class="task-header">
                   <h4>{{ task.title }}</h4>
                   <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
@@ -921,8 +921,10 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="deadline">Deadline*</label>
-              <input type="datetime-local" id="deadline" required />
+              <label for="start_time">Start-Time*</label>
+              <input type="datetime-local" id="start_time" required />
+              <label for="end_time">End-Time*</label>
+              <input type="datetime-local" id="end_time" required />
             </div>
             <div class="form-group">
               <label for="reminder">Reminder</label>
@@ -1043,7 +1045,8 @@
       document.getElementById('description').value = task.description || '';
       document.getElementById('priority').value = task.priority || 'medium';
       document.getElementById('category').value = (task.category && task.category !== 'none') ? task.category : '';
-      document.getElementById('deadline').value = toLocalDatetimeInputValue(task.deadline);
+      document.getElementById('start_time').value = toLocalDatetimeInputValue(task.start_time);
+      document.getElementById('end_time').value = toLocalDatetimeInputValue(task.end_time);
       document.getElementById('reminder').value = task.reminder && task.reminder !== 'none' ? task.reminder : '';
 
       const submitBtn = document.querySelector('#taskForm button[type="submit"]');
@@ -1067,15 +1070,36 @@
         description: document.getElementById('description').value.trim(),
         priority: document.getElementById('priority').value,
         category: document.getElementById('category').value || 'none',
-        deadline: document.getElementById('deadline').value, // send as local string; backend will parse
+        start_time: document.getElementById('start_time').value, // send as local string; backend will parse
+        end_time: document.getElementById('end_time').value,
         reminder: document.getElementById('reminder').value || 'none'
       };
 
       // basic validation
-      if (!formData.title || !formData.deadline) {
-        alert('Title and Deadline are required.');
-        return;
+      
+      if (!formData.title || !formData.start_time || !formData.end_time) {
+  alert('Title, Start-time, and End-time are required.');
+  return;
+}
+const start = new Date(formData.start_time);
+const end = new Date(formData.end_time);
+if (start >= end) {
+  alert("End time must be after start time.");
+  return;
+}
+      if (formData.reminder !== 'none') {
+        const reminderMin = parseInt(formData.reminder, 10);
+        if (isNaN(reminderMin) || reminderMin < 0) {
+          alert('Invalid reminder value.');
+          return;
+        }
+        const reminderTime = new Date(end.getTime() - reminderMin * 60000);
+        if (reminderTime < start) {
+          alert('Reminder time must be after start time.');
+          return;
+        }
       }
+
 
       const url = isEditMode ? `/edit-task/${taskId}/` : '/add-task/';
       const method = 'POST'; // both endpoints accept POST
@@ -1158,7 +1182,7 @@
 
         if (currentFilter === 'completed') return !!task.completed;
 
-        const datePart = (task.deadline || '').split('T')[0];
+        const datePart = (task.end_time || '').split('T')[0];
         if (currentFilter === 'today') return datePart === todayStr && !task.completed;
         if (currentFilter === 'upcoming') return datePart > todayStr && !task.completed;
 
@@ -1171,7 +1195,7 @@
         const pa = prio[a.priority] || 99;
         const pb = prio[b.priority] || 99;
         if (pa !== pb) return pa - pb;
-        return new Date(a.deadline) - new Date(b.deadline);
+        return new Date(a.end_time) - new Date(b.end_time);
       });
 
       if (filtered.length === 0) {
@@ -1198,7 +1222,7 @@
           </div>
           <p>${task.description || ''}</p>
           <div class="task-meta">
-            <span><i class="fas fa-clock"></i> ${formatDate(task.deadline)} at ${formatTime(task.deadline)}</span>
+            <span><i class="fas fa-clock"></i> ${formatDate(task.end_time)} at ${formatTime(task.end_time)}</span>
             ${task.category && task.category !== 'none' ? `<span><i class="fas fa-tag"></i> ${task.category}</span>` : ''}
           </div>
           <div class="task-actions">

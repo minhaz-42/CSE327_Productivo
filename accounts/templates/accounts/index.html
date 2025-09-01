@@ -910,14 +910,14 @@
     {% for task in today_tasks %}
   <div class="task-item {% if task.completed %}completed{% endif %}"
        data-task-id="{{ task.id }}"
-       data-deadline-iso="{{ task.deadline|date:'c' }}">
+       data-end_time-iso="{{ task.end_time|date:'c' }}">
         <div class="task-header">
           <h4>{{ task.title }}</h4>
           <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
         </div>
         <p>{{ task.description }}</p>
         <div class="task-meta">
-          <span><i class="fas fa-clock"></i> Due: {{ task.deadline|date:"g:i A" }}</span>
+          <span><i class="fas fa-clock"></i> Due: {{ task.end_time|date:"g:i A" }}</span>
           {% if task.category %}
             <span><i class="fas fa-tag"></i> {{ task.category }}</span>
           {% endif %}
@@ -945,14 +945,14 @@
     {% for task in upcoming_tasks %}
   <div class="task-item"
        data-task-id="{{ task.id }}"
-       data-deadline-iso="{{ task.deadline|date:'c' }}">
+       data-end_time-iso="{{ task.end_time|date:'c' }}">
         <div class="task-header">
           <h4>{{ task.title }}</h4>
           <span class="priority-badge {{ task.priority|lower }}">{{ task.priority }}</span>
         </div>
         <p>{{ task.description }}</p>
         <div class="task-meta">
-          <span><i class="fas fa-clock"></i> {{ task.deadline|date:"D, g:i A" }}</span>
+          <span><i class="fas fa-clock"></i> {{ task.end_time|date:"D, g:i A" }}</span>
           {% if task.category %}
             <span><i class="fas fa-tag"></i> {{ task.category }}</span>
           {% endif %}
@@ -1138,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const description = document.getElementById('description').value.trim();
       const priority = document.getElementById('priority').value;
       const category = document.getElementById('category').value.trim() || 'none';
-      const deadline = document.getElementById('deadline').value;
+      const end_time= document.getElementById('end_time').value;
       const reminder = document.getElementById('reminder').value || 'none';
 
       const isEditing = this.getAttribute('data-editing');
@@ -1156,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             description,
             priority,
             category,
-            deadline,
+            end_time,
             reminder,
           }),
         });
@@ -1262,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const priorityBadge = taskItem.querySelector('.priority-badge');
       const priority = priorityBadge ? priorityBadge.classList[1] : 'low';
       const category = taskItem.querySelector('.fa-tag')?.nextSibling?.textContent?.trim() || '';
-      const deadline = taskItem.getAttribute('data-deadline-iso') || '';
+      const end_time = taskItem.getAttribute('data-end_time-iso') || '';
       const taskId = taskItem.dataset.taskId || '';
 
       // Fill form inputs
@@ -1271,11 +1271,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('priority').value = priority;
       document.getElementById('category').value = category.toLowerCase();
 
-      if (deadline) {
-        const date = new Date(deadline);
-        document.getElementById('deadline').value = date.toISOString().slice(0, 16);
+      if (end_time) {
+        const date = new Date(end_time);
+        document.getElementById('end_time').value = date.toISOString().slice(0, 16);
       } else {
-        document.getElementById('deadline').value = '';
+        document.getElementById('end_time').value = '';
       }
 
       document.getElementById('reminder').value = '';

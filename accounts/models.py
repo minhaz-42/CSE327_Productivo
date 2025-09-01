@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # ------------------
 # Student Model
@@ -46,7 +47,8 @@ class Task(models.Model):
     description = models.TextField(blank=True, null=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='none', blank=True)
-    deadline = models.DateTimeField()
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField()
     reminder = models.CharField(max_length=10, choices=REMINDER_CHOICES, default='none', blank=True)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
