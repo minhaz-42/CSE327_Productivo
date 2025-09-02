@@ -889,14 +889,14 @@
               <span style="font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: 1px;">Today's Task</span>
             </div>
             <div style="padding: 0 28px 22px 28px;">
-            {% if today_tasks and today_tasks.0 %}
+            {% if task_rightnow %}
               <div class="task-item" style="margin-bottom: 22px; background: rgba(255,255,255,0.85); border-radius: 14px; box-shadow: 0 2px 12px rgba(67,97,238,0.10); border-left: 7px solid #4895ef; padding: 22px 20px;">
                 <div class="task-header" style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
-                  <h4 id="pomodoroTaskTitle" style="font-size: 1.25rem; font-weight: 800; color: #3a0ca3; margin-bottom: 2px;">{{ today_tasks.0.title }}</h4>
-                  <span class="priority-badge {{ today_tasks.0.priority|lower }}" style="margin-left: 0; font-size: 0.95rem; padding: 5px 14px; border-radius: 12px; font-weight: 700; background: linear-gradient(90deg, #ef233c 0%, #ff9e00 100%); color: #fff; box-shadow: 0 1px 4px rgba(239,35,60,0.10);">{{ today_tasks.0.priority }}</span>
+                  <h4 id="pomodoroTaskTitle" style="font-size: 1.25rem; font-weight: 800; color: #3a0ca3; margin-bottom: 2px;">{{ task_rightnow.title }}</h4>
+                  <span class="priority-badge {{ today_tasks.0.priority|lower }}" style="margin-left: 0; font-size: 0.95rem; padding: 5px 14px; border-radius: 12px; font-weight: 700; background: linear-gradient(90deg, #ef233c 0%, #ff9e00 100%); color: #fff; box-shadow: 0 1px 4px rgba(239,35,60,0.10);">{{ task_rightnow.priority }}</span>
                 </div>
                 <div class="task-meta" style="font-size: 1.08rem; color: #560bad; font-weight: 500;">
-                  <span style="display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-clock" style="color: #4895ef;"></i> <b>Due:</b> {{ today_tasks.0.deadline|date:"g:i A, M d" }}</span>
+                  <span style="display: inline-flex; align-items: center; gap: 8px;"><i class="fas fa-clock" style="color: #4895ef;"></i> <b>End Time:</b> {{ task_rightnow.end_time|date:"g:i A, M d" }}</span>
                 </div>
               </div>
               <button id="startPomodoroBtn" class="btn primary-btn" style="margin-bottom: 10px; font-size: 1.15rem; padding: 14px 36px; border-radius: 10px; font-weight: 700; letter-spacing: 0.7px; background: linear-gradient(90deg, #4895ef 0%, #b5179e 100%); color: #fff; box-shadow: 0 4px 16px rgba(67,97,238,0.18); border: none; transition: box-shadow 0.2s, transform 0.2s; position: relative; overflow: hidden;">
@@ -910,8 +910,37 @@
                   background: linear-gradient(90deg, #4895ef 0%, #7209b7 100%);
                 }
               </style>
+            {% elif today_tasks_incomplete %}
+              <p style="font-size: 1.12rem; color: #fff; margin: 22px 0; font-weight: 500;">Next task: {{ next_task.title }} in <span id="timeRemaining"></span></p>
+              <script>  
+                 let timerInterval;
+                 let timeRemaining = parseInt("{{ time_remaining_total_Seconds|default:'0' }}") || 0;
+
+                function updateNextTaskTimer() {
+                  if (timeRemaining > 0) {
+                  const hours = Math.floor(timeRemaining / 3600);
+                  const minutes = Math.floor((timeRemaining % 3600) / 60);
+                  const seconds = timeRemaining % 60;
+                  document.getElementById('timeRemaining').textContent =
+                 `${hours}h ${minutes}m ${seconds}s`;
+                  timeRemaining--;
+                 } else {
+                 document.getElementById('timeRemaining').textContent = "Any Moment!";
+                 clearInterval(timerInterval);
+                 window.location.reload();
+                 }
+              }
+
+              // Run once initially
+              updateNextTaskTimer();
+
+              // Update every second
+              timerInterval = setInterval(updateNextTaskTimer, 1000);
+            
+              </script>
+            
             {% else %}
-              <p style="font-size: 1.12rem; color: #fff; margin: 22px 0; font-weight: 500;">No tasks due today.</p>
+              <p style="font-size: 1.12rem; color: #fff; margin: 22px 0; font-weight: 500;">No Tasks for Today!</p>
             {% endif %}
             </div>
             <div style="position: absolute; right: -60px; top: -60px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(76,201,240,0.18) 0%, rgba(72,149,239,0.08) 80%); z-index: 0;"></div>
@@ -953,7 +982,7 @@
         </div>
         <p>{{ task.description }}</p>
         <div class="task-meta">
-          <span><i class="fas fa-clock"></i> Due: {{ task.end_time|date:"g:i A" }}</span>
+          <span><i class="fas fa-clock"></i> Due: {{ task.start_time|date:"g:i A" }}</span>
           {% if task.category %}
             <span><i class="fas fa-tag"></i> {{ task.category }}</span>
           {% endif %}
@@ -981,7 +1010,7 @@
         </div>
         <p>{{ task.description }}</p>
         <div class="task-meta">
-          <span><i class="fas fa-clock"></i> {{ task.end_time|date:"D, g:i A" }}</span>
+          <span><i class="fas fa-clock"></i> {{ task.start_time|date:"D, g:i A" }}</span>
           {% if task.category %}
             <span><i class="fas fa-tag"></i> {{ task.category }}</span>
           {% endif %}
@@ -1318,10 +1347,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Pomodoro Timer Logic
+/*
   let timerInterval = null;
   let totalSeconds = 25 * 60;
   let isRunning = false;
   let isPaused = false;
+  //let timeRemaining = parseInt("{{ time_remaining_current_task|default:'0' }}");
 
   const minutesDisplay = document.getElementById('minutes');
   const secondsDisplay = document.getElementById('seconds');
@@ -1390,6 +1421,137 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   updateTimerDisplay();
+  */
+  
+ 
+ let timerInterval = null;
+ let isRunning = false;
+ let isPaused = false;
+ const cycleCount = document.getElementById('cycleCount');
+
+
+// Time remaining for current task in seconds from Django context
+ let timeRemaining = parseInt("{{ time_remaining_current_task|default:'0' }}") || 0;
+
+// Pomodoro settings
+ const workDuration = 20;  // 25 minutes  10 seconds used for testing
+ const shortBreak = 5;     // 5 minutes    5 seconds used for testing
+ const longBreak = 10;     // 15 minutes  10 seconds used for testing
+
+ let pomodoroCount = 1;  // Completed work sessions starting with 1st cycle
+ let onBreak = false;
+ let totalSeconds = Math.min(workDuration, timeRemaining); // start session capped to task remaining
+
+ const minutesDisplay = document.getElementById('minutes');
+ const secondsDisplay = document.getElementById('seconds');
+ const startBtn = document.getElementById('startTimer');
+ const pauseBtn = document.getElementById('pauseTimer');
+ const resetBtn = document.getElementById('resetTimer');
+ const startPomodoroBtn = document.getElementById('startPomodoroBtn');
+
+ //function used to update the cycles in the screen
+ function updateCycleDisplay() {
+  // current cycle is 1 
+  let currentCycle = (pomodoroCount % 4) || 4;  //cycle is 1,2,3,4 then again 1
+  cycleCount.textContent = `Cycle: ${currentCycle}/4`;
+}
+
+ //updating timer display
+ function updateTimerDisplay() {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  minutesDisplay.textContent = String(mins).padStart(2, '0');
+  secondsDisplay.textContent = String(secs).padStart(2, '0');
+ }
+
+ function startTimer() {
+  if (isRunning || timeRemaining <= 0) return; 
+  isRunning = true;
+  isPaused = false;
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
+
+  timerInterval = setInterval(() => { //function repeats every second
+    if (!isPaused && totalSeconds > 0) {
+      totalSeconds--;  //adjusting the total seconds 
+      timeRemaining--; //adjusting the total time remaining
+      updateTimerDisplay();
+    } else if (totalSeconds === 0) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+
+      if (timeRemaining <= 0) {
+        alert('Task completed!');
+        window.location.reload();
+        return;
+      }
+
+      if (!onBreak) {
+        // Work session finished so update cycle (updating after every work cycle)
+        pomodoroCount++;
+        updateCycleDisplay();
+        if (pomodoroCount % 4 === 0) { //if cycle = 4 then time for a long break
+          totalSeconds = Math.min(longBreak, timeRemaining);
+        } else {
+          totalSeconds = Math.min(shortBreak, timeRemaining);  //else a short break
+        }
+        onBreak = true; //since now its on break
+        alert('Work session finished! Break time starts now.');
+        startTimer();
+      } else {
+        // Break finished, start next work session
+        totalSeconds = Math.min(workDuration, timeRemaining);
+        onBreak = false;
+        alert('Break finished! Back to work.');
+        startTimer();
+      }
+      
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (!isRunning) return;
+  isPaused = !isPaused;
+  pauseBtn.innerHTML = isPaused
+    ? '<i class="fas fa-play"></i> Resume'
+    : '<i class="fas fa-pause"></i> Pause';
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  totalSeconds = Math.min(workDuration, timeRemaining);
+  onBreak = false;
+  isRunning = false;
+  isPaused = false;
+  pomodoroCount = 0;
+  updateTimerDisplay();
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+}
+
+if (startBtn) startBtn.addEventListener('click', startTimer);
+if (pauseBtn) pauseBtn.addEventListener('click', pauseTimer);
+if (resetBtn) resetBtn.addEventListener('click', resetTimer);
+if (startPomodoroBtn) {
+  startPomodoroBtn.addEventListener('click', () => { //if start timer button is pressed
+    const pomodoroBox = document.getElementById('pomodoroTimerBox');
+    if (pomodoroBox) {
+      pomodoroBox.style.display = 'block';
+      startTimer();
+      window.scrollTo({ top: pomodoroBox.offsetTop - 60, behavior: 'smooth' });
+    }
+  });
+}
+
+// Initialize display
+updateTimerDisplay();
+
+  
 });
 </script>
 
