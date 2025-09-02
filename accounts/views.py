@@ -96,7 +96,7 @@ def dashboard(request):
     
     #for pomodoro logic calculating the time remaining for the task
     if task_rightnow:
-        time_remaining_current_task = int((task_rightnow.end_time - current_time).total_seconds())
+        time_remaining_current_task = int((task_rightnow.end_time - current_time).total_seconds()) //1
     
     else:
         time_remaining_current_task = 0
