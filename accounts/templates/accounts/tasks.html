@@ -993,7 +993,7 @@
                 </div>
                 <p>{{ task.description }}</p>
                 <div class="task-meta">
-                  <span><i class="fas fa-clock"></i> {{ task.deadline|date:"M d, Y - g:i A" }}</span>
+                  <span><i class="fas fa-clock"></i> {{ task.start_time|date:"M d, Y - g:i A" }}</span>
                   {% if task.category %}
                     <span><i class="fas fa-tag"></i> {{ task.category }}</span>
                   {% endif %}
@@ -1181,7 +1181,7 @@
       const dt = new Date(isoString);
       const tzOffsetMin = dt.getTimezoneOffset();
       const local = new Date(dt.getTime() - tzOffsetMin * 60000);
-      return local.toISOString().slice(0, 16);
+      return local.toJSON().slice(0, 16);
     }
 
     // ======================
@@ -1379,7 +1379,7 @@ if (start >= end) {
           </div>
           <p>${task.description || ''}</p>
           <div class="task-meta">
-            <span><i class="fas fa-clock"></i> ${formatDate(task.end_time)} at ${formatTime(task.end_time)}</span>
+            <span><i class="fas fa-clock"></i> ${formatDate(task.start_time)} at ${formatTime(task.start_time)}</span>
             ${task.category && task.category !== 'none' ? `<span><i class="fas fa-tag"></i> ${task.category}</span>` : ''}
           </div>
           <div class="task-actions">

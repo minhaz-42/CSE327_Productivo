@@ -90,10 +90,50 @@ def dashboard(request):
     user = request.user
     tasks = Task.objects.filter(user=user).order_by('end_time')
 
-    today = now().date()
+    #today = now().date()
+    current_time = timezone.localtime();
+    today = current_time.date();
     today_tasks = tasks.filter(end_time__date=today)
+    today_tasks_incomplete = today_tasks.filter(end_time__gte=current_time,completed = False)
+    task_rightnow = today_tasks_incomplete.filter( start_time__lte=current_time,end_time__gte=current_time).first();
+    
+    #for pomodoro logic calculating the time remaining for the task
+    if task_rightnow:
+        time_remaining_current_task = int((task_rightnow.end_time - current_time).total_seconds())
+    
+    else:
+        time_remaining_current_task = 0
+
     upcoming_tasks = tasks.filter(completed = False, end_time__date__gt=today)[:5]  # Limit to 5 upcoming tasks which are not completed
     
+    next_task = None
+    next_task_qs = None
+    # next task
+    if(today_tasks_incomplete):
+        next_task_qs = today_tasks_incomplete.filter(
+        Q(start_time__hour__gt=current_time.hour) | Q(start_time__hour=current_time.hour, start_time__minute__gt=current_time.minute)).order_by('start_time')  # earliest first
+        
+        
+    if(next_task_qs):
+        # Get the first upcoming task
+        next_task = next_task_qs.first()
+  
+
+     
+    #time remaining for next task
+    if next_task:
+       time_remaining = next_task.start_time - current_time
+       total_seconds = int(time_remaining.total_seconds())
+       total_seconds = total_seconds // 1
+       hours = total_seconds // 3600
+       minutes = (total_seconds % 3600) // 60
+    # time_remaining is a timedelta object
+    else:
+       time_remaining = None
+       hours = 0
+       minutes = 0
+       total_seconds = 0
+
     # Calculate statistics for dashboard
     completed_tasks_count = tasks.filter(completed=True).count()
     high_priority_count = tasks.filter(priority='high', completed=False).count()
@@ -110,6 +150,14 @@ def dashboard(request):
 
     context = {
         'today_tasks': today_tasks,
+        'today_tasks_incomplete': today_tasks_incomplete,
+        'next_task': next_task,
+        'time_remaining_hours': hours,
+        'time_remaining_minutes': minutes,
+        'time_remaining_total_Seconds': total_seconds,
+        'task_rightnow': task_rightnow,
+        'time_remaining_current_task': time_remaining_current_task,
+        'time_remaining': time_remaining,
         'upcoming_tasks': upcoming_tasks,
         'completed_tasks_count': completed_tasks_count,
         'high_priority_count': high_priority_count,
