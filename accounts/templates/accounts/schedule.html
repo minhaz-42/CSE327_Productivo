@@ -6,405 +6,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Schedule | Intelligent Task Planner</title>
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-  <!-- FullCalendar CSS -->
-  <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
+  <!-- Your global stylesheet -->
+  <link rel="stylesheet" href="{% static 'accounts/style.css' %}">
 
-  <!-- Custom Styles -->
+  <!-- FullCalendar v6 (all-in-one) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.min.css"/>
+
   <style>
-    /* Base Styles & Variables */
-    :root {
-      --primary: #4361ee;
-      --primary-light: #4895ef;
-      --primary-dark: #3a0ca3;
-      --secondary: #7209b7;
-      --secondary-light: #b5179e;
-      --secondary-dark: #560bad;
-      --background: #f8f9fa;
-      --surface: #ffffff;
-      --error: #f72585;
-      --on-primary: #ffffff;
-      --on-secondary: #ffffff;
-      --on-background: #212529;
-      --on-surface: #212529;
-      --on-error: #ffffff;
-      --gray-light: #e9ecef;
-      --gray-medium: #adb5bd;
-      --gray-dark: #495057;
-      --success: #4cc9f0;
-      --warning: #f8961e;
-      --info: #4895ef;
-      --priority-high: #ef233c;
-      --priority-medium: #ff9e00;
-      --priority-low: #38b000;
+    :root{
+      --primary:#4361ee; --primary-light:#4895ef; --background:#f8f9fa; --surface:#ffffff;
+      --on-surface:#212529; --gray-light:#e9ecef; --gray-medium:#adb5bd;
+      /* Soft priority colors */
+      --soft-red-bg:#fde2e2;     --soft-red-border:#f8b4b4;     --soft-red-text:#7a1f1f;
+      --soft-yellow-bg:#fff7d6;  --soft-yellow-border:#ffe08a;  --soft-yellow-text:#6b4f00;
+      --soft-green-bg:#dff7e3;   --soft-green-border:#a9e6b0;   --soft-green-text:#1b4332;
+    }
+    *{box-sizing:border-box} body{background:var(--background); color:#222; margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+
+    /* Layout (same as before, condensed) */
+    .app{display:grid;grid-template-areas:"sidebar header" "sidebar main";grid-template-columns:240px 1fr;grid-template-rows:60px 1fr;min-height:100vh}
+    .header{grid-area:header;display:flex;justify-content:space-between;align-items:center;padding:0 20px;background:var(--surface);box-shadow:0 2px 4px rgba(0,0,0,.08)}
+    .menu-btn{background:none;border:1px solid transparent;padding:6px 10px;border-radius:6px;cursor:pointer}
+    .menu-btn:hover{border-color:var(--gray-light)}
+    .sidebar{grid-area:sidebar;background:var(--surface);box-shadow:2px 0 4px rgba(0,0,0,.05)}
+    .sidebar-nav a{display:flex;gap:10px;padding:12px 20px;text-decoration:none;color:var(--on-surface)}
+    .sidebar-nav a.active{background:var(--primary-light);color:#fff}
+    .main-content{grid-area:main;padding:20px}
+    .calendar-container{background:var(--surface);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:16px}
+
+    /* FullCalendar tweaks */
+    .fc .fc-toolbar-title{font-size:1.25rem}
+    .fc .fc-button{background:var(--surface);border:1px solid var(--gray-light);color:var(--on-surface)}
+    .fc .fc-button:hover{background:var(--gray-light)}
+    .fc .fc-daygrid-day.fc-day-today{background-color:rgba(67,97,238,.08)}
+
+    /* Soft priority styles */
+    .fc-event-high{
+      background:var(--soft-red-bg)!important; color:var(--soft-red-text)!important;
+      border:1px solid var(--soft-red-border)!important;
+    }
+    .fc-event-medium{
+      background:var(--soft-yellow-bg)!important; color:var(--soft-yellow-text)!important;
+      border:1px solid var(--soft-yellow-border)!important;
+    }
+    .fc-event-low{
+      background:var(--soft-green-bg)!important; color:var(--soft-green-text)!important;
+      border:1px solid var(--soft-green-border)!important;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:9999}
+    .modal{width:min(520px,94vw);background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);overflow:hidden}
+    .modal-header{padding:14px 16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+    .modal-title{font-size:1.05rem;font-weight:600}
+    .modal-body{padding:16px}
+    .modal-row{margin:8px 0;color:#333}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.8rem;border:1px solid rgba(0,0,0,.1)}
+    .badge-high{background:var(--soft-red-bg);border-color:var(--soft-red-border);color:var(--soft-red-text)}
+    .badge-medium{background:var(--soft-yellow-bg);border-color:var(--soft-yellow-border);color:var(--soft-yellow-text)}
+    .badge-low{background:var(--soft-green-bg);border-color:var(--soft-green-border);color:var(--soft-green-text)}
+    .modal-actions{padding:14px 16px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end}
+    .btn{border:1px solid #ddd;background:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+    .btn.danger{background:#f44336;border-color:#f44336;color:#fff}
+    .close-x{border:none;background:none;font-size:1.2rem;cursor:pointer}
 
-    body {
-      background-color: var(--background);
-      color: var(--on-background);
-      transition: all 0.3s ease;
-    }
-
-    /* App Layout */
-    .app {
-      display: grid;
-      grid-template-areas:
-        "sidebar header"
-        "sidebar main";
-      grid-template-columns: 240px 1fr;
-      grid-template-rows: 60px 1fr;
-      min-height: 100vh;
-    }
-
-    /* Header Styles */
-    .header {
-      grid-area: header;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      background-color: var(--surface);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .menu-btn {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--on-surface);
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 4px;
-    }
-
-    .menu-btn:hover {
-      background-color: var(--gray-light);
-    }
-
-    .app-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--on-surface);
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
-
-    /* Sidebar Styles */
-    .sidebar {
-      grid-area: sidebar;
-      background-color: var(--surface);
-      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      z-index: 1000;
-      position: relative;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar-logo {
-      padding: 20px;
-      border-bottom: 1px solid var(--gray-light);
-    }
-
-    .sidebar-logo h2 {
-      color: var(--primary);
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 20px 0;
-    }
-
-    .sidebar-nav ul {
-      list-style: none;
-    }
-
-    .sidebar-nav li {
-      margin-bottom: 5px;
-    }
-
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: var(--on-surface);
-      text-decoration: none;
-      transition: all 0.2s;
-      gap: 10px;
-    }
-
-    .sidebar-nav a:hover {
-      background-color: var(--gray-light);
-      color: var(--on-surface);
-    }
-
-    .sidebar-nav a:hover i {
-      color: var(--on-surface);
-    }
-
-    .sidebar-nav a.active {
-      background-color: var(--primary-light);
-      color: var(--on-primary);
-    }
-
-    .sidebar-nav a.active i {
-      color: var(--on-primary);
-    }
-
-    .sidebar-nav i {
-      width: 24px;
-      text-align: center;
-      color: var(--gray-medium);
-    }
-
-    .sidebar-nav a.active:hover {
-      background-color: var(--primary);
-      color: var(--on-primary);
-    }
-
-    .sidebar-nav a.active:hover i {
-      color: var(--on-primary);
-    }
-
-    /* Sidebar Footer Styles */
-    .sidebar-footer {
-      margin-top: auto;
-      padding: 20px;
-      border-top: 1px solid var(--gray-light);
-    }
-
-    .sidebar-footer a {
-      display: block;
-      padding: 10px 0;
-      color: var(--on-surface);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .sidebar-footer a:hover {
-      color: var(--primary);
-    }
-
-    .sidebar-footer a i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-
-    /* Main Content Styles */
-    .main-content {
-      grid-area: main;
-      padding: 20px;
-      background-color: var(--background);
-      overflow-y: auto;
-    }
-
-    .schedule-container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    /* Schedule Header */
-    .schedule-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .schedule-header h2 {
-      font-size: 1.8rem;
-      color: var(--on-background);
-    }
-
-    /* Calendar Container */
-    .calendar-container {
-      background-color: var(--surface);
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    #calendar {
-      margin-top: 20px;
-    }
-
-    /* Custom FullCalendar Styling */
-    .fc .fc-toolbar-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--on-surface);
-    }
-
-    .fc .fc-button {
-      background-color: var(--surface);
-      border: 1px solid var(--gray-light);
-      color: var(--on-surface);
-      transition: all 0.2s;
-    }
-
-    .fc .fc-button:hover {
-      background-color: var(--gray-light);
-    }
-
-    .fc .fc-button-primary:not(:disabled).fc-button-active {
-      background-color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .fc .fc-button-primary:disabled {
-      background-color: var(--gray-light);
-      border-color: var(--gray-light);
-      color: var(--gray-medium);
-    }
-
-    .fc .fc-daygrid-day-number {
-      color: var(--on-surface);
-    }
-
-    .fc .fc-col-header-cell-cushion {
-      color: var(--on-surface);
-      font-weight: 500;
-    }
-
-    .fc .fc-daygrid-day.fc-day-today {
-      background-color: rgba(67, 97, 238, 0.1);
-    }
-
-    .fc .fc-event {
-      border-radius: 4px;
-      border: none;
-      padding: 2px 4px;
-      font-size: 0.85rem;
-    }
-
-    .fc .fc-event-title {
-      font-weight: 500;
-    }
-
-    .fc .fc-event-high {
-      background-color: var(--priority-high);
-      border-left: 3px solid darken(var(--priority-high), 10%);
-    }
-
-    .fc .fc-event-medium {
-      background-color: var(--priority-medium);
-      border-left: 3px solid darken(var(--priority-medium), 10%);
-    }
-
-    .fc .fc-event-low {
-      background-color: var(--priority-low);
-      border-left: 3px solid darken(var(--priority-low), 10%);
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 992px) {
-      .app {
-        grid-template-areas:
-          "header"
-          "main";
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        height: calc(100vh - 60px);
-        width: 240px;
-        transform: translateX(-100%);
-      }
-
-      .sidebar.active {
-        transform: translateX(0);
-      }
-      
-      .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 60px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 999;
-      }
-      
-      .sidebar-overlay.active {
-        display: block;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .schedule-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .header {
-        padding: 0 10px;
-      }
-
-      .main-content {
-        padding: 15px;
-      }
-
-      .fc .fc-toolbar {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .fc .fc-toolbar-chunk {
-        display: flex;
-        gap: 5px;
-      }
+    @media (max-width:992px){
+      .app{grid-template-areas:"header" "main";grid-template-columns:1fr}
+      .sidebar{display:none}
     }
   </style>
 </head>
@@ -413,54 +85,35 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <button class="menu-btn" id="sidebarToggle">
-          <i class="fas fa-bars"></i>
-        </button>
+        <button class="menu-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         <h1 class="app-title">Intelligent Task Planner</h1>
       </div>
-
       <div class="header-right">
-        <!-- Logout Button -->
-        <a href="{% url 'logout'%}" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </a>
-        
-        <!-- User Avatar -->
-        <div class="user-profile">
-          <div class="avatar">{{user.username|slice:"0:1"|upper}}</div>
-        </div>
+        <a href="{% url 'logout' %}" class="btn">Logout</a>
+        <div class="user-profile"><div class="avatar">{{ user.username|slice:"0:1"|upper }}</div></div>
       </div>
     </header>
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo">
-        <h2>TaskPlanner</h2>
-      </div>
+    <aside class="sidebar">
+      <div class="sidebar-logo"><h2>TaskPlanner</h2></div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="{% url 'dashboard'%}"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-          <li><a href="{% url 'task'%}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
-          <li><a href="{% url 'schedule' %}" class="active"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
-          <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-          <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+          <li><a href="{% url 'dashboard' %}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="{% url 'task' %}"><i class="fas fa-tasks"></i><span>Tasks</span></a></li>
+          <li><a href="{% url 'schedule' %}" class="active"><i class="fas fa-calendar-alt"></i><span>Schedule</span></a></li>
+          <li><a href="{% url 'analytics' %}"><i class="fas fa-chart-bar"></i><span>Analytics</span></a></li>
+          <li><a href="{% url 'settings' %}"><i class="fas fa-cog"></i><span>Settings</span></a></li>
         </ul>
       </nav>
     </aside>
-    
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="main-content">
       <div class="schedule-container">
-        <!-- Schedule Header -->
         <div class="schedule-header">
           <h2><i class="fas fa-calendar-alt"></i> My Schedule</h2>
         </div>
-
-        <!-- Calendar Container -->
         <div class="calendar-container">
           <div id="calendar"></div>
         </div>
@@ -468,129 +121,128 @@
     </main>
   </div>
 
+  <!-- Modal -->
+  <div class="modal-backdrop" id="taskModalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Task</div>
+        <button class="close-x" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-row"><strong>When:</strong> <span id="modalWhen"></span></div>
+        <div class="modal-row"><strong>Category:</strong> <span id="modalCategory"></span></div>
+        <div class="modal-row"><strong>Priority:</strong> <span id="modalPriority"></span></div>
+        <div class="modal-row"><strong>Description:</strong><div id="modalDesc" style="white-space:pre-wrap;margin-top:4px;"></div></div>
+      </div>
+      <div class="modal-actions">
+        <a id="openTasksPage" class="btn" href="{% url 'task' %}">Open Tasks</a>
+        <button id="completeBtn" class="btn primary">Mark Completed</button>
+        <button id="deleteBtn" class="btn danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FullCalendar JS -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-  <!-- JavaScript -->
   <script>
-    // DOM Elements
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    // Small helpers
+    const $$ = (s, r=document) => r.querySelector(s);
+    function fmt(dt){ try{ return new Date(dt).toLocaleString(); }catch{ return dt; } }
+    function badgeFor(priority){
+      const p = (priority||'medium').toLowerCase();
+      const span = document.createElement('span');
+      span.className = 'badge badge-' + p;
+      span.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+      return span;
+    }
+    function getCookie(name) {
+      const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return m ? m.pop() : '';
+    }
 
-    // Sample events data (replace with your actual tasks data)
-    let events = [
-      {
-        id: '1',
-        title: 'Team Meeting',
-        description: 'Weekly team meeting to discuss project progress and blockers.',
-        start: '2025-07-25T10:00:00',
-        end: '2025-07-25T11:30:00',
-        priority: 'medium',
-        category: 'meeting',
-        allDay: false
-      },
-      {
-        id: '2',
-        title: 'Client Presentation',
-        description: 'Prepare slides and demo for quarterly review meeting with key stakeholders.',
-        start: '2025-07-26T14:00:00',
-        end: '2025-07-26T15:30:00',
-        priority: 'high',
-        category: 'presentation',
-        allDay: false
-      },
-      {
-        id: '3',
-        title: 'Project Deadline',
-        description: 'Final submission for the current project phase.',
-        start: '2025-07-28',
-        end: '2025-07-28',
-        priority: 'high',
-        category: 'deadline',
-        allDay: true
-      },
-      {
-        id: '4',
-        title: 'Dentist Appointment',
-        description: 'Regular dental checkup at City Dental Clinic.',
-        start: '2025-07-29T09:00:00',
-        end: '2025-07-29T10:00:00',
-        priority: 'low',
-        category: 'appointment',
-        allDay: false
-      }
-    ];
-
-    // Initialize calendar
-    document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
       const calendarEl = document.getElementById('calendar');
-      
+      const modal = $$('#taskModalBackdrop');
+      const modalTitle = $$('#modalTitle');
+      const modalWhen = $$('#modalWhen');
+      const modalCategory = $$('#modalCategory');
+      const modalPriority = $$('#modalPriority');
+      const modalDesc = $$('#modalDesc');
+      const modalClose = $$('#modalClose');
+      const completeBtn = $$('#completeBtn');
+      const deleteBtn = $$('#deleteBtn');
+
+      // Init calendar
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        height: 'auto',
+        headerToolbar: { left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,timeGridDay' },
+        events: { url: "{% url 'task_events' %}", method: "GET" },
+
+        // Color by priority -> classNames fc-event-high/medium/low
+        eventClassNames: arg => {
+          const p = (arg.event.extendedProps?.priority || 'medium').toLowerCase();
+          return [`fc-event-${p}`];
         },
-        events: events.map(event => ({
-          id: event.id,
-          title: event.title,
-          start: event.start,
-          end: event.end,
-          allDay: event.allDay,
-          extendedProps: {
-            description: event.description,
-            priority: event.priority,
-            category: event.category
-          },
-          className: `fc-event-${event.priority}`
-        })),
-        eventClassNames: function(arg) {
-          return [`fc-event-${arg.event.extendedProps.priority}`];
-        },
-        eventContent: function(arg) {
-          // Custom event rendering
-          const priorityDot = document.createElement('div');
-          priorityDot.className = 'event-priority-dot';
-          priorityDot.style.backgroundColor = getPriorityColor(arg.event.extendedProps.priority);
-          
-          const titleEl = document.createElement('div');
-          titleEl.className = 'fc-event-title';
-          titleEl.innerText = arg.event.title;
-          
-          const container = document.createElement('div');
-          container.className = 'fc-event-content';
-          container.appendChild(priorityDot);
-          container.appendChild(titleEl);
-          
-          return { domNodes: [container] };
+
+        // Click to view modal (+ actions)
+        eventClick: async function(info){
+          info.jsEvent.preventDefault();
+          const id = info.event.id;
+
+          // Load latest task data
+          const resp = await fetch(`/get-task/${id}/`, { credentials: 'same-origin' });
+          const data = await resp.json();
+          if (!data.success) return;
+
+          const t = data.task;
+          modalTitle.textContent = t.title || '(Untitled task)';
+          modalWhen.textContent = `${fmt(t.start_time)}  —  ${fmt(t.end_time)}`;
+          modalCategory.textContent = t.category || 'none';
+          modalDesc.textContent = t.description || '(no description)';
+
+          // Priority badge
+          modalPriority.innerHTML = '';
+          modalPriority.appendChild(badgeFor(t.priority));
+
+          // Show modal
+          modal.style.display = 'flex';
+
+          // Complete -> POST to your endpoint then remove from calendar
+          completeBtn.onclick = async () => {
+            await fetch(`/complete-task/${id}/`, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': getCookie('csrftoken') },
+              credentials: 'same-origin'
+            });
+            // Remove event from calendar immediately
+            const ev = calendar.getEventById(id);
+            if (ev) ev.remove();
+            modal.style.display = 'none';
+          };
+
+          // Delete -> DELETE endpoint then remove
+          deleteBtn.onclick = async () => {
+            await fetch(`/delete-task/${id}/`, {
+              method: 'DELETE',
+              headers: { 'X-CSRFToken': getCookie('csrftoken') },
+              credentials: 'same-origin'
+            });
+            const ev = calendar.getEventById(id);
+            if (ev) ev.remove();
+            modal.style.display = 'none';
+          };
         }
       });
 
       calendar.render();
-    });
 
-    // Helper function to get priority color
-    function getPriorityColor(priority) {
-      switch(priority) {
-        case 'high': return 'var(--priority-high)';
-        case 'medium': return 'var(--priority-medium)';
-        case 'low': return 'var(--priority-low)';
-        default: return 'var(--gray-medium)';
-      }
-    }
-
-    // Toggle Sidebar (for mobile)
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      sidebarOverlay.classList.toggle('active');
-    });
-
-    // Close sidebar when clicking on overlay
-    sidebarOverlay.addEventListener('click', () => {
-      sidebar.classList.remove('active');
-      sidebarOverlay.classList.remove('active');
+      // Close modal
+      modalClose.addEventListener('click', () => modal.style.display='none');
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      });
     });
   </script>
 </body>

@@ -11,7 +11,10 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Student, Task
 from django.utils.dateparse import parse_datetime
-
+from django.utils.dateparse import parse_date
+from django.views.decorators.http import require_GET
+from django.http import JsonResponse
+from datetime import timedelta
 
 # ------------------ PUBLIC VIEWS ------------------
 
@@ -166,6 +169,33 @@ def schedule(request):
         'unread_count': unread_count,
     }
     return render(request, 'accounts/schedule.html', context)
+
+
+@login_required
+def task_events(request):
+    # Only send NOT completed tasks
+    qs = Task.objects.filter(user=request.user, completed=False)
+
+    events = []
+    for t in qs:
+        start = t.start_time
+        end = t.end_time or (start + timedelta(minutes=30))
+        if timezone.is_aware(start): start = timezone.localtime(start)
+        if timezone.is_aware(end):   end = timezone.localtime(end)
+        priority = (t.priority or 'medium').lower()
+
+        events.append({
+            "id": t.id,
+            "title": t.title,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "extendedProps": {
+                "priority": priority,
+                "category": t.category or 'none',
+                "description": t.description or "",
+            },
+        })
+    return JsonResponse(events, safe=False)
 
 
 @login_required
@@ -376,7 +406,7 @@ def get_task(request, task_id):
                     'description': task.description,
                     'priority': task.priority,
                     'category': task.category,
-                    'start_time': task.deadline.isoformat(),
+                    'start_time': task.start_time.isoformat(),
                     'end_time': task.end_time.isoformat(),
                     'reminder': task.reminder,
                     'completed': task.completed
