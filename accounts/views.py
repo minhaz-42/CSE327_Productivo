@@ -87,8 +87,9 @@ def dashboard(request):
     user = request.user
     tasks = Task.objects.filter(user=user).order_by('end_time')
 
-    today = now().date()
-    current_time = now();
+    #today = now().date()
+    current_time = timezone.localtime();
+    today = current_time.date();
     today_tasks = tasks.filter(end_time__date=today)
     today_tasks_incomplete = today_tasks.filter(end_time__gte=current_time,completed = False)
     task_rightnow = today_tasks_incomplete.filter( start_time__lte=current_time,end_time__gte=current_time).first();
