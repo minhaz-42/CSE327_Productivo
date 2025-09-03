@@ -11,6 +11,11 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Student, Task
 from django.utils.dateparse import parse_datetime
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from accounts.models import PlanYourTasks
+from accounts.scheduler import run_scheduler
+from django.core.exceptions import ValidationError
 
 
 # ------------------ PUBLIC VIEWS ------------------
@@ -722,7 +727,18 @@ def mark_notifications_read(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
+@login_required(login_url='login')
+def schedule_plan(request, plan_id):
+    plan = get_object_or_404(PlanYourTasks, id=plan_id)
 
+    try:
+        run_scheduler(plan)
+        messages.success(request, "Tasks scheduled successfully!")
+    except ValidationError as e:
+        messages.error(request, str(e))
+
+    # Redirect to admin ScheduledTask list for now
+    return redirect("/admin/accounts/scheduledtask/")
 
 
 

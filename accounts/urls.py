@@ -17,6 +17,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name="logout"),
     path('profile_update/', views.profile_update, name="profile_update"),
     path('reset_password/', views.reset_password, name="reset_password"),
+    path('schedule-plan/<int:plan_id>/', views.schedule_plan, name='schedule_plan'),
     
     # Task management
     path('add-task/', views.add_task, name='add-task'),
