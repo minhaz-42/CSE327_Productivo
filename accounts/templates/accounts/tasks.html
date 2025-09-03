@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plan Tasks | Intelligent Task Planner</title>
+  <title>Tasks | Intelligent Task Planner</title>
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="{% static 'accounts/style.css'%}">
@@ -12,114 +12,6 @@
 
   <!-- Custom Styles -->
   <style>
-    /* All your existing styles remain the same */
-    /* --- Enhanced Plan Modal Styling --- */
-    .plan-modal {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(67, 97, 238, 0.15);
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0;
-      overflow: hidden;
-      border: 1px solid #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .plan-modal-header {
-      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-      color: #fff;
-      padding: 28px 32px 18px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 18px 18px 0 0;
-      box-shadow: 0 2px 12px rgba(106, 17, 203, 0.08);
-    }
-
-    .plan-modal-title {
-      font-size: 2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .plan-modal-close {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: #fff;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .plan-modal-close:hover {
-      color: #ffecec;
-    }
-
-    .plan-modal-body {
-      padding: 32px;
-      background: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    .plan-modal-section {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(67, 97, 238, 0.07);
-      padding: 28px 24px;
-      margin-bottom: 0;
-    }
-
-    .plan-modal-section-title {
-      font-size: 1.3rem;
-      color: #2575fc;
-      font-weight: 600;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .plan-tasks-controls {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 18px;
-    }
-
-    .plan-search-box input {
-      font-size: 1.1rem;
-      padding: 12px 18px 12px 40px;
-    }
-
-    .plan-filter-controls .filter-btn {
-      font-size: 1rem;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: 8px;
-    }
-
-    .plan-form-row .form-group label,
-    .form-group label {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .plan-form-actions .btn {
-      font-size: 1.1rem;
-      padding: 12px 24px;
-      border-radius: 8px;
-    }
-
-    .plan-form-actions .btn:hover {
-      box-shadow: 0 2px 8px #2575fc33;
-      opacity: 0.95;
-    }
-    /* --- End Enhanced Plan Modal Styling --- */
     /* Base Styles & Variables */
     :root {
       --primary: #4361ee;
@@ -189,6 +81,55 @@
       gap: 15px;
     }
 
+    /* Modal animation */
+    .modal-overlay {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .plan-modal {
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Calendar day styling */
+    .calendar-day {
+      padding: 8px;
+      text-align: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .calendar-day:hover {
+      background-color: #f0f0f0;
+    }
+
+    .calendar-day.has-tasks {
+      background-color: var(--secondary-light);
+      color: white;
+    }
+
+    .calendar-day.selected {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+
     .menu-btn {
       background: none;
       border: none;
@@ -213,21 +154,6 @@
       display: flex;
       align-items: center;
       gap: 20px;
-    }
-
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      text-decoration: none;
-      color: var(--on-surface);
-      padding: 8px 12px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
-    }
-
-    .logout-btn:hover {
-      background-color: var(--gray-light);
     }
 
     .notification-wrapper {
@@ -264,11 +190,10 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 15px;
       z-index: 100;
-      display: none;
     }
 
-    .notification-panel.active {
-      display: block;
+    .notification-panel.hidden {
+      display: none;
     }
 
     .user-profile {
@@ -917,268 +842,6 @@
     /* input polish */
     #taskId { display: none; }
     input[type="datetime-local"] { padding: 8px; font-family: inherit; }
-    
-    /* Plan modal specific styles */
-    .time-input-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    
-    .time-input-group .form-group {
-      flex: 1;
-      margin-bottom: 0;
-    }
-    
-    .optional-label {
-      color: var(--gray-medium);
-      font-style: italic;
-    }
-    
-    .plan-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    
-    .auto-schedule-btn {
-      background-color: var(--info);
-      color: white;
-    }
-    
-    .auto-schedule-btn:hover {
-      background-color: #3a7fc4;
-    }
-
-    /* Plan Tasks Modal Styles */
-    .plan-modal {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(67, 97, 238, 0.15);
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 0;
-      overflow: hidden;
-      border: 1px solid #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .plan-modal-header {
-      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-      color: #fff;
-      padding: 28px 32px 18px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 18px 18px 0 0;
-      box-shadow: 0 2px 12px rgba(106, 17, 203, 0.08);
-    }
-
-    .plan-modal-title {
-      font-size: 2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .plan-modal-close {
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: #fff;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .plan-modal-close:hover {
-      color: #ffecec;
-    }
-
-    .plan-modal-body {
-      padding: 32px;
-      background: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    .plan-modal-section {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(67, 97, 238, 0.07);
-      padding: 28px 24px;
-      margin-bottom: 0;
-    }
-
-    .plan-modal-section-title {
-      font-size: 1.3rem;
-      color: #2575fc;
-      font-weight: 600;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .plan-tasks-controls {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 18px;
-    }
-
-    .plan-search-box {
-      position: relative;
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .plan-search-box input {
-      width: 100%;
-      padding: 10px 15px 10px 38px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      background: #f8f9fa;
-      font-size: 1rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .plan-search-box input:focus {
-      border-color: #2575fc;
-      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.12);
-    }
-
-    .plan-search-box i {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6a11cb;
-      font-size: 1.1em;
-      opacity: 0.7;
-    }
-
-    .plan-filter-controls {
-      display: flex;
-      gap: 10px;
-    }
-
-    .plan-filter-controls .filter-btn {
-      background: #e8f4ff;
-      color: #2575fc;
-      border: 1px solid #2575fc;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .plan-filter-controls .filter-btn:hover,
-    .plan-filter-controls .filter-btn.active {
-      background: #2575fc;
-      color: #fff;
-      box-shadow: 0 2px 8px #2575fc33;
-    }
-
-    .plan-task-list {
-      margin-top: 18px;
-      min-height: 60px;
-    }
-
-    .plan-form-container {
-      margin-top: 10px;
-    }
-
-    .plan-form-row {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .plan-form-row .form-group {
-      flex: 1;
-    }
-
-    .form-group label {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #2575fc;
-      display: block;
-    }
-
-    input[type="date"], input[type="time"], select {
-      width: 100%;
-      padding: 10px 15px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 1rem;
-      background: #f8f9fa;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    input[type="date"]:focus, input[type="time"]:focus, select:focus {
-      border-color: #2575fc;
-      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.12);
-    }
-
-    .plan-form-actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 18px;
-    }
-
-    .plan-form-actions .btn {
-      padding: 12px 22px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s, box-shadow 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .plan-form-actions .primary-btn {
-      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(106, 17, 203, 0.08);
-    }
-
-    .plan-form-actions .primary-btn:hover {
-      background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
-      box-shadow: 0 4px 16px rgba(106, 17, 203, 0.12);
-    }
-
-    .plan-form-actions .auto-schedule-btn {
-      background: #4cc9f0;
-      color: #fff;
-    }
-
-    .plan-form-actions .auto-schedule-btn:hover {
-      background: #4895ef;
-    }
-
-    .plan-form-actions .secondary-btn {
-      background: #e8f4ff;
-      color: #2575fc;
-      border: 1px solid #2575fc;
-    }
-
-    .plan-form-actions .secondary-btn:hover {
-      background: #2575fc;
-      color: #fff;
-      box-shadow: 0 2px 8px #2575fc33;
-    }
-    /* --- End Improved Plan Modal Styling --- */
   </style>
 </head>
 <body class="light-theme">
@@ -1192,6 +855,54 @@
         <h1 class="app-title">Intelligent Task Planner</h1>
       </div>
 
+        <!-- Planned Task Modal (for Plan Your Task) -->
+        <div class="task-form-modal" id="plannedTaskFormModal" style="display:none;">
+          <div class="task-form-container">
+            <div class="task-form-header">
+              <h3 id="plannedTaskFormTitle">Add Planned Task</h3>
+              <button class="close-btn" id="closePlannedTaskForm">&times;</button>
+            </div>
+            <form id="plannedTaskForm">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="plannedTitle">Title*</label>
+                <input type="text" id="plannedTitle" required placeholder="Enter task title" />
+              </div>
+              <div class="form-group">
+                <label for="plannedDescription">Description</label>
+                <textarea id="plannedDescription" rows="3" placeholder="Add details about the task"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="plannedPriority">Priority*</label>
+                  <select id="plannedPriority" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="plannedCategory">Category</label>
+                  <select id="plannedCategory">
+                    <option value="">None</option>
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="finance">Finance</option>
+                    <option value="health">Health</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="plannedDuration">Duration*</label>
+                <input type="text" id="plannedDuration" required placeholder="e.g. 2 hours, 30 minutes" />
+              </div>
+              <button type="submit" class="primary-btn btn btn-block">
+                <i class="fas fa-plus"></i> Save Planned Task
+              </button>
+            </form>
+          </div>
+        </div>
+
       <div class="header-right">
         <!-- Logout Button -->
         <a href="{% url 'logout'%}" class="logout-btn">
@@ -1204,7 +915,7 @@
             <i class="fas fa-bell"></i>
             <span class="notification-badge"></span>
           </button>
-          <div class="notification-panel" id="notificationPanel">
+          <div class="notification-panel hidden" id="notificationPanel">
             <p>No new notifications.</p>
           </div>
         </div>
@@ -1243,7 +954,7 @@
           <h2><i class="fas fa-tasks"></i> My Tasks</h2>
         </div>
 
-        <!-- Filter and Search Controls -->
+        <!-- Filter and Search Controls - MODIFIED -->
         <div class="tasks-controls">
           <div class="search-box">
             <i class="fas fa-search"></i>
@@ -1262,13 +973,14 @@
             <button class="filter-btn" data-filter="completed">
               <i class="fas fa-check-circle"></i> Completed
             </button>
+            <!-- NEW BUTTON -->
             <button class="plan-btn" id="planTasksBtn">
               <i class="fas fa-calendar-plus"></i> Plan Your Tasks
             </button>
           </div>
         </div>
 
-        <!-- Task List -->
+        <!-- Task List (server-rendered for initial paint; JS will re-render) -->
         <div class="task-list" id="taskList">
           {% if tasks %}
             {% for task in tasks %}
@@ -1281,7 +993,7 @@
                 </div>
                 <p>{{ task.description }}</p>
                 <div class="task-meta">
-                  <span><i class="fas fa-clock"></i> {{ task.start_time|date:"M d, Y - g:i A" }}</span>
+                  <span><i class="fas fa-clock"></i> {{ task.deadline|date:"M d, Y - g:i A" }}</span>
                   {% if task.category %}
                     <span><i class="fas fa-tag"></i> {{ task.category }}</span>
                   {% endif %}
@@ -1364,23 +1076,23 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="start_time">Start Time*</label>
+
+              <label for="start_time">Start-Time*</label>
               <input type="datetime-local" id="start_time" required />
+              <label for="end_time">End-Time*</label>
+              <input type="datetime-local" id="end_time" required />
+
             </div>
             <div class="form-group">
-              <label for="end_time">End Time*</label>
-              <input type="datetime-local" id="end_time" required />
+              <label for="reminder">Reminder</label>
+              <select id="reminder">
+                <option value="">None</option>
+                <option value="15">15 minutes before</option>
+                <option value="30">30 minutes before</option>
+                <option value="60">1 hour before</option>
+                <option value="1440">1 day before</option>
+              </select>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="reminder">Reminder</label>
-            <select id="reminder">
-              <option value="">None</option>
-              <option value="15">15 minutes before</option>
-              <option value="30">30 minutes before</option>
-              <option value="60">1 hour before</option>
-              <option value="1440">1 day before</option>
-            </select>
           </div>
           <button type="submit" class="primary-btn btn btn-block">
             <i class="fas fa-plus"></i> Save Task
@@ -1393,546 +1105,561 @@
   <!-- JavaScript -->
   <script>
     // ======================
-// 1) DOM ELEMENTS
-// ======================
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const notificationBtn = document.getElementById('notificationBtn');
-const notificationPanel = document.getElementById('notificationPanel');
-const addTaskBtn = document.getElementById('addTaskBtn');
-const taskFormModal = document.getElementById('taskFormModal');
-const closeTaskForm = document.getElementById('closeTaskForm');
-const taskForm = document.getElementById('taskForm');
-const taskList = document.getElementById('taskList');
-const emptyState = document.getElementById('emptyState');
-const filterBtns = document.querySelectorAll('.filter-btn');
-const taskSearch = document.getElementById('taskSearch');
-const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
-const planTasksBtn = document.getElementById('planTasksBtn');
+    // 1) DOM ELEMENTS
+    // ======================
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskFormModal = document.getElementById('taskFormModal');
+    const closeTaskForm = document.getElementById('closeTaskForm');
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+    const emptyState = document.getElementById('emptyState');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const taskSearch = document.getElementById('taskSearch');
+    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
 
-// ======================
-// 2) STATE
-// ======================
-let currentFilter = "all";
-let currentSearch = "";
+    // ======================
+    // 2) STATE
+    // ======================
+    let currentFilter = "all";
+    let currentSearch = "";
 
-// Flatten Django's serializers.serialize('json', tasks)
-// [{ pk, fields: {title, ...} }] -> [{ id, title, ... }]
-{% if tasks_json %}
-  const _raw = JSON.parse('{{ tasks_json|escapejs }}');
-  let tasks = _raw.map(o => ({ id: o.pk, ...o.fields }));
-{% else %}
-  let tasks = [];
-{% endif %}
+    // Flatten Django's serializers.serialize('json', tasks)
+    // [{ pk, fields: {title, ...} }] -> [{ id, title, ... }]
+    const _raw = JSON.parse('{{ tasks_json|escapejs }}');
+    let tasks = _raw.map(o => ({ id: o.pk, ...o.fields }));
 
-// ======================
-// 3) UTILS
-// ======================
-function getCSRFToken() {
-  const name = 'csrftoken';
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-    if (cookie.startsWith(name + '=')) {
-      return decodeURIComponent(cookie.substring(name.length + 1));
-    }
-  }
-  // fallback: try hidden input in the form (since we have {% csrf_token %})
-  const hidden = document.querySelector('input[name=csrfmiddlewaretoken]');
-  return hidden ? hidden.value : null;
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    month: 'short', 
-    day: 'numeric' 
-  });
-}
-
-function formatTime(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('en-US', { 
-    hour: 'numeric', 
-    minute: '2-digit' 
-  });
-}
-
-function resetTaskForm() {
-  document.getElementById('taskFormTitle').textContent = 'Add New Task';
-  document.getElementById('taskId').value = '';
-  taskForm.reset();
-  document.getElementById('priority').value = 'medium';
-  const submitBtn = document.querySelector('#taskForm button');
-  submitBtn.innerHTML = '<i class="fas fa-plus"></i> Save Task';
-}
-
-function showTaskForm(task = null) {
-  resetTaskForm();
-  
-  if (task) {
-    document.getElementById('taskFormTitle').textContent = 'Edit Task';
-    document.getElementById('taskId').value = task.id;
-    document.getElementById('title').value = task.title;
-    document.getElementById('description').value = task.description || '';
-    document.getElementById('priority').value = task.priority;
-    document.getElementById('category').value = task.category || '';
-    
-    // Format dates for datetime-local input
-    const startTime = new Date(task.start_time);
-    const endTime = new Date(task.end_time);
-    
-    document.getElementById('start_time').value = startTime.toISOString().slice(0, 16);
-    document.getElementById('end_time').value = endTime.toISOString().slice(0, 16);
-    document.getElementById('reminder').value = task.reminder || '';
-    
-    const submitBtn = document.querySelector('#taskForm button');
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Task';
-  }
-  
-  taskFormModal.style.display = 'flex';
-}
-
-function closeTaskFormModal() {
-  taskFormModal.style.display = 'none';
-}
-
-function filterTasks() {
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  
-  let filteredTasks = tasks;
-  
-  // Apply search filter
-  if (currentSearch) {
-    const searchLower = currentSearch.toLowerCase();
-    filteredTasks = filteredTasks.filter(task => 
-      task.title.toLowerCase().includes(searchLower) || 
-      (task.description && task.description.toLowerCase().includes(searchLower))
-    );
-  }
-  
-  // Apply category filter
-  if (currentFilter !== 'all') {
-    switch(currentFilter) {
-      case 'today':
-        filteredTasks = filteredTasks.filter(task => {
-          const taskDate = new Date(task.start_time);
-          return taskDate >= todayStart && taskDate < todayEnd;
-        });
-        break;
-      case 'upcoming':
-        filteredTasks = filteredTasks.filter(task => new Date(task.start_time) > now);
-        break;
-      case 'completed':
-        filteredTasks = filteredTasks.filter(task => task.completed);
-        break;
-    }
-  }
-  
-  // Render tasks
-  renderTasks(filteredTasks);
-}
-
-function renderTasks(tasksToRender) {
-  if (tasksToRender.length === 0) {
-    taskList.style.display = 'none';
-    emptyState.style.display = 'block';
-    return;
-  }
-  
-  taskList.style.display = 'flex';
-  emptyState.style.display = 'none';
-  
-  // Clear existing tasks
-  taskList.innerHTML = '';
-  
-  // Add tasks to the list
-  tasksToRender.forEach(task => {
-    const taskItem = document.createElement('div');
-    taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
-    taskItem.dataset.taskId = task.id;
-    taskItem.dataset.end_timeIso = new Date(task.end_time).toISOString();
-    
-    const formattedStartTime = formatDate(task.start_time) + ' at ' + formatTime(task.start_time);
-    
-    taskItem.innerHTML = `
-      <div class="task-header">
-        <h4>${task.title}</h4>
-        <span class="priority-badge ${task.priority.toLowerCase()}">${task.priority}</span>
-      </div>
-      <p>${task.description || ''}</p>
-      <div class="task-meta">
-        <span><i class="fas fa-clock"></i> ${formattedStartTime}</span>
-        ${task.category ? `<span><i class="fas fa-tag"></i> ${task.category}</span>` : ''}
-      </div>
-      <div class="task-actions">
-        <button class="action-btn edit" data-task-id="${task.id}">
-          <i class="fas fa-pencil-alt"></i> Edit
-        </button>
-        ${!task.completed ? `
-          <button class="action-btn complete" data-task-id="${task.id}">
-            <i class="fas fa-check"></i> Complete
-          </button>
-        ` : `
-          <button class="action-btn delete" data-task-id="${task.id}">
-            <i class="fas fa-trash"></i> Delete
-          </button>
-        `}
-      </div>
-    `;
-    
-    taskList.appendChild(taskItem);
-  });
-  
-  // Add event listeners to the new buttons
-  document.querySelectorAll('.action-btn.edit').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const taskId = e.currentTarget.dataset.taskId;
-      const task = tasks.find(t => t.id == taskId);
-      showTaskForm(task);
-    });
-  });
-  
-  document.querySelectorAll('.action-btn.complete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const taskId = e.currentTarget.dataset.taskId;
-      completeTask(taskId);
-    });
-  });
-  
-  document.querySelectorAll('.action-btn.delete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const taskId = e.currentTarget.dataset.taskId;
-      deleteTask(taskId);
-    });
-  });
-}
-
-async function saveTask(taskData) {
-  const isEdit = !!taskData.id;
-  const url = isEdit ? `/tasks/${taskData.id}/` : '/tasks/';
-  const method = isEdit ? 'PUT' : 'POST';
-  
-  try {
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken()
-      },
-      body: JSON.stringify(taskData)
-    });
-    
-    if (response.ok) {
-      const savedTask = await response.json();
-      
-      if (isEdit) {
-        // Update existing task
-        const index = tasks.findIndex(t => t.id === savedTask.id);
-        if (index !== -1) {
-          tasks[index] = savedTask;
+    // ======================
+    // 3) UTILS
+    // ======================
+    function getCSRFToken() {
+      const name = 'csrftoken';
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          return decodeURIComponent(cookie.substring(name.length + 1));
         }
-      } else {
-        // Add new task
-        tasks.push(savedTask);
       }
-      
-      filterTasks();
-      closeTaskFormModal();
-    } else {
-      console.error('Failed to save task');
+      // fallback: try hidden input in the form (since we have {% csrf_token %})
+      const hidden = document.querySelector('input[name=csrfmiddlewaretoken]');
+      return hidden ? hidden.value : null;
     }
-  } catch (error) {
-    console.error('Error saving task:', error);
-  }
-}
 
-async function completeTask(taskId) {
-  try {
-    const response = await fetch(`/tasks/${taskId}/complete/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit' 
+      });
+    }
+
+    function resetTaskForm() {
+      document.getElementById('taskFormTitle').textContent = 'Add New Task';
+      document.getElementById('taskId').value = '';
+      taskForm.reset();
+      document.getElementById('priority').value = 'medium';
+      const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+      submitBtn.innerHTML = '<i class="fas fa-plus"></i> Save Task';
+    }
+
+    // Format a datetime string for <input type="datetime-local"> in local time
+    function toLocalDatetimeInputValue(isoString) {
+      const dt = new Date(isoString);
+      const tzOffsetMin = dt.getTimezoneOffset();
+      const local = new Date(dt.getTime() - tzOffsetMin * 60000);
+      return local.toISOString().slice(0, 16);
+    }
+
+    // ======================
+    // 4) OPEN/CLOSE MODAL
+    // ======================
+    function openTaskForm() {
+      resetTaskForm();
+      taskFormModal.style.display = 'flex';
+    }
+
+    function openEditTaskForm(taskId) {
+      const task = tasks.find(t => String(t.id) === String(taskId));
+      if (!task) return;
+
+      document.getElementById('taskFormTitle').textContent = 'Edit Task';
+      document.getElementById('taskId').value = task.id;
+      document.getElementById('title').value = task.title || '';
+      document.getElementById('description').value = task.description || '';
+      document.getElementById('priority').value = task.priority || 'medium';
+      document.getElementById('category').value = (task.category && task.category !== 'none') ? task.category : '';
+      document.getElementById('start_time').value = toLocalDatetimeInputValue(task.start_time);
+      document.getElementById('end_time').value = toLocalDatetimeInputValue(task.end_time);
+      document.getElementById('reminder').value = task.reminder && task.reminder !== 'none' ? task.reminder : '';
+
+      const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+      submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+
+      taskFormModal.style.display = 'flex';
+    }
+
+    // ======================
+    // 5) SUBMIT (ADD/EDIT)
+    // ======================
+    async function handleTaskFormSubmit(e) {
+      e.preventDefault();
+
+      const csrfToken = getCSRFToken();
+      const taskId = document.getElementById('taskId').value;
+      const isEditMode = taskId !== '';
+
+      const formData = {
+        title: document.getElementById('title').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value || 'none',
+        start_time: document.getElementById('start_time').value, // send as local string; backend will parse
+        end_time: document.getElementById('end_time').value,
+        reminder: document.getElementById('reminder').value || 'none'
+      };
+
+      // basic validation
+      
+      if (!formData.title || !formData.start_time || !formData.end_time) {
+  alert('Title, Start-time, and End-time are required.');
+  return;
+}
+const start = new Date(formData.start_time);
+const end = new Date(formData.end_time);
+if (start >= end) {
+  alert("End time must be after start time.");
+  return;
+}
+      if (formData.reminder !== 'none') {
+        const reminderMin = parseInt(formData.reminder, 10);
+        if (isNaN(reminderMin) || reminderMin < 0) {
+          alert('Invalid reminder value.');
+          return;
+        }
+        const reminderTime = new Date(end.getTime() - reminderMin * 60000);
+        if (reminderTime < start) {
+          alert('Reminder time must be after start time.');
+          return;
+        }
+      }
+
+
+      const url = isEditMode ? `/edit-task/${taskId}/` : '/add-task/';
+      const method = 'POST'; // both endpoints accept POST
+
+      try {
+        const resp = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await resp.json();
+
+        if (data.success) {
+          alert(`✅ Task ${isEditMode ? 'updated' : 'added'} successfully!`);
+          resetTaskForm();
+          taskFormModal.style.display = 'none';
+          location.reload();
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        alert(`❌ Error: ${err.message}`);
+      }
+    }
+
+    // ======================
+    // 6) TASK ACTIONS
+    // ======================
+    function completeTask(taskId) {
+      if (!confirm('Mark this task as completed?')) return;
+
+      fetch(`/complete-task/${taskId}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCSRFToken() }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to complete task');
+        }
+      })
+      .catch(() => alert('Failed to complete task'));
+    }
+
+    function deleteTask(taskId) {
+      if (!confirm('Are you sure you want to delete this task?')) return;
+
+      fetch(`/delete-task/${taskId}/`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': getCSRFToken() }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Failed to delete task');
+        }
+      })
+      .catch(() => alert('Failed to delete task'));
+    }
+
+    // ======================
+    // 7) RENDER
+    // ======================
+    function renderTasks() {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+
+      let filtered = tasks.filter(task => {
+        const hay = ((task.title || '') + ' ' + (task.description || '')).toLowerCase();
+        if (currentSearch && !hay.includes(currentSearch)) return false;
+
+        if (currentFilter === 'completed') return !!task.completed;
+
+        const datePart = (task.end_time || '').split('T')[0];
+        if (currentFilter === 'today') return datePart === todayStr && !task.completed;
+        if (currentFilter === 'upcoming') return datePart > todayStr && !task.completed;
+
+        return true; // 'all'
+      });
+
+      // Sort by priority then deadline
+      const prio = { high: 1, medium: 2, low: 3 };
+      filtered.sort((a, b) => {
+        const pa = prio[a.priority] || 99;
+        const pb = prio[b.priority] || 99;
+        if (pa !== pb) return pa - pb;
+        return new Date(a.end_time) - new Date(b.end_time);
+      });
+
+      if (filtered.length === 0) {
+        taskList.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      taskList.style.display = 'flex';
+      emptyState.style.display = 'none';
+      taskList.innerHTML = '';
+
+      filtered.forEach(task => {
+        const div = document.createElement('div');
+        div.className = `task-item ${task.completed ? 'completed' : ''}`;
+        div.dataset.taskId = task.id;
+
+        div.innerHTML = `
+          <div class="task-header">
+            <h4>${task.title || ''}</h4>
+            <span class="priority-badge ${task.priority || 'medium'}">
+              ${(task.priority || 'medium').charAt(0).toUpperCase() + (task.priority || 'medium').slice(1)}
+            </span>
+          </div>
+          <p>${task.description || ''}</p>
+          <div class="task-meta">
+            <span><i class="fas fa-clock"></i> ${formatDate(task.end_time)} at ${formatTime(task.end_time)}</span>
+            ${task.category && task.category !== 'none' ? `<span><i class="fas fa-tag"></i> ${task.category}</span>` : ''}
+          </div>
+          <div class="task-actions">
+            <button class="action-btn edit" data-task-id="${task.id}">
+              <i class="fas fa-pencil-alt"></i> Edit
+            </button>
+            ${!task.completed ? `
+              <button class="action-btn complete" data-task-id="${task.id}">
+                <i class="fas fa-check"></i> Complete
+              </button>` : ''
+            }
+            <button class="action-btn delete" data-task-id="${task.id}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        `;
+        taskList.appendChild(div);
+      });
+    }
+
+    // ======================
+    // 8) EVENTS
+    // ======================
+    // Sidebar + notifications
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.classList.toggle('active');
+    });
+    sidebarOverlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    });
+    notificationBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notificationPanel.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!notificationPanel.contains(e.target) && e.target !== notificationBtn) {
+        notificationPanel.classList.add('hidden');
       }
     });
-    
-    if (response.ok) {
-      // Update local task data
-      const task = tasks.find(t => t.id == taskId);
-      if (task) {
-        task.completed = true;
-      }
-      
-      filterTasks();
-    } else {
-      console.error('Failed to complete task');
-    }
-  } catch (error) {
-    console.error('Error completing task:', error);
-  }
-}
 
-async function deleteTask(taskId) {
-  try {
-    const response = await fetch(`/tasks/${taskId}/`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
+    // Modal open/close
+    [addTaskBtn, createTaskEmptyBtn].filter(Boolean).forEach(btn => {
+      btn.addEventListener('click', openTaskForm);
+    });
+    closeTaskForm.addEventListener('click', () => {
+      taskFormModal.style.display = 'none';
+      resetTaskForm();
+    });
+
+    // Planned Task modal close
+    document.getElementById('closePlannedTaskForm').addEventListener('click', function() {
+      document.getElementById('plannedTaskFormModal').style.display = 'none';
+      document.getElementById('plannedTaskForm').reset();
+    });
+
+    // Planned Task form submit (demo only)
+    document.getElementById('plannedTaskForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Planned Task saved (demo only)!');
+      document.getElementById('plannedTaskFormModal').style.display = 'none';
+      document.getElementById('plannedTaskForm').reset();
+    });
+
+    // Submit
+    taskForm.addEventListener('submit', handleTaskFormSubmit);
+
+    // Delegated actions
+    document.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.action-btn.edit');
+      const completeBtn = e.target.closest('.action-btn.complete');
+      const deleteBtn = e.target.closest('.action-btn.delete');
+
+      if (editBtn) {
+        openEditTaskForm(editBtn.dataset.taskId);
+      }
+      if (completeBtn) {
+        completeTask(completeBtn.dataset.taskId);
+      }
+      if (deleteBtn) {
+        deleteTask(deleteBtn.dataset.taskId);
       }
     });
-    
-    if (response.ok) {
-      // Remove from local tasks
-      tasks = tasks.filter(t => t.id != taskId);
-      filterTasks();
-    } else {
-      console.error('Failed to delete task');
-    }
-  } catch (error) {
-    console.error('Error deleting task:', error);
-  }
-}
 
-// ======================
-// 4) EVENT LISTENERS
-// ======================
-sidebarToggle.addEventListener('click', () => {
-  sidebar.classList.toggle('active');
-  sidebarOverlay.classList.toggle('active');
-});
+    // Filter + search
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function () {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        renderTasks();
+      });
+    });
+    taskSearch.addEventListener('input', function () {
+      currentSearch = this.value.toLowerCase();
+      renderTasks();
+    });
 
-sidebarOverlay.addEventListener('click', () => {
-  sidebar.classList.remove('active');
-  sidebarOverlay.classList.remove('active');
-});
-
-notificationBtn.addEventListener('click', () => {
-  notificationPanel.classList.toggle('active');
-});
-
-addTaskBtn.addEventListener('click', () => {
-  showTaskForm();
-});
-
-createTaskEmptyBtn.addEventListener('click', () => {
-  showTaskForm();
-});
-
-closeTaskForm.addEventListener('click', closeTaskFormModal);
-
-taskForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  
-  const taskData = {
-    title: document.getElementById('title').value,
-    description: document.getElementById('description').value,
-    priority: document.getElementById('priority').value,
-    category: document.getElementById('category').value,
-    start_time: document.getElementById('start_time').value,
-    end_time: document.getElementById('end_time').value,
-    reminder: document.getElementById('reminder').value
-  };
-  
-  const taskId = document.getElementById('taskId').value;
-  if (taskId) {
-    taskData.id = taskId;
-  }
-  
-  saveTask(taskData);
-});
-
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    filterTasks();
-  });
-});
-
-taskSearch.addEventListener('input', () => {
-  currentSearch = taskSearch.value;
-  filterTasks();
-});
-
-planTasksBtn.addEventListener('click', () => {
-  // Create and show the plan tasks modal
-  const planModal = document.createElement('div');
-  planModal.className = 'task-form-modal';
-  planModal.innerHTML = `
-    <div class="plan-modal">
-      <div class="plan-modal-header">
-        <h3 class="plan-modal-title"><i class="fas fa-calendar-plus"></i> Plan Your Tasks</h3>
-        <button class="plan-modal-close">&times;</button>
-      </div>
-      <div class="plan-modal-body">
-        <div class="plan-modal-section">
-          <h4 class="plan-modal-section-title">Filter Tasks</h4>
-          <div class="plan-tasks-controls">
-            <div class="plan-search-box">
-              <i class="fas fa-search"></i>
-              <input type="text" placeholder="Search tasks..." id="planTaskSearch">
-            </div>
-            <div class="plan-filter-controls">
-              <button class="filter-btn" data-plan-filter="all">
-                <i class="fas fa-list"></i> All
-              </button>
-              <button class="filter-btn" data-plan-filter="high">
-                <i class="fas fa-arrow-up"></i>Today
-              </button>
-              <button class="filter-btn" data-plan-filter="unplanned">
-                <i class="fas fa-calendar-times"></i> Completed
-              </button>
-            </div>
-          </div>
-          <div class="plan-task-list" id="planTaskList">
-            <!-- Tasks will be populated here -->
-          </div>
-        </div>
-        <div class="plan-modal-section">
-          <h4 class="plan-modal-section-title">Schedule Selected Tasks</h4>
-          <div class="plan-form-container">
-            <div class="plan-form-row">
-              <div class="form-group">
-                <label for="planStartDate">Start Date</label>
-                <input type="date" id="planStartDate" required>
+    // Init
+    renderTasks();
+    // Plan Tasks Button Functionality
+    document.getElementById('planTasksBtn').addEventListener('click', function() {
+      // Create modal overlay
+      const modalOverlay = document.createElement('div');
+      modalOverlay.className = 'modal-overlay';
+      modalOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      // Create modal content
+      const modalContent = document.createElement('div');
+      modalContent.className = 'plan-modal';
+      modalContent.style.cssText = `
+        background-color: white;
+        border-radius: 10px;
+        padding: 25px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+      `;
+      // Modal header
+      const modalHeader = document.createElement('div');
+      modalHeader.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      `;
+      const modalTitle = document.createElement('h2');
+      modalTitle.textContent = 'Plan Your Tasks';
+      modalTitle.style.cssText = `
+        margin: 0;
+        color: var(--primary);
+        font-size: 1.5rem;
+      `;
+      const closeButton = document.createElement('button');
+      closeButton.innerHTML = '&times;';
+      closeButton.style.cssText = `
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #999;
+      `;
+      closeButton.addEventListener('click', function() {
+        document.body.removeChild(modalOverlay);
+      });
+      modalHeader.appendChild(modalTitle);
+      modalHeader.appendChild(closeButton);
+      // Modal body with calendar view
+      const modalBody = document.createElement('div');
+      modalBody.innerHTML = `
+          <form class="plan-task-form" style="display: flex; flex-direction: column; gap: 18px; width: 100%;">
+            <div style="display: flex; gap: 16px;">
+              <div style="flex: 1;">
+                <label for="planDate" style="font-weight: 500; margin-bottom: 6px; display: block;">Date</label>
+                <input type="date" id="planDate" name="planDate" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
               </div>
-            <div class="form-group">
-                <label for="planEndDate">End Date</label>
-                <input type="date" id="planEndDate" required>
+              <div style="flex: 1;">
+                <label for="preferredStart" style="font-weight: 500; margin-bottom: 6px; display: block;">Preferred Start Time</label>
+                <input type="time" id="preferredStart" name="preferredStart" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+              </div>
+              <div style="flex: 1;">
+                <label for="preferredEnd" style="font-weight: 500; margin-bottom: 6px; display: block;">Preferred End Time</label>
+                <input type="time" id="preferredEnd" name="preferredEnd" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
               </div>
             </div>
-            <div class="form-group">
-              <label for="planTimePreference">Time Preference</label>
-              <select id="planTimePreference">
-                <option value="morning">Morning (8 AM - 12 PM)</option>
-                <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
-                <option value="evening">Evening (5 PM - 9 PM)</option>
-                <option value="custom">Custom Time</option>
-              </select>
+            <div style="display: flex; flex-direction: column; gap: 18px; align-items: center;">
+          <button id="openAddTaskFromPlan" style="padding: 10px 20px; background-color: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; margin-bottom: 16px;">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button id="savePlan" type="submit" style="padding: 8px 15px; background-color: var(--secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Save Plan</button>
+              <button id="cancelPlan" type="button" style="padding: 8px 15px; background-color: #f1f1f1; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">Cancel</button>
             </div>
-            <div class="form-group" id="customTimeGroup" style="display: none;">
-              <label for="planCustomTime">Custom Time</label>
-              <input type="time" id="planCustomTime">
-            </div>
-            <div class="plan-form-actions">
-              <button class="btn primary-btn" id="addTaskInPlanBtn">
-                <i class="fas fa-plus"></i> Add Task
-              </button>
-              <button class="btn auto-schedule-btn" id="autoScheduleBtn">
-                <i class="fas fa-magic"></i> Auto Schedule
-              </button>
-              <button class="btn secondary-btn" id="saveScheduleBtn">
-                <i class="fas fa-save"></i> Save
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(planModal);
-  planModal.style.display = 'flex';
-  
-  // Set up event listeners for the plan modal
-  const closeBtn = planModal.querySelector('.plan-modal-close');
-  closeBtn.addEventListener('click', () => {
-    document.body.removeChild(planModal);
-  });
-  
-  const timePreference = planModal.querySelector('#planTimePreference');
-  const customTimeGroup = planModal.querySelector('#customTimeGroup');
-  const addTaskInPlanBtn = planModal.querySelector('#addTaskInPlanBtn');
-  
-  timePreference.addEventListener('change', () => {
-    customTimeGroup.style.display = timePreference.value === 'custom' ? 'block' : 'none';
-  });
-  
-  addTaskInPlanBtn.addEventListener('click', () => {
-    // Close the plan modal and open the add task modal
-    document.body.removeChild(planModal);
-    showTaskForm();
-  });
-  
-  // Set default dates (today and tomorrow)
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  
-  const startDateInput = planModal.querySelector('#planStartDate');
-  const endDateInput = planModal.querySelector('#planEndDate');
-  
-  startDateInput.value = today.toISOString().split('T')[0];
-  endDateInput.value = tomorrow.toISOString().split('T')[0];
-  
-  // Populate tasks in the plan modal
-  const planTaskList = planModal.querySelector('#planTaskList');
-  const unplannedTasks = tasks.filter(task => !task.completed);
-  
-  if (unplannedTasks.length === 0) {
-    planTaskList.innerHTML = '<p class="empty-text">No tasks available for planning.</p>';
-  } else {
-    unplannedTasks.forEach(task => {
-      const taskElement = document.createElement('div');
-      taskElement.className = 'task-item';
-      taskElement.innerHTML = `
-        <div class="task-header">
-          <h4>${task.title}</h4>
-          <span class="priority-badge ${task.priority.toLowerCase()}">${task.priority}</span>
-        </div>
-        <p>${task.description || ''}</p>
-        <div class="task-meta">
-          <span><i class="fas fa-clock"></i> ${task.start_time ? 'Scheduled' : 'Unscheduled'}</span>
-        </div>
-        <div class="task-actions">
-          <input type="checkbox" class="task-select" data-task-id="${task.id}">
-          <label>Select for planning</label>
+          </form>
         </div>
       `;
-      planTaskList.appendChild(taskElement);
-    });
-  }
-  
-  // Set up filter buttons in the plan modal
-  const planFilterBtns = planModal.querySelectorAll('.filter-btn[data-plan-filter]');
-  planFilterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      planFilterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // In a real implementation, you would filter the tasks here
-    });
-  });
-  
-  // Set up search in the plan modal
-  const planSearch = planModal.querySelector('#planTaskSearch');
-  planSearch.addEventListener('input', () => {
-    const searchTerm = planSearch.value.toLowerCase();
-    const taskItems = planModal.querySelectorAll('.task-item');
-    
-    taskItems.forEach(item => {
-      const title = item.querySelector('h4').textContent.toLowerCase();
-      const description = item.querySelector('p').textContent.toLowerCase();
-      
-      if (title.includes(searchTerm) || description.includes(searchTerm)) {
-        item.style.display = 'flex';
-      } else {
-        item.style.display = 'none';
+      // Append elements
+      modalContent.appendChild(modalHeader);
+      modalContent.appendChild(modalBody);
+      modalOverlay.appendChild(modalContent);
+      document.body.appendChild(modalOverlay);
+      // Add Task button in Plan modal opens the main Add Task modal
+      const openAddTaskFromPlanBtn = modalContent.querySelector('#openAddTaskFromPlan');
+      if (openAddTaskFromPlanBtn) {
+          openAddTaskFromPlanBtn.addEventListener('click', function() {
+            document.body.removeChild(modalOverlay);
+            document.getElementById('plannedTaskFormModal').style.display = 'flex';
+          });
       }
+      // Close modal when clicking outside
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === modalOverlay) {
+          document.body.removeChild(modalOverlay);
+        }
+      });
+      // Add calendar navigation functionality
+      const prevMonthBtn = modalContent.querySelector('#prevMonth');
+      const nextMonthBtn = modalContent.querySelector('#nextMonth');
+      const currentMonthEl = modalContent.querySelector('#currentMonth');
+      let currentDate = new Date();
+      function updateCalendar() {
+    // Render month/year
+    currentMonthEl.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+    // Get calendar grid
+    const calendarGrid = modalContent.querySelector('.calendar-grid');
+    // Remove previous days (keep days of week)
+    while (calendarGrid.children.length > 7) {
+      calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+    // Get first day of month
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Add empty slots for days before first day
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      calendarGrid.appendChild(empty);
+    }
+    // Add days
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'calendar-day';
+      dayDiv.textContent = d;
+      dayDiv.dataset.date = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      calendarGrid.appendChild(dayDiv);
+    }
+    // Highlight selected day
+    if (window.selectedCalendarDay) {
+      const sel = calendarGrid.querySelector(`[data-date='${window.selectedCalendarDay}']`);
+      if (sel) sel.classList.add('selected');
+    }
+    // Add click listeners for day selection
+    calendarGrid.querySelectorAll('.calendar-day').forEach(day => {
+      day.onclick = function() {
+        calendarGrid.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+        this.classList.add('selected');
+        window.selectedCalendarDay = this.dataset.date;
+      };
     });
-  });
-});
-
-// ======================
-// 5) INITIALIZATION
-// ======================
-document.addEventListener('DOMContentLoaded', () => {
-  filterTasks();
-});
+      }
+      prevMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendar();
+      });
+      nextMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendar();
+      });
+      // Save plan functionality
+      const savePlanBtn = modalContent.querySelector('#savePlan');
+      savePlanBtn.addEventListener('click', function() {
+        // In a real implementation, this would save the scheduled tasks
+        alert('Your task plan has been saved!');
+        document.body.removeChild(modalOverlay);
+      });
+      // Cancel button
+      const cancelBtn = modalContent.querySelector('#cancelPlan');
+      cancelBtn.addEventListener('click', function() {
+        document.body.removeChild(modalOverlay);
+      });
+      // Initialize calendar
+      updateCalendar();
+    });
   </script>
 </body>
 </html>

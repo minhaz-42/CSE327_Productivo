@@ -720,3 +720,9 @@ def mark_notifications_read(request):
         # to mark notifications as read for this user
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
+
+
+

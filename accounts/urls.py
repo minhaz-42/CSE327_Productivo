@@ -25,5 +25,7 @@ urlpatterns = [
     path('delete-task/<int:task_id>/', views.delete_task, name='delete-task'),
     path('analytics/', views.analytics, name="analytics"),
     path('mark-notifications-read/', views.mark_notifications_read, name='mark_notifications_read'),
+    
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
