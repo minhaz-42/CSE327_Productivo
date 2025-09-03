@@ -2,6 +2,8 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from django.contrib import admin
+
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -21,12 +23,13 @@ urlpatterns = [
     
     # Task management
     path('add-task/', views.add_task, name='add-task'),
+    path('get-task/<int:task_id>/', views.get_task, name='get-task'),
     path('edit-task/<int:task_id>/', views.edit_task, name='edit-task'),
     path('complete-task/<int:task_id>/', views.complete_task, name='complete-task'),
     path('delete-task/<int:task_id>/', views.delete_task, name='delete-task'),
-    path('analytics/', views.analytics, name="analytics"),
     path('mark-notifications-read/', views.mark_notifications_read, name='mark_notifications_read'),
     
-
+    #JSON feed for FullCalendar
+    path('api/task-events/', views.task_events, name='task_events'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
