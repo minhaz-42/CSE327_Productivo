@@ -11,6 +11,11 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Student, Task
 from django.utils.dateparse import parse_datetime
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from accounts.models import PlanYourTasks
+from accounts.scheduler import run_scheduler
+from django.core.exceptions import ValidationError
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.http import JsonResponse
@@ -99,7 +104,7 @@ def dashboard(request):
     
     #for pomodoro logic calculating the time remaining for the task
     if task_rightnow:
-        time_remaining_current_task = int((task_rightnow.end_time - current_time).total_seconds())
+        time_remaining_current_task = int((task_rightnow.end_time - current_time).total_seconds()) //1
     
     else:
         time_remaining_current_task = 0
@@ -750,3 +755,20 @@ def mark_notifications_read(request):
         # to mark notifications as read for this user
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required(login_url='login')
+def schedule_plan(request, plan_id):
+    plan = get_object_or_404(PlanYourTasks, id=plan_id)
+
+    try:
+        run_scheduler(plan)
+        messages.success(request, "Tasks scheduled successfully!")
+    except ValidationError as e:
+        messages.error(request, str(e))
+
+    # Redirect to admin ScheduledTask list for now
+    return redirect("/admin/accounts/scheduledtask/")
+
+
+
