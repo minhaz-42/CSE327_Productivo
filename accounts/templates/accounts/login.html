@@ -159,39 +159,6 @@
       text-decoration: underline;
     }
     
-    .forgot-password {
-      text-align: right;
-      margin: -0.5rem 0 1rem;
-    }
-    
-    .forgot-password a {
-      color: var(--gray-text);
-      font-size: 0.85rem;
-      text-decoration: none;
-    }
-    
-    .forgot-password a:hover {
-      color: var(--primary-color);
-      text-decoration: underline;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .remember-me input {
-      width: auto;
-    }
-    
-    .form-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    
     @media (max-width: 600px) {
       .auth-container {
         padding: 1.75rem;
@@ -216,7 +183,7 @@
         <span>Home</span>
       </a>
       <div class="auth-logo">
-        <span>TaskPlanner</span>
+        <span>TaskMaze</span>
       </div>
     </div>
   </nav>
@@ -237,16 +204,6 @@
         <i class="fas fa-lock"></i>
       </div>
       
-      <div class="form-footer">
-        <div class="remember-me">
-          <input type="checkbox" id="remember" />
-          <label for="remember">Remember me</label>
-        </div>
-        <div class="forgot-password">
-          <a href="forgot-password.html">Forgot password?</a>
-        </div>
-      </div>
-      
       <button type="submit" class="primary-btn">Login</button>
       
       <p class="auth-switch">
@@ -264,10 +221,9 @@
       
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
-      const rememberMe = document.getElementById('remember').checked;
       
       // In a real application, you would send this data to your server
-      console.log('Login attempt:', { username, password, rememberMe });
+      console.log('Login attempt:', { username, password });
       
       // For demo purposes, redirect to dashboard
       window.location.href = 'dashboard.html';
@@ -285,19 +241,7 @@
       window.location.href = 'register.html';
     });
 
-    document.querySelector('.forgot-password a').addEventListener('click', function(e) {
-      e.preventDefault();
-      window.location.href = 'forgot-password.html';
-    });
-
-    // Check for remembered credentials
-    document.addEventListener('DOMContentLoaded', function() {
-      const rememberedUsername = localStorage.getItem('rememberedUsername');
-      if (rememberedUsername) {
-        document.getElementById('username').value = rememberedUsername;
-        document.getElementById('remember').checked = true;
-      }
-    });
+    // Clean up any remembered credentials functionality
     */
   </script>
 </body>
@@ -315,5 +259,4 @@
   </script>
     {% endif %}
 </body>
-</html>
 </html>
