@@ -21,6 +21,8 @@ from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 from datetime import timedelta
 from .scheduler import run_scheduler
+from django.core.mail import send_mail
+from django.conf import settings as django_settings
 
 # ------------------ PUBLIC VIEWS ------------------
 
@@ -61,6 +63,13 @@ def registration(request):
                 dob=date_of_birth,
                 institution=institution,
                 profile_pic=profile_picture
+            )
+            send_mail(
+            subject="Welcome to Task Maze!",
+            message=f"Hi {firstname},\n\nYour registration was successful. You can now log in with your username: {username} and manage your tasks.",
+            from_email= django_settings.EMAIL_HOST_USER,  #my email
+            recipient_list=[email],  #user email
+            fail_silently=False,
             )
             context['success'] = "Registration successful! You can now log in."
 
@@ -889,8 +898,8 @@ def add_plantask(request):
 
 @login_required
 def plan_your_tasks(request):
-    # Get the selected date (e.g., from a GET parameter or default to today)
-    date_str = request.GET.get('date')  # ?date=2025-09-04
+   
+    date_str = request.GET.get('date')  
     if date_str:
         selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     else:
