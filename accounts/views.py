@@ -432,7 +432,7 @@ def complete_task(request, task_id):
 @login_required
 @csrf_exempt
 def delete_task(request, task_id):
-    if request.method == 'DELETE':
+    if request.method in ['POST', 'DELETE']:
         try:
             task = Task.objects.get(pk=task_id, user=request.user)
             task.delete()
@@ -543,7 +543,8 @@ def analytics(request):
         'in_progress_percent': in_progress_percent,
         'overdue_percent': overdue_percent,
         'high_priority_completed': high_priority_completed,
-        'high_priority': high_priority_total,
+        'high_priority_total': high_priority_total,  # Fixed variable name
+        'chart_data': chart_data,  # Pass the data object for template
         'chart_data_json': json.dumps(chart_data),  # For JavaScript charts
         'period': period,
         'notifications': notifications,
@@ -772,3 +773,8 @@ def schedule_plan(request, plan_id):
 
 
 
+# accounts/views.py
+from django.shortcuts import render
+
+def plan_your_tasks(request):
+    return render(request, "planyourtask.html")

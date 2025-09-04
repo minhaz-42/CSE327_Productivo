@@ -1332,9 +1332,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (end_time) {
         const date = new Date(end_time);
-        document.getElementById('end_time').value = date.toISOString().slice(0, 16);
+        document.getElementById('deadline').value = date.toISOString().slice(0, 16);
       } else {
-        document.getElementById('end_time').value = '';
+        document.getElementById('deadline').value = '';
       }
 
       document.getElementById('reminder').value = '';

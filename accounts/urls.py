@@ -31,5 +31,7 @@ urlpatterns = [
     
     #JSON feed for FullCalendar
     path('api/task-events/', views.task_events, name='task_events'),
+    path("planyourtasks/", views.plan_your_tasks, name="planyourtasks"),    
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

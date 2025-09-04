@@ -730,10 +730,10 @@
       }
     }
     .empty-notifications {
-  padding: 20px;
-  text-align: center;
-  color: var(--gray-medium);
-}
+      padding: 20px;
+      text-align: center;
+      color: var(--gray-medium);
+    }
   </style>
 </head>
 <body class="light-theme">
@@ -753,38 +753,38 @@
           <i class="fas fa-sign-out-alt"></i>
           <span>Logout</span>
         </a>
-       <!-- Notification Bell -->
-<div class="notification-wrapper">
-  <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
-    <i class="fas fa-bell"></i>
-    {% if unread_count > 0 %}
-    <span class="notification-badge">{{ unread_count }}</span>
-    {% endif %}
-  </button>
-  <div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-      <h3>Notifications</h3>
-      <button class="mark-all-read" id="markAllRead">Mark all as read</button>
-    </div>
-    <div class="notification-list">
-      {% if notifications %}
-        {% for notification in notifications %}
-          <div class="notification-item {% if notification.unread %}unread{% endif %}">
-            <i class="{{ notification.icon }}"></i>
-            <div class="notification-content">
-              <p>{{ notification.message }}</p>
-              <span class="notification-time">{{ notification.time_display }}</span>
+        <!-- Notification Bell -->
+        <div class="notification-wrapper">
+          <button class="notification-btn" id="notificationBtn" aria-label="Notifications">
+            <i class="fas fa-bell"></i>
+            {% if unread_count > 0 %}
+            <span class="notification-badge">{{ unread_count }}</span>
+            {% endif %}
+          </button>
+          <div class="notification-panel" id="notificationPanel">
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <button class="mark-all-read" id="markAllRead">Mark all as read</button>
+            </div>
+            <div class="notification-list">
+              {% if notifications %}
+                {% for notification in notifications %}
+                  <div class="notification-item {% if notification.unread %}unread{% endif %}">
+                    <i class="{{ notification.icon }}"></i>
+                    <div class="notification-content">
+                      <p>{{ notification.message }}</p>
+                      <span class="notification-time">{{ notification.time_display }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="empty-notifications">
+                  <p>No notifications</p>
+                </div>
+              {% endif %}
             </div>
           </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-notifications">
-          <p>No notifications</p>
         </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
         
         <!-- User Avatar -->
         <div class="user-profile">
@@ -823,9 +823,9 @@
         <div class="analytics-header">
           <h2><i class="fas fa-chart-bar"></i> Productivity Analytics</h2>
           <div class="time-period-selector">
-            <button class="time-period-btn active" data-period="week">This Week</button>
-            <button class="time-period-btn" data-period="month">This Month</button>
-            <button class="time-period-btn" data-period="quarter">This Quarter</button>
+            <button class="time-period-btn {% if period == 'week' %}active{% endif %}" data-period="week">This Week</button>
+            <button class="time-period-btn {% if period == 'month' %}active{% endif %}" data-period="month">This Month</button>
+            <button class="time-period-btn {% if period == 'quarter' %}active{% endif %}" data-period="quarter">This Quarter</button>
           </div>
         </div>
 
@@ -834,8 +834,9 @@
           <div class="stat-card">
             <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> Tasks Completed</h3>
             <div class="stat-value" id="completedTasks">{{ completed_tasks }}</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> <span id="completionRate">{{ completion_rate }}</span>% completion rate
+            <div class="stat-change {% if completion_rate >= 70 %}positive{% elif completion_rate < 50 %}negative{% endif %}">
+                <i class="fas {% if completion_rate >= 70 %}fa-arrow-up{% elif completion_rate < 50 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
+                <span id="completionRate">{{ completion_rate }}</span>% completion rate
             </div>
           </div>
           <div class="stat-card">
@@ -848,14 +849,17 @@
           <div class="stat-card">
             <h3><i class="fas fa-bolt" style="color: var(--primary);"></i> Productivity Score</h3>
             <div class="stat-value" id="productivityScore">{{ completion_rate }}%</div>
-            <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> <span id="productivityStatus">Good progress</span>
+            <div class="stat-change {% if completion_rate >= 70 %}positive{% elif completion_rate < 50 %}negative{% endif %}">
+                <i class="fas {% if completion_rate >= 70 %}fa-arrow-up{% elif completion_rate < 50 %}fa-arrow-down{% else %}fa-minus{% endif %}"></i> 
+                <span id="productivityStatus">
+                  {% if completion_rate >= 70 %}Excellent{% elif completion_rate >= 50 %}Good progress{% else %}Needs improvement{% endif %}
+                </span>
             </div>
           </div>
           <div class="stat-card">
             <h3><i class="fas fa-calendar-times" style="color: var(--error);"></i> Overdue Tasks</h3>
             <div class="stat-value" id="overdueTasks">{{ overdue_tasks }}</div>
-            <div class="stat-change" id="overdueStatus">
+            <div class="stat-change {% if overdue_tasks > 0 %}negative{% else %}positive{% endif %}" id="overdueStatus">
                 {% if overdue_tasks > 0 %}
                 <i class="fas fa-arrow-up"></i> Needs attention
                 {% else %}
@@ -960,7 +964,7 @@
           <h3><i class="fas fa-lightbulb"></i> Productivity Tips</h3>
           <div class="tip-item">
             <h4><i class="fas fa-check-circle"></i> Focus on High-Impact Tasks</h4>
-            <p id="priorityTip">You've completed {{ high_priority_completed }}/{{ high_priority }} of your high-priority tasks this week. Try to maintain this focus on important tasks.</p>
+            <p id="priorityTip">You've completed {{ high_priority_completed }}/{{ high_priority_total }} of your high-priority tasks. Try to maintain this focus on important tasks.</p>
           </div>
           <div class="tip-item">
             <h4><i class="fas fa-clock"></i> Time Blocking</h4>
@@ -968,7 +972,7 @@
           </div>
           <div class="tip-item">
             <h4><i class="fas fa-calendar-alt"></i> Plan Ahead</h4>
-            <p id="planningTip">Your completion rate is {{ completion_rate }}%. Try to maintain consistency in your task completion.</p>
+            <p id="planningTip">Your completion rate is {{ completion_rate }}%. {% if completion_rate < 50 %}Try to improve your task completion rate by focusing on one task at a time.{% elif completion_rate < 70 %}Good progress! Keep up the consistency.{% else %}Excellent work! Maintain this productivity level.{% endif %}</p>
           </div>
         </div>
       </div>
@@ -994,23 +998,18 @@
     // ======================
     let completionChart = null;
     let priorityChart = null;
-    let currentPeriod = 'week';
     
-    // Get chart data from Django template
-    let chartData = {};
-    try {
-        chartData = JSON.parse('{{ chart_data_json|escapejs }}');
-        console.log('Chart data loaded:', chartData);
-    } catch (e) {
-        console.error('Error parsing chart data:', e);
-        // Fallback data if parsing fails
-        chartData = {
-            dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            completion_trend: [0, 0, 0, 0, 0, 0, 0],
-            priority_data: {high: 0, medium: 0, low: 0},
-            total_period_tasks: 0
-        };
-    }
+    // Get chart data from Django template variables
+    const chartData = {
+      dates: {{ chart_data.dates|safe }},
+      completion_trend: {{ chart_data.completion_trend }},
+      priority_data: {
+        high: {{ chart_data.priority_data.high }},
+        medium: {{ chart_data.priority_data.medium }},
+        low: {{ chart_data.priority_data.low }}
+      },
+      total_period_tasks: {{ chart_data.total_period_tasks }}
+    };
 
     // ======================
     // NOTIFICATION BELL LOGIC
@@ -1062,50 +1061,50 @@
     });
 
     // Mark all as read functionality
-    // Mark all notifications as read
-if (markAllRead) {
-    markAllRead.addEventListener('click', function() {
-        // This would typically make an AJAX call to your backend
-        // to mark notifications as read in the database
-        const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-        unreadNotifications.forEach(notification => {
-            notification.classList.remove('unread');
+    if (markAllRead) {
+        markAllRead.addEventListener('click', function() {
+            // This would typically make an AJAX call to your backend
+            // to mark notifications as read in the database
+            const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+            unreadNotifications.forEach(notification => {
+                notification.classList.remove('unread');
+            });
+            
+            // Update badge count
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            
+            // In a real application, you would also send an AJAX request
+            // to update the server-side read status
+            fetch('/mark-notifications-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({mark_all_read: true})
+            }).catch(error => console.error('Error:', error));
         });
-        
-        // Update badge count
-        const badge = document.querySelector('.notification-badge');
-        if (badge) {
-            badge.style.display = 'none';
-        }
-        
-        // In a real application, you would also send an AJAX request
-        // to update the server-side read status
-        fetch('/mark-notifications-read/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({mark_all_read: true})
-        }).catch(error => console.error('Error:', error));
-    });
-}
+    }
 
-// Helper function to get CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
+
     // ======================
     // SIDEBAR FUNCTIONALITY
     // ======================
@@ -1213,16 +1212,18 @@ function getCookie(name) {
         // Create priority distribution chart
         const priorityCtx = document.getElementById('priorityChart');
         if (priorityCtx) {
+            // Calculate percentages for the doughnut chart
+            const totalPriority = chartData.priority_data.high + chartData.priority_data.medium + chartData.priority_data.low;
+            const highPercent = totalPriority > 0 ? Math.round((chartData.priority_data.high / totalPriority) * 100) : 0;
+            const mediumPercent = totalPriority > 0 ? Math.round((chartData.priority_data.medium / totalPriority) * 100) : 0;
+            const lowPercent = totalPriority > 0 ? Math.round((chartData.priority_data.low / totalPriority) * 100) : 0;
+            
             priorityChart = new Chart(priorityCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['High Priority', 'Medium Priority', 'Low Priority'],
                     datasets: [{
-                        data: [
-                            chartData.priority_data?.high || 0, 
-                            chartData.priority_data?.medium || 0, 
-                            chartData.priority_data?.low || 0
-                        ],
+                        data: [highPercent, mediumPercent, lowPercent],
                         backgroundColor: [
                             '#ef233c', // High priority
                             '#ff9e00', // Medium priority
@@ -1251,7 +1252,16 @@ function getCookie(name) {
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.label}: ${context.raw}%`;
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const count = context.dataset.data.map((val, index) => {
+                                        if (index === context.dataIndex) {
+                                            if (label === 'High Priority') return chartData.priority_data.high;
+                                            if (label === 'Medium Priority') return chartData.priority_data.medium;
+                                            if (label === 'Low Priority') return chartData.priority_data.low;
+                                        }
+                                    })[0];
+                                    return `${label}: ${value}% (${count} tasks)`;
                                 }
                             }
                         }
@@ -1265,14 +1275,6 @@ function getCookie(name) {
     // INITIALIZATION
     // ======================
     document.addEventListener('DOMContentLoaded', function() {
-        // Set active time period button based on current period
-        const currentPeriod = '{{ period }}';
-        const activeButton = document.querySelector(`.time-period-btn[data-period="${currentPeriod}"]`);
-        if (activeButton) {
-            timePeriodBtns.forEach(btn => btn.classList.remove('active'));
-            activeButton.classList.add('active');
-        }
-        
         // Initialize charts
         initializeCharts();
         

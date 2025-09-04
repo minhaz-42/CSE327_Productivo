@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plan Your Tasks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #7209b7;
+      --secondary-light: #b5179e;
+      --secondary-dark: #560bad;
+      --background: #f8f9fa;
+      --surface: #ffffff;
+      --error: #f72585;
+      --on-primary: #ffffff;
+      --on-secondary: #ffffff;
+      --on-background: #212529;
+      --on-surface: #212529;
+      --on-error: #ffffff;
+      --gray-light: #e9ecef;
+      --gray-medium: #adb5bd;
+      --gray-dark: #495057;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --info: #4895ef;
+      --priority-high: #ef233c;
+      --priority-medium: #ff9e00;
+      --priority-low: #38b000;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--on-background);
+      transition: all 0.3s ease;
+    }
+
+    /* App Layout */
+    .app {
+      display: grid;
+      grid-template-areas:
+        "sidebar header"
+        "sidebar main";
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: 60px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Header Styles */
+    .header {
+      grid-area: header;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      background-color: var(--surface);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--on-surface);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+    }
+
+    .menu-btn:hover {
+      background-color: var(--gray-light);
+    }
+
+    .app-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .notification-wrapper {
+      position: relative;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--on-surface);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 15px;
+      height: 15px;
+      background-color: var(--error);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+    }
+
+    .notification-panel {
+      position: absolute;
+      right: 0;
+      top: 40px;
+      width: 300px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 15px;
+      z-index: 100;
+    }
+
+    .notification-panel.hidden {
+      display: none;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      grid-area: sidebar;
+      background-color: var(--surface);
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-logo {
+      padding: 20px;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .sidebar-logo h2 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: all 0.2s;
+      gap: 10px;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--gray-light);
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--primary-light);
+      color: var(--on-primary);
+    }
+
+    .sidebar-nav a.active i {
+      color: var(--on-primary);
+    }
+
+    .sidebar-nav i {
+      width: 24px;
+      text-align: center;
+      color: var(--gray-medium);
+    }
+
+    .sidebar-nav a.active:hover {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .sidebar-nav a.active:hover i {
+      color: var(--on-primary);
+    }
+
+    /* Sidebar Footer Styles */
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px;
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .sidebar-footer a {
+      display: block;
+      padding: 10px 0;
+      color: var(--on-surface);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .sidebar-footer a:hover {
+      color: var(--primary);
+    }
+
+    .sidebar-footer a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      grid-area: main;
+      padding: 20px;
+      background-color: var(--background);
+      overflow-y: auto;
+    }
+
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.8rem;
+      color: var(--on-background);
+    }
+
+    /* Dashboard Controls */
+    .dashboard-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--gray-light);
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box input {
+      padding: 8px 15px 8px 35px;
+      border: 1px solid var(--gray-light);
+      border-radius: 4px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+      width: 200px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 10px;
+      color: var(--gray-medium);
+    }
+
+    /* Preferred Working Hours Section */
+    .preferred-hours-section {
+      background-color: var(--surface);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .preferred-hours-section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .preferred-hours-section h3 i {
+      color: var(--primary);
+    }
+
+    .pref-hours-form {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .pref-time-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .pref-time-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--on-surface);
+    }
+
+    .pref-time-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pref-time-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--gray-light);
+      border-radius: 4px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+      font-size: 0.9rem;
+    }
+
+    .pref-time-input input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .save-pref-btn {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .save-pref-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Task List Styles */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .task-item {
+      background-color: var(--surface);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--gray-medium);
+      transition: all 0.2s;
+    }
+
+    .task-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .task-item.high {
+      border-left-color: var(--priority-high);
+    }
+
+    .task-item.medium {
+      border-left-color: var(--priority-medium);
+    }
+
+    .task-item.low {
+      border-left-color: var(--priority-low);
+    }
+
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .task-header h4 {
+      font-size: 1rem;
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .priority-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .priority-badge.high {
+      background-color: rgba(239, 35, 60, 0.1);
+      color: var(--priority-high);
+    }
+
+    .priority-badge.medium {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--priority-medium);
+    }
+
+    .priority-badge.low {
+      background-color: rgba(56, 176, 0, 0.1);
+      color: var(--priority-low);
+    }
+
+    .task-item p {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+      margin-bottom: 12px;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.8rem;
+      color: var(--gray-medium);
+      margin-bottom: 12px;
+    }
+
+    .task-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .task-meta i {
+      font-size: 0.9rem;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .action-btn i {
+      font-size: 0.9rem;
+    }
+
+    .action-btn.edit {
+      background-color: var(--info);
+      color: white;
+    }
+
+    .action-btn.edit:hover {
+      background-color: #3a7fc4;
+    }
+
+    .action-btn.complete {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .action-btn.complete:hover {
+      background-color: #3aa8d0;
+    }
+
+    .action-btn.delete {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .action-btn.delete:hover {
+      background-color: #d41a5c;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--gray-light);
+      margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+      color: var(--gray-medium);
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: var(--gray-medium);
+      margin-bottom: 20px;
+    }
+
+    /* Plan Button */
+    .plan-btn {
+      background-color: var(--secondary);
+      color: var(--on-secondary);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-btn:hover {
+      background-color: var(--secondary-dark);
+    }
+
+    /* Primary Button */
+    .primary-btn {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Task Form Modal */
+    .task-form-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-form-container {
+      background-color: var(--surface);
+      width: 90%;
+      max-width: 600px;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .task-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-medium);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--on-surface);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray-light);
+      border-radius: 4px;
+      background-color: var(--surface);
+      color: var(--on-surface);
+      font-size: 0.9rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .pref-time-btn {
+      background-color: var(--gray-light);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    .pref-time-btn:hover {
+      background-color: var(--gray-medium);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .app {
+        grid-template-areas:
+          "header"
+          "main";
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        height: calc(100vh - 60px);
+        width: 240px;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 999;
+      }
+      
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .dashboard-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .filter-buttons {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      
+      .pref-hours-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .pref-time-group {
+        min-width: 100%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        padding: 0 10px;
+      }
+
+      .main-content {
+        padding: 15px;
+      }
+
+      .task-actions {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+
+      .action-btn {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body class="light-theme">
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-btn" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="app-title">Intelligent Task Planner</h1>
+      </div>
+
+      <div class="header-right">
+        <!-- Notification Button -->
+        <div class="notification-wrapper">
+          <button class="notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge"></span>
+          </button>
+          <div class="notification-panel hidden" id="notificationPanel">
+            <p>No new notifications</p>
+          </div>
+        </div>
+        
+        <!-- Logout Button - Updated with Django URL -->
+        <a href="{% url 'logout' %}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+       
+        <!-- User Avatar -->
+        <div class="user-profile">
+          <div class="avatar">U</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h2>TaskPlanner</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <!-- Updated links with Django URL names -->
+          <li><a href="{% url 'task' %}"><i class="fas fa-tasks"></i> <span>My Tasks</span></a></li>
+        </ul>
+      </nav>
+      
+      
+    </aside>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+          <h2><i class="fas fa-home"></i> Task Dashboard</h2>
+          
+        </div>
+
+        <!-- Preferred Working Hours Section -->
+        <div class="preferred-hours-section">
+          <h3><i class="fas fa-clock"></i> Preferred Working Hours</h3>
+          <form class="pref-hours-form" id="prefHoursForm">
+            <div class="pref-time-group">
+              <label>Date</label>
+              <div class="pref-time-input">
+                <input type="date" id="prefStartDate" value="">
+              </div>
+            </div>
+            <div class="pref-time-group">
+              <label>Start Time</label>
+              <div class="pref-time-input">
+                <input type="time" id="prefStartTime" value="09:00">
+              </div>
+            </div>
+            <div class="pref-time-group">
+              <label>End Time</label>
+              <div class="pref-time-input">
+                <input type="time" id="prefEndTime" value="17:00">
+              </div>
+            </div>
+            <button type="button" class="save-pref-btn" id="savePrefHours">
+              <i class="fas fa-save"></i> Save Preferences
+            </button>
+          </form>
+        </div>
+
+        <!-- Dashboard Controls -->
+        <div class="dashboard-controls">
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+              <i class="fas fa-layer-group"></i> All Tasks
+            </button>
+          </div>
+          
+          <div class="">
+            <button class="plan-btn" id="planTasksBtn">
+            <i class="fas fa-calendar-plus"></i> Auto Schedule
+          </button>
+          </div>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-list" id="taskList">
+          <!-- Task 1 -->
+          <div class="task-item high">
+            <div class="task-header">
+              <h4>Complete Project Proposal</h4>
+              <span class="priority-badge high">High</span>
+            </div>
+            <p>Finish the project proposal document and send to client for review</p>
+            <div class="task-meta">
+              <span><i class="fas fa-clock"></i> Today, 3:00 PM</span>
+              <span><i class="fas fa-tag"></i> Work</span>
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </button>
+              <button class="action-btn complete">
+                <i class="fas fa-check"></i> Complete
+              </button>
+            </div>
+          </div>
+          
+          <!-- Task 2 -->
+          <div class="task-item medium">
+            <div class="task-header">
+              <h4>Team Meeting</h4>
+              <span class="priority-badge medium">Medium</span>
+            </div>
+            <p>Weekly team sync to discuss project progress and blockers</p>
+            <div class="task-meta">
+              <span><i class="fas fa-clock"></i> Tomorrow, 10:00 AM</span>
+              <span><i class="fas fa-tag"></i> Work</span>
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </button>
+              <button class="action-btn complete">
+                <i class="fas fa-check"></i> Complete
+              </button>
+            </div>
+          </div>
+          
+          <!-- Task 3 -->
+          <div class="task-item low">
+            <div class="task-header">
+              <h4>Grocery Shopping</h4>
+              <span class="priority-badge low">Low</span>
+            </div>
+            <p>Buy groceries for the week - fruits, vegetables, milk, eggs</p>
+            <div class="task-meta">
+              <span><i class="fas fa-clock"></i> This weekend</span>
+              <span><i class="fas fa-tag"></i> Personal</span>
+            </div>
+            <div class="task-actions">
+              <button class="action-btn edit">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </button>
+              <button class="action-btn complete">
+                <i class="fas fa-check"></i> Complete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <i class="fas fa-tasks"></i>
+          <h3>No tasks found</h3>
+          <p>Try changing your filters or create a new task</p>
+          <button class="primary-btn" id="createTaskEmptyBtn">
+            <i class="fas fa-plus"></i> Create Task
+          </button>
+        </div>
+
+        <!-- Add Task Button -->
+        <button class="primary-btn" id="addTaskBtn">
+          <i class="fas fa-plus"></i> Add New Task
+        </button>
+      </div>
+    </main>
+
+    <!-- Task Form Modal -->
+    <div class="task-form-modal" id="taskFormModal">
+      <div class="task-form-container">
+        <div class="task-form-header">
+          <h3 id="taskFormTitle">Add New Task</h3>
+          <button class="close-btn" id="closeTaskForm">&times;</button>
+        </div>
+        <form id="taskForm">
+          <input type="hidden" id="taskId" value="">
+          <div class="form-group">
+            <label for="title">Title*</label>
+            <input type="text" id="title" required placeholder="Enter task title">
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3" placeholder="Add details about the task"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="priority">Priority*</label>
+              <select id="priority" required>
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category">
+                <option value="">None</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="finance">Finance</option>
+                <option value="health">Health</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="start_time">Start Time*</label>
+              <input type="time" id="start_time" required>
+            </div>
+            <div class="form-group">
+              <label for="end_time">End Time*</label>
+              <input type="time" id="end_time" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reminder">Reminder</label>
+            <select id="reminder">
+              <option value="none">None</option>
+              <option value="5">5 minutes before</option>
+              <option value="15">15 minutes before</option>
+              <option value="30">30 minutes before</option>
+              <option value="60">1 hour before</option>
+            </select>
+          </div>
+          <button type="submit" class="primary-btn btn btn-block">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // DOM Elements
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
+    const taskFormModal = document.getElementById('taskFormModal');
+    const closeTaskForm = document.getElementById('closeTaskForm');
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+    const emptyState = document.getElementById('emptyState');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const taskSearch = document.getElementById('taskSearch');
+    const planTasksBtn = document.getElementById('planTasksBtn');
+    const savePrefHoursBtn = document.getElementById('savePrefHours');
+    const prefStartTime = document.getElementById('prefStartTime');
+    const prefEndTime = document.getElementById('prefEndTime');
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+
+    // State
+    let tasks = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    // Functions
+    function openTaskForm() {
+      document.getElementById('taskFormTitle').textContent = 'Add New Task';
+      document.getElementById('taskId').value = '';
+      taskForm.reset();
+      
+      // Set default times from preferred hours
+      startTimeInput.value = prefStartTime.value;
+      endTimeInput.value = prefEndTime.value;
+      
+      taskFormModal.style.display = 'flex';
+    }
+
+    function closeTaskFormModal() {
+      taskFormModal.style.display = 'none';
+    }
+
+    function navigateToPlanningPage() {
+      // Use Django's URL pattern name
+      window.location.href = "{% url 'planyourtasks' %}";
+    }
+
+    function savePreferredHours() {
+      const startTime = prefStartTime.value;
+      const endTime = prefEndTime.value;
+      
+      // Validate that end time is after start time
+      if (startTime >= endTime) {
+        alert('End time must be after start time');
+        return;
+      }
+      
+      // Save to localStorage (in a real app, you would send to server)
+      localStorage.setItem('prefStartTime', startTime);
+      localStorage.setItem('prefEndTime', endTime);
+      
+      alert('Preferred working hours saved successfully!');
+    }
+
+    function loadPreferredHours() {
+      // Load from localStorage (in a real app, you would fetch from server)
+      const savedStartTime = localStorage.getItem('prefStartTime');
+      const savedEndTime = localStorage.getItem('prefEndTime');
+      
+      if (savedStartTime) prefStartTime.value = savedStartTime;
+      if (savedEndTime) prefEndTime.value = savedEndTime;
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load saved preferred hours
+      loadPreferredHours();
+      
+      // Sidebar toggle for mobile
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+      });
+      
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      });
+      
+      // Notification panel toggle
+      notificationBtn.addEventListener('click', () => {
+        notificationPanel.classList.toggle('hidden');
+      });
+      
+      // Close notification panel when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!notificationBtn.contains(e.target) && !notificationPanel.contains(e.target)) {
+          notificationPanel.classList.add('hidden');
+        }
+      });
+      
+      // Task form modal
+      addTaskBtn.addEventListener('click', openTaskForm);
+      createTaskEmptyBtn.addEventListener('click', openTaskForm);
+      closeTaskForm.addEventListener('click', closeTaskFormModal);
+      
+      // Close modal when clicking outside
+      taskFormModal.addEventListener('click', (e) => {
+        if (e.target === taskFormModal) {
+          closeTaskFormModal();
+        }
+      });
+      
+      // Task form submission
+      taskForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate that end time is after start time
+        if (endTimeInput.value <= startTimeInput.value) {
+          alert('End time must be after start time');
+          return;
+        }
+        
+        alert('Task added successfully!');
+        closeTaskFormModal();
+      });
+      
+      // Filter buttons
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          // In a real app, you would filter tasks here
+        });
+      });
+      
+      // Search input
+      taskSearch.addEventListener('input', () => {
+        currentSearch = taskSearch.value;
+        // In a real app, you would filter tasks here
+      });
+      
+      // Plan Tasks button
+      planTasksBtn.addEventListener('click', navigateToPlanningPage);
+      
+      // Save preferred hours
+      savePrefHoursBtn.addEventListener('click', savePreferredHours);
+    });
+  </script>
+</body>
+</html>
