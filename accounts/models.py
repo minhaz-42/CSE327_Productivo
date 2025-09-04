@@ -65,6 +65,7 @@ class ScheduledTask(models.Model):
     duration = models.DurationField(null=True, blank=True)  # hours + minutes for scheduling
     start_time = models.TimeField(null=True, blank=True)    # set by scheduler
     end_time = models.TimeField(null=True, blank=True)      # set by scheduler
+    reminder = models.CharField(max_length=10, choices=REMINDER_CHOICES, default='none', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

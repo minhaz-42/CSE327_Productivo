@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Count, Q   
 from django.utils import timezone
-from datetime import timedelta
-from .models import Student, Task
+from datetime import datetime, timedelta
+from .models import Student, Task, ScheduledTask
 from django.utils.dateparse import parse_datetime
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
@@ -20,6 +20,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 from datetime import timedelta
+from .scheduler import run_scheduler
 
 # ------------------ PUBLIC VIEWS ------------------
 
@@ -758,23 +759,181 @@ def mark_notifications_read(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
-@login_required(login_url='login')
-def schedule_plan(request, plan_id):
-    plan = get_object_or_404(PlanYourTasks, id=plan_id)
+##just for testing
+#@login_required(login_url='login')
+#def schedule_plan(request, plan_id):
+ #   plan = get_object_or_404(PlanYourTasks, id=plan_id)
 
-    try:
-        run_scheduler(plan)
-        messages.success(request, "Tasks scheduled successfully!")
-    except ValidationError as e:
-        messages.error(request, str(e))
+  #  try:
+   #     run_scheduler(plan)
+    #    messages.success(request, "Tasks scheduled successfully!")
+    #except ValidationError as e:
+     #   messages.error(request, str(e))
 
     # Redirect to admin ScheduledTask list for now
-    return redirect("/admin/accounts/scheduledtask/")
+    #return redirect("/admin/accounts/scheduledtask/")
 
 
 
 # accounts/views.py
 from django.shortcuts import render
 
+
+@login_required
+def save_preferences(request):
+     if request.method == "POST":
+        try:
+            date_str = request.POST.get("date")
+            start_time_str = request.POST.get("start_time")
+            end_time_str = request.POST.get("end_time")
+
+            if not date_str or not start_time_str or not end_time_str:
+                return JsonResponse({"success": False, "error": "All fields are required."})
+
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+            start_time = datetime.strptime(start_time_str, "%H:%M").time()
+            end_time = datetime.strptime(end_time_str, "%H:%M").time()
+
+            # create or update the plan for that user + date
+            plan, created = PlanYourTasks.objects.update_or_create(
+                user=request.user,
+                date=date,
+                defaults={
+                    "preferred_start_time": start_time,
+                    "preferred_end_time": end_time,
+                }
+            )
+
+            return JsonResponse({"success": True, "message": "Preferences saved!"})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+     return JsonResponse({"success": False, "error": "Invalid request method"})
+
+@login_required
+@csrf_exempt
+def add_plantask(request):
+    if request.method == 'POST':
+        try:
+            # Extract data from request
+            plan_date_str = request.POST.get('plan_date')
+            plan_start_str = request.POST.get('plan_start_time')
+            plan_end_str = request.POST.get('plan_end_time')
+            title = request.POST.get('title')
+            description = request.POST.get('description', '')
+            priority = request.POST.get('priority', 'medium')
+            category = request.POST.get('category', 'none')
+            duration_str = request.POST.get('duration')  # format: HH:MM
+            start_time_str = request.POST.get('start_time')  # optional
+            end_time_str = request.POST.get('end_time')      # optional
+            reminder = request.POST.get('reminder', 'none')
+
+            # Validate required fields
+            if not (plan_date_str and plan_start_str and plan_end_str and title and duration_str):
+                return JsonResponse({'success': False, 'error': 'Missing required fields.'})
+
+            # Convert plan date and times to proper objects
+            plan_date = datetime.strptime(plan_date_str, "%Y-%m-%d").date()
+            plan_start_time = datetime.strptime(plan_start_str, "%H:%M").time()
+            plan_end_time = datetime.strptime(plan_end_str, "%H:%M").time()
+
+            # Get or create PlanYourTasks for the user
+            plan, _ = PlanYourTasks.objects.get_or_create(
+                user=request.user,
+                date=plan_date,
+                defaults={
+                    'preferred_start_time': plan_start_time,
+                    'preferred_end_time': plan_end_time
+                }
+            )
+
+            # Convert duration string "HH:MM" to timedelta
+            hours, minutes = map(int, duration_str.split(":"))
+            duration = timedelta(hours=hours, minutes=minutes)
+
+            # Convert optional start and end times
+            start_time = datetime.strptime(start_time_str, "%H:%M").time() if start_time_str != "null" else None
+            end_time = datetime.strptime(end_time_str, "%H:%M").time() if end_time_str != "null" else None
+
+            # Create ScheduledTask
+            ScheduledTask.objects.create(
+                plan=plan,
+                title=title,
+                description=description,
+                priority=priority,
+                category=category,
+                duration=duration,
+                start_time=start_time,
+                end_time=end_time,
+                reminder=reminder
+            )
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@login_required
 def plan_your_tasks(request):
-    return render(request, "planyourtask.html")
+    # Get the selected date (e.g., from a GET parameter or default to today)
+    date_str = request.GET.get('date')  # ?date=2025-09-04
+    if date_str:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    else:
+        selected_date = timezone.now().date()
+
+    try:
+        plan = PlanYourTasks.objects.get(user=request.user, date=selected_date)
+        tasks = plan.tasks.all().order_by('start_time')  # related_name='tasks'
+    except PlanYourTasks.DoesNotExist:
+        tasks = []
+
+    context = {
+        'tasks': tasks,
+        'selected_date': selected_date,
+    }
+
+    return render(request, 'planyourtask.html', context)
+
+
+def auto_schedule(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            plan_date_str = data.get('plan_date')
+            if not plan_date_str:
+                return JsonResponse({'success': False, 'error': 'Missing plan date.'})
+
+            plan_date = datetime.strptime(plan_date_str, "%Y-%m-%d").date()
+            plan = PlanYourTasks.objects.get(user=request.user, date=plan_date)
+
+            # Run scheduler (updates ScheduledTask start/end times)
+            updated_tasks = run_scheduler(plan)
+
+            # Serialize scheduled tasks
+            tasks_data = []
+            for t in updated_tasks:
+                tasks_data.append({
+                    'id': t.id,
+                    'title': t.title,
+                    'description': t.description,
+                    'priority': t.priority,
+                    'category': t.category,
+                    'start_time': t.start_time.strftime("%H:%M") if t.start_time else "",
+                    'end_time': t.end_time.strftime("%H:%M") if t.end_time else "",
+                    'duration': str(t.duration) if t.duration else "",
+                    'reminder': getattr(t, 'reminder', ''),
+                })
+
+            return JsonResponse({'success': True, 'tasks': tasks_data})
+
+        except PlanYourTasks.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'No plan found for that date.'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})

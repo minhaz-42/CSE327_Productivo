@@ -933,69 +933,33 @@
 
         <!-- Task List -->
         <div class="task-list" id="taskList">
-          <!-- Task 1 -->
-          <div class="task-item high">
+        {% if tasks %}
+         {% for task in tasks %}
+          <div class="task-item {{ task.priority|lower }}">
             <div class="task-header">
-              <h4>Complete Project Proposal</h4>
-              <span class="priority-badge high">High</span>
+              <h4>{{ task.title }}</h4>
+              <span class="priority-badge {{ task.priority|lower }}">{{ task.priority|capfirst }}</span>
             </div>
-            <p>Finish the project proposal document and send to client for review</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Today, 3:00 PM</span>
-              <span><i class="fas fa-tag"></i> Work</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete">
-                <i class="fas fa-check"></i> Complete
-              </button>
+            <p>{{task.description}}</p>
+              <div class="task-meta">
+             {% if task.start_time %}
+            <span><i class="fas fa-clock"></i> {{ task.start_time|time:"H:i" }} - {{ task.end_time|time:"H:i" }}</span>
+            {% else %}
+            <span><i class="fas fa-clock"></i> Flexible Task with duration {{ task.duration }}</span>
+            {% endif %}
+            {% if task.category %}
+            <span><i class="fas fa-tag"></i> {{ task.category }}</span>
+            {% endif %}
             </div>
           </div>
+           {% endfor %}
+         {% else %}
+          <p>No tasks scheduled for {{ selected_date }}.</p>
+         {% endif %}
+         </div>
           
-          <!-- Task 2 -->
-          <div class="task-item medium">
-            <div class="task-header">
-              <h4>Team Meeting</h4>
-              <span class="priority-badge medium">Medium</span>
-            </div>
-            <p>Weekly team sync to discuss project progress and blockers</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> Tomorrow, 10:00 AM</span>
-              <span><i class="fas fa-tag"></i> Work</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete">
-                <i class="fas fa-check"></i> Complete
-              </button>
-            </div>
-          </div>
           
-          <!-- Task 3 -->
-          <div class="task-item low">
-            <div class="task-header">
-              <h4>Grocery Shopping</h4>
-              <span class="priority-badge low">Low</span>
-            </div>
-            <p>Buy groceries for the week - fruits, vegetables, milk, eggs</p>
-            <div class="task-meta">
-              <span><i class="fas fa-clock"></i> This weekend</span>
-              <span><i class="fas fa-tag"></i> Personal</span>
-            </div>
-            <div class="task-actions">
-              <button class="action-btn edit">
-                <i class="fas fa-pencil-alt"></i> Edit
-              </button>
-              <button class="action-btn complete">
-                <i class="fas fa-check"></i> Complete
-              </button>
-            </div>
-          </div>
-        </div>
+    
 
         <!-- Empty State (Hidden by default) -->
         <div class="empty-state" id="emptyState" style="display: none;">
@@ -1053,12 +1017,17 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="start_time">Start Time*</label>
-              <input type="time" id="start_time" required>
+              <label for="start_time">Start Time</label>
+              <input type="time" id="task_start_time">
             </div>
             <div class="form-group">
-              <label for="end_time">End Time*</label>
-              <input type="time" id="end_time" required>
+              <label for="end_time">End Time</label>
+              <input type="time" id="task_end_time">
+            </div>
+            <div class="form-group">
+              <label for="duration">Duration</label>
+              <input type="number" id="durationHours" placeholder="Hours" min="0">
+              <input type="number" id="durationMinutes" placeholder="Minutes" min="0" max="59">
             </div>
           </div>
           <div class="form-group">
@@ -1100,8 +1069,9 @@
     const savePrefHoursBtn = document.getElementById('savePrefHours');
     const prefStartTime = document.getElementById('prefStartTime');
     const prefEndTime = document.getElementById('prefEndTime');
-    const startTimeInput = document.getElementById('start_time');
-    const endTimeInput = document.getElementById('end_time');
+    const prefStartDate = document.getElementById('prefStartDate');
+    //const startTimeInput = document.getElementById('task_start_time');
+    //const endTimeInput = document.getElementById('task_end_time');
 
     // State
     let tasks = [];
@@ -1115,8 +1085,8 @@
       taskForm.reset();
       
       // Set default times from preferred hours
-      startTimeInput.value = prefStartTime.value;
-      endTimeInput.value = prefEndTime.value;
+      //startTimeInput.value = prefStartTime.value;
+      //endTimeInput.value = prefEndTime.value;
       
       taskFormModal.style.display = 'flex';
     }
@@ -1130,31 +1100,69 @@
       window.location.href = "{% url 'planyourtasks' %}";
     }
 
-    function savePreferredHours() {
+  document.addEventListener('DOMContentLoaded', function() {
+    const savePrefHoursBtn = document.getElementById('savePrefHours');
+    savePrefHoursBtn.addEventListener('click', function() {
+        
       const startTime = prefStartTime.value;
       const endTime = prefEndTime.value;
+      const date = prefStartDate.value;
       
+      //check no fields are missing
+      if (!date || !startTime || !endTime) {
+        alert("Please fill in all fields.");
+       return;
+       }
+
       // Validate that end time is after start time
       if (startTime >= endTime) {
         alert('End time must be after start time');
         return;
       }
       
-      // Save to localStorage (in a real app, you would send to server)
+      // Save to localStorage 
       localStorage.setItem('prefStartTime', startTime);
       localStorage.setItem('prefEndTime', endTime);
+      localStorage.setItem('prefStartDate', date);
       
-      alert('Preferred working hours saved successfully!');
-    }
+      fetch("{% url 'save_preferences' %}", {
+       method: "POST",
+       headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/x-www-form-urlencoded",
+       },
+      body: new URLSearchParams({
+      date: date,
+      start_time: startTime,
+      end_time: endTime,
+      }),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        alert("Preferences saved Successfully! ");
+      } else {
+        alert("Error: " + data.error);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("Something went wrong while saving preferences!");
+    });
+     });
+});
 
     function loadPreferredHours() {
       // Load from localStorage (in a real app, you would fetch from server)
       const savedStartTime = localStorage.getItem('prefStartTime');
       const savedEndTime = localStorage.getItem('prefEndTime');
+      const savedDate = localStorage.getItem('prefStartDate');
       
       if (savedStartTime) prefStartTime.value = savedStartTime;
       if (savedEndTime) prefEndTime.value = savedEndTime;
+      if (savedDate) prefStartDate.value = savedDate;
     }
+ 
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', function() {
@@ -1200,15 +1208,126 @@
       taskForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Validate that end time is after start time
-        if (endTimeInput.value <= startTimeInput.value) {
-          alert('End time must be after start time');
-          return;
-        }
         
-        alert('Task added successfully!');
-        closeTaskFormModal();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const priority = document.getElementById('priority').value;
+      const category = document.getElementById('category').value;
+      const reminder = document.getElementById('reminder').value;
+
+      // Duration
+      const hours = parseInt(document.getElementById('durationHours').value, 10) || 0;
+      const minutes = parseInt(document.getElementById('durationMinutes').value, 10) || 0;
+      const duration = `${hours}:${minutes}`;
+  
+      // Optional user-defined start/end for fixed tasks
+      const startTimeInput = document.getElementById('task_start_time').value; // HH:MM
+      const endTimeInput = document.getElementById('task_end_time').value;     // HH:MM
+
+      // Plan date from preferred hours
+      const planDate = localStorage.getItem('prefStartDate');
+      const planStartTime = localStorage.getItem('prefStartTime');
+      const planEndTime = localStorage.getItem('prefEndTime');
+
+     fetch("/add-plantask/", {
+       method: "POST",
+        headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/x-www-form-urlencoded",
+       },
+    body: new URLSearchParams({
+      title,
+      description,
+      priority,
+      category,
+      reminder,
+      duration,
+      plan_date: planDate,
+      plan_start_time: planStartTime,
+      plan_end_time: planEndTime,
+      start_time: startTimeInput ? startTimeInput : null,
+      end_time: endTimeInput ? endTimeInput : null
+     
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+      alert("Task added successfully!");
+         taskForm.reset();
+         window.location.reload();
+      } else {
+         alert("Error: " + data.error);
+       }
+     })
+      .catch(err => {
+       console.error(err);
+       alert("Something went wrong!");
       });
+        closeTaskFormModal();
+      
+        });
+         
+        planTasksBtn.addEventListener('click', function() {
+      
+      
+       const planDate = localStorage.getItem('prefStartDate');
+    
+       if (!planDate) {
+        alert("No plan selected for scheduling.");
+        return;
+    }
+
+    fetch("/auto-schedule/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ plan_date: planDate }),
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = ''; // clear old tasks
+
+            data.tasks.forEach(task => {
+                const taskDiv = document.createElement('div');
+                taskDiv.classList.add('task-item', task.priority);
+
+                taskDiv.innerHTML = `
+                    <div class="task-header">
+                        <h4>${task.title}</h4>
+                        <span class="priority-badge ${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+                    </div>
+                    <p>${task.description}</p>
+                    <div class="task-meta">
+                        <span><i class="fas fa-clock"></i> ${task.start_time} - ${task.end_time}</span>
+                        <span><i class="fas fa-tag"></i> ${task.category}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="action-btn edit"><i class="fas fa-pencil-alt"></i> Edit</button>
+                        <button class="action-btn complete"><i class="fas fa-check"></i> Complete</button>
+                    </div>
+                `;
+
+                taskList.appendChild(taskDiv);
+            });
+
+            alert("Tasks auto-scheduled successfully!");
+
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong during auto-scheduling.");
+    });
+    
+   });
+
       
       // Filter buttons
       filterBtns.forEach(btn => {
@@ -1227,10 +1346,11 @@
       });
       
       // Plan Tasks button
-      planTasksBtn.addEventListener('click', navigateToPlanningPage);
+      //planTasksBtn.addEventListener('click', navigateToPlanningPage);
+   
       
-      // Save preferred hours
-      savePrefHoursBtn.addEventListener('click', savePreferredHours);
+      
+      
     });
   </script>
 </body>

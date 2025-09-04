@@ -19,7 +19,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name="logout"),
     path('profile_update/', views.profile_update, name="profile_update"),
     path('reset_password/', views.reset_password, name="reset_password"),
-    path('schedule-plan/<int:plan_id>/', views.schedule_plan, name='schedule_plan'),
+    #path('schedule-plan/<int:plan_id>/', views.schedule_plan, name='schedule_plan'), just a test
     
     # Task management
     path('add-task/', views.add_task, name='add-task'),
@@ -31,7 +31,10 @@ urlpatterns = [
     
     #JSON feed for FullCalendar
     path('api/task-events/', views.task_events, name='task_events'),
-    path("planyourtasks/", views.plan_your_tasks, name="planyourtasks"),    
+    path("planyourtasks/", views.plan_your_tasks, name="planyourtasks"),   
+    path("save-preferences/", views.save_preferences, name="save_preferences"),
+    path("add-plantask/", views.add_plantask, name="addplantask"),
+    path("auto-schedule/", views.auto_schedule, name="auto_schedule"),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
