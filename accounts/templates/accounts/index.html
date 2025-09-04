@@ -1474,7 +1474,7 @@ document.addEventListener('DOMContentLoaded', () => {
       startBtn.disabled = false;
       pauseBtn.disabled = true;
 
-      if (timeRemaining <= 0) {
+      if (timeRemaining <= 0) { //if no more time remaining then task finishes
         alert('Task completed!');
         window.location.reload();
         return;
@@ -1502,17 +1502,17 @@ document.addEventListener('DOMContentLoaded', () => {
       
       updateTimerDisplay();
     }
-  }, 1000);
+  }, 1000); //every second time will be updated 
 }
-
-function pauseTimer() {
+ //function to pause timer
+function pauseTimer() { 
   if (!isRunning) return;
   isPaused = !isPaused;
   pauseBtn.innerHTML = isPaused
     ? '<i class="fas fa-play"></i> Resume'
     : '<i class="fas fa-pause"></i> Pause';
 }
-
+//function to reset timer
 function resetTimer() {
   clearInterval(timerInterval);
   totalSeconds = Math.min(workDuration, timeRemaining);
