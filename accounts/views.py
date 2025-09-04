@@ -787,6 +787,16 @@ def save_preferences(request):
             start_time_str = request.POST.get("start_time")
             end_time_str = request.POST.get("end_time")
 
+            existing_tasks = Task.objects.filter(
+                user=request.user,
+                start_time__date= date_str
+            )
+            if existing_tasks.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'You already have tasks scheduled for this date.'
+                })
+
             if not date_str or not start_time_str or not end_time_str:
                 return JsonResponse({"success": False, "error": "All fields are required."})
 
@@ -937,3 +947,47 @@ def auto_schedule(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+
+@csrf_exempt
+def save_all_tasks(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            plan_date_str = data.get('plan_date')
+            if not plan_date_str:
+                return JsonResponse({'success': False, 'error': 'No plan date provided.'})
+
+            plan_date = datetime.strptime(plan_date_str, "%Y-%m-%d").date()
+            plan = PlanYourTasks.objects.filter(user=request.user, date=plan_date).first()
+            if not plan:
+                return JsonResponse({'success': False, 'error': 'No plan found for this date.'})
+
+            scheduled_tasks = ScheduledTask.objects.filter(plan=plan)
+            for st in scheduled_tasks:
+                start_dt = datetime.combine(plan.date, st.start_time)
+                end_dt = datetime.combine(plan.date, st.end_time)
+
+                # Save to Task model
+                Task.objects.create(
+                    user=request.user,
+                    title=st.title,
+                    description=st.description,
+                    priority=st.priority,
+                    category=st.category,
+                    start_time= start_dt,
+                    end_time= end_dt,
+                    reminder=getattr(st, 'reminder', 'none'),
+                    completed=False
+                )
+
+            # Delete ScheduledTasks and the Plan
+            scheduled_tasks.delete()
+            plan.delete()
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})

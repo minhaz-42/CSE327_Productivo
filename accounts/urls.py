@@ -35,6 +35,8 @@ urlpatterns = [
     path("save-preferences/", views.save_preferences, name="save_preferences"),
     path("add-plantask/", views.add_plantask, name="addplantask"),
     path("auto-schedule/", views.auto_schedule, name="auto_schedule"),
+    path("save-all-tasks/", views.save_all_tasks, name="save_all_tasks"),
+
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

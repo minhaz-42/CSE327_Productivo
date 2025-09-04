@@ -837,17 +837,7 @@
       </div>
 
       <div class="header-right">
-        <!-- Notification Button -->
-        <div class="notification-wrapper">
-          <button class="notification-btn" id="notificationBtn">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge"></span>
-          </button>
-          <div class="notification-panel hidden" id="notificationPanel">
-            <p>No new notifications</p>
-          </div>
-        </div>
-        
+      
         <!-- Logout Button - Updated with Django URL -->
         <a href="{% url 'logout' %}" class="logout-btn">
           <i class="fas fa-sign-out-alt"></i>
@@ -856,7 +846,7 @@
        
         <!-- User Avatar -->
         <div class="user-profile">
-          <div class="avatar">U</div>
+          <div class="avatar">{{user.username|slice:"0:1"|upper}}</div>
         </div>
       </div>
     </header>
@@ -924,12 +914,14 @@
             </button>
           </div>
           
+          {% if tasks %}
           <div class="">
             <button class="plan-btn" id="planTasksBtn">
             <i class="fas fa-calendar-plus"></i> Auto Schedule
           </button>
           </div>
         </div>
+         {% endif %}
 
         <!-- Task List -->
         <div class="task-list" id="taskList">
@@ -954,7 +946,7 @@
           </div>
            {% endfor %}
          {% else %}
-          <p>No tasks scheduled for {{ selected_date }}.</p>
+          <p>No tasks added for Planning.</p>
          {% endif %}
          </div>
           
@@ -962,7 +954,7 @@
     
 
         <!-- Empty State (Hidden by default) -->
-        <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state" id="emptyState" style="display: none">
           <i class="fas fa-tasks"></i>
           <h3>No tasks found</h3>
           <p>Try changing your filters or create a new task</p>
@@ -975,6 +967,10 @@
         <button class="primary-btn" id="addTaskBtn">
           <i class="fas fa-plus"></i> Add New Task
         </button>
+
+        <button type="button" id="saveAllTasksBtn" class="primary-btn" disabled>
+       <i class="fas fa-layer-group"></i> Save All Tasks
+      </button>
       </div>
     </main>
 
@@ -1054,8 +1050,8 @@
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationPanel = document.getElementById('notificationPanel');
+   // const notificationBtn = document.getElementById('notificationBtn');
+   // const notificationPanel = document.getElementById('notificationPanel');
     const addTaskBtn = document.getElementById('addTaskBtn');
     const createTaskEmptyBtn = document.getElementById('createTaskEmptyBtn');
     const taskFormModal = document.getElementById('taskFormModal');
@@ -1070,6 +1066,7 @@
     const prefStartTime = document.getElementById('prefStartTime');
     const prefEndTime = document.getElementById('prefEndTime');
     const prefStartDate = document.getElementById('prefStartDate');
+    const saveAllTasksBtn = document.getElementById('saveAllTasksBtn');
     //const startTimeInput = document.getElementById('task_start_time');
     //const endTimeInput = document.getElementById('task_end_time');
 
@@ -1168,7 +1165,13 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Load saved preferred hours
       loadPreferredHours();
-      
+
+       //open task form
+       addTaskBtn.addEventListener('click', openTaskForm);
+       // Task form modal
+      createTaskEmptyBtn.addEventListener('click', openTaskForm);
+      closeTaskForm.addEventListener('click', closeTaskFormModal);
+   
       // Sidebar toggle for mobile
       sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('active');
@@ -1180,34 +1183,9 @@
         sidebarOverlay.classList.remove('active');
       });
       
-      // Notification panel toggle
-      notificationBtn.addEventListener('click', () => {
-        notificationPanel.classList.toggle('hidden');
-      });
-      
-      // Close notification panel when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!notificationBtn.contains(e.target) && !notificationPanel.contains(e.target)) {
-          notificationPanel.classList.add('hidden');
-        }
-      });
-      
-      // Task form modal
-      addTaskBtn.addEventListener('click', openTaskForm);
-      createTaskEmptyBtn.addEventListener('click', openTaskForm);
-      closeTaskForm.addEventListener('click', closeTaskFormModal);
-      
-      // Close modal when clicking outside
-      taskFormModal.addEventListener('click', (e) => {
-        if (e.target === taskFormModal) {
-          closeTaskFormModal();
-        }
-      });
-      
-      // Task form submission
+  
       taskForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
+      e.preventDefault();
         
       const title = document.getElementById('title').value;
       const description = document.getElementById('description').value;
@@ -1228,6 +1206,12 @@
       const planDate = localStorage.getItem('prefStartDate');
       const planStartTime = localStorage.getItem('prefStartTime');
       const planEndTime = localStorage.getItem('prefEndTime');
+
+     if ((duration === "0:0" && (!startTimeInput || !endTimeInput)) ||
+        (duration !== "0:0" && (!startTimeInput && endTimeInput || startTimeInput && !endTimeInput))) {
+        alert("Please provide either a valid duration OR both start and end times.");
+        return;
+       }
 
      fetch("/add-plantask/", {
        method: "POST",
@@ -1255,7 +1239,7 @@
       if (data.success) {
       alert("Task added successfully!");
          taskForm.reset();
-         window.location.reload();
+         window.location.href = `/planyourtasks/?date=${planDate}`;
       } else {
          alert("Error: " + data.error);
        }
@@ -1266,8 +1250,19 @@
       });
         closeTaskFormModal();
       
-        });
+    });
+      
+      
+      // Close modal when clicking outside
+   taskFormModal.addEventListener('click', (e) => {
+        if (e.target === taskFormModal) {
+          closeTaskFormModal();
+        }
+      });
+      
+   
          
+        //autoscheduling button 
         planTasksBtn.addEventListener('click', function() {
       
       
@@ -1276,18 +1271,18 @@
        if (!planDate) {
         alert("No plan selected for scheduling.");
         return;
-    }
+        }
 
-    fetch("/auto-schedule/", {
+       fetch("/auto-schedule/", {
         method: "POST",
         headers: {
             "X-CSRFToken": "{{ csrf_token }}",
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ plan_date: planDate }),
-    })
-    .then(res => res.json())
-    .then(data => {
+      })
+     .then(res => res.json())
+     .then(data => {
         if (data.success) {
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = ''; // clear old tasks
@@ -1314,6 +1309,7 @@
 
                 taskList.appendChild(taskDiv);
             });
+            document.getElementById("saveAllTasksBtn").disabled = false;
 
             alert("Tasks auto-scheduled successfully!");
 
@@ -1327,6 +1323,46 @@
     });
     
    });
+
+
+
+   //save task button 
+  saveAllTasksBtn.addEventListener('click', function() {
+ 
+    // Plan date from localStorage
+    
+    const planDate = localStorage.getItem('prefStartDate');
+
+    fetch("/save-all-tasks/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ plan_date: planDate })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Clear local storage
+            localStorage.removeItem('prefStartDate');
+            localStorage.removeItem('prefStartTime');
+            localStorage.removeItem('prefEndTime');
+
+            // Redirect with success message
+            alert("Tasks saved successfully!");
+            window.location.href = "/task/";  //redirects to task page
+        } else {
+            alert("Error: " + data.error);
+        }
+     })
+    .catch(err => {
+        console.error(err);
+        alert("Something went wrong!");
+    });
+    
+   });
+
 
       
       // Filter buttons
