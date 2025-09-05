@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 from collections import Counter
 from accounts.models import PlanYourTasks, ScheduledTask, Task
+from django.utils import timezone
 
 PRIORITY_ORDER = {"high": 1, "medium": 2, "low": 3}  #ranking priorities to make sorting easier
 
@@ -29,8 +30,19 @@ def run_scheduler(plan: PlanYourTasks):
 
     # Collect historical completion data 
     completed_tasks = Task.objects.filter(user=user, completed=True)
-    completion_hours = [t.end_time.hour for t in completed_tasks if t.end_time] #finding the hours at which the tasks were previously completed
+    #completion_hours = [t.start_time.hour for t in completed_tasks if t.start_time]
+    #completion_hours = [t.end_time.hour for t in completed_tasks if t.end_time] #finding the hours at which the tasks were previously completed
+    completion_hours = []
+
+   
+    for t in completed_tasks:
+      if t.start_time:
+        # Convert to local time 
+         local_dt = timezone.localtime(t.start_time)
+         completion_hours.append(local_dt.hour)
+
     hour_counts = Counter(completion_hours)  #maps each end time to the frequency of completion
+    
 
     # Building available gaps from fixed tasks 
     start_dt = datetime.combine(plan.date, plan.preferred_start_time)
